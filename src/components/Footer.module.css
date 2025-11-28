@@ -1,0 +1,32 @@
+/* Footer Styles */
+.footer {
+  @apply border-t border-border/50 py-8 px-4;
+}
+
+.container {
+  @apply max-w-7xl mx-auto;
+}
+
+.content {
+  @apply flex flex-col md:flex-row justify-between items-center gap-4;
+}
+
+.branding {
+  @apply flex items-center gap-2 text-muted-foreground;
+}
+
+.heart {
+  @apply w-4 h-4 text-primary fill-primary;
+}
+
+.socialLinks {
+  @apply flex gap-4;
+}
+
+.socialLink {
+  @apply text-muted-foreground hover:text-primary transition-colors;
+}
+
+.copyright {
+  @apply text-muted-foreground text-sm;
+}

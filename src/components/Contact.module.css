@@ -1,0 +1,96 @@
+/* Contact Section Styles */
+.section {
+  @apply py-20 px-4 md:px-8;
+}
+
+.container {
+  @apply max-w-7xl mx-auto;
+}
+
+.header {
+  @apply text-center mb-16;
+}
+
+.heading {
+  @apply text-4xl md:text-5xl font-bold mb-4;
+}
+
+.description {
+  @apply text-muted-foreground text-lg max-w-2xl mx-auto;
+}
+
+.contentGrid {
+  @apply grid md:grid-cols-2 gap-12 max-w-5xl mx-auto;
+}
+
+.infoSection {
+  @apply space-y-8;
+}
+
+.infoHeader {
+  @apply text-2xl font-bold mb-6;
+}
+
+.infoDescription {
+  @apply text-muted-foreground mb-8;
+}
+
+.contactList {
+  @apply space-y-6;
+}
+
+.contactCard {
+  @apply card-glass p-4 cursor-hover;
+}
+
+.contactCardContent {
+  @apply flex items-center gap-4;
+}
+
+.iconWrapper {
+  @apply p-3 rounded-full bg-primary/10;
+}
+
+.contactLabel {
+  @apply font-semibold text-sm;
+}
+
+.contactValue {
+  @apply text-muted-foreground text-sm;
+}
+
+.formCard {
+  @apply card-glass p-8;
+}
+
+.form {
+  @apply space-y-6;
+}
+
+.fieldWrapper {
+  @apply relative;
+}
+
+.label {
+  @apply absolute left-3 transition-all pointer-events-none;
+}
+
+.labelFloating {
+  @apply top-0 text-xs text-primary bg-card px-1;
+}
+
+.labelDefault {
+  @apply top-4 text-sm text-muted-foreground;
+}
+
+.textarea {
+  @apply min-h-[120px] cursor-hover resize-none;
+}
+
+.submitButton {
+  @apply w-full gap-2 cursor-hover relative overflow-hidden;
+}
+
+.successMessage {
+  @apply text-green-500 text-center text-sm;
+}

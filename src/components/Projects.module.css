@@ -1,0 +1,68 @@
+/* Projects Section Styles */
+.section {
+  @apply py-20 px-4 md:px-8;
+}
+
+.container {
+  @apply max-w-7xl mx-auto;
+}
+
+.header {
+  @apply text-center mb-16;
+}
+
+.heading {
+  @apply text-4xl md:text-5xl font-bold mb-4;
+}
+
+.description {
+  @apply text-muted-foreground text-lg max-w-2xl mx-auto;
+}
+
+.projectsGrid {
+  @apply grid md:grid-cols-2 gap-8;
+}
+
+.card {
+  @apply card-glass overflow-hidden h-full relative;
+}
+
+.imageWrapper {
+  @apply relative overflow-hidden;
+}
+
+.image {
+  @apply w-full h-48 object-cover;
+}
+
+.imageOverlay {
+  @apply absolute inset-0 bg-gradient-to-t from-background/90 to-transparent;
+}
+
+.content {
+  @apply p-6;
+}
+
+.title {
+  @apply text-2xl font-bold mb-3;
+}
+
+.projectDescription {
+  @apply text-muted-foreground mb-4;
+}
+
+.tagsWrapper {
+  @apply flex flex-wrap gap-2 mb-6;
+}
+
+.badge {
+  @apply cursor-hover;
+}
+
+.buttonsWrapper {
+  @apply flex gap-3;
+}
+
+.button {
+  @apply gap-2 cursor-hover;
+}

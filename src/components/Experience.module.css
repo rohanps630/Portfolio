@@ -1,0 +1,88 @@
+/* Experience Section Styles */
+.section {
+  @apply py-20 px-4 md:px-8 relative;
+}
+
+.timeline {
+  @apply absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-primary to-transparent hidden md:block;
+}
+
+.container {
+  @apply max-w-7xl mx-auto;
+}
+
+.header {
+  @apply text-center mb-16;
+}
+
+.heading {
+  @apply text-4xl md:text-5xl font-bold mb-4;
+}
+
+.description {
+  @apply text-muted-foreground text-lg max-w-2xl mx-auto;
+}
+
+.itemsWrapper {
+  @apply space-y-12;
+}
+
+.itemContainer {
+  @apply flex gap-8 items-center;
+}
+
+.timelineDot {
+  @apply hidden md:flex relative z-10;
+}
+
+.dot {
+  @apply w-16 h-16 rounded-full bg-primary/20 border-4 border-primary flex items-center justify-center;
+}
+
+.contentWrapper {
+  @apply flex-1;
+}
+
+.card {
+  @apply card-glass p-6 cursor-hover;
+}
+
+.cardHeader {
+  @apply flex items-start justify-between mb-3;
+}
+
+.titleGroup {
+  @apply space-y-1;
+}
+
+.title {
+  @apply text-2xl font-bold mb-1;
+}
+
+.company {
+  @apply text-primary font-medium;
+}
+
+.year {
+  @apply text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full;
+}
+
+.cardDescription {
+  @apply text-muted-foreground mb-4;
+}
+
+.toggleButton {
+  @apply flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors;
+}
+
+.achievementsList {
+  @apply mt-4 space-y-2;
+}
+
+.achievement {
+  @apply flex items-start gap-2 text-sm text-muted-foreground;
+}
+
+.achievementBullet {
+  @apply text-primary mt-1;
+}

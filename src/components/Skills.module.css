@@ -1,0 +1,40 @@
+/* Skills Section Styles */
+.section {
+  @apply py-20 px-4 md:px-8 bg-secondary/30;
+}
+
+.container {
+  @apply max-w-7xl mx-auto;
+}
+
+.header {
+  @apply text-center mb-16;
+}
+
+.heading {
+  @apply text-4xl md:text-5xl font-bold mb-4;
+}
+
+.description {
+  @apply text-muted-foreground text-lg max-w-2xl mx-auto;
+}
+
+.categoriesGrid {
+  @apply grid md:grid-cols-3 gap-8;
+}
+
+.card {
+  @apply card-glass p-6 h-full;
+}
+
+.cardTitle {
+  @apply text-xl font-bold mb-4 text-center;
+}
+
+.skillsWrapper {
+  @apply flex flex-wrap gap-2 justify-center;
+}
+
+.skillBadge {
+  @apply text-sm cursor-default;
+}

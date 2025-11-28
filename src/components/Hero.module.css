@@ -1,0 +1,88 @@
+/* Hero Section Styles */
+.section {
+  @apply min-h-screen flex items-center justify-center py-20 px-4 md:px-8 relative overflow-hidden;
+}
+
+.backgroundWrapper {
+  @apply absolute inset-0 overflow-hidden pointer-events-none;
+}
+
+.orb {
+  @apply absolute w-96 h-96 rounded-full blur-3xl;
+}
+
+.orbPrimary {
+  @apply top-1/4 left-1/4 bg-primary/20;
+}
+
+.orbAccent {
+  @apply bottom-1/4 right-1/4 bg-accent/20;
+}
+
+.orbCenter {
+  @apply top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5;
+}
+
+.container {
+  @apply max-w-4xl mx-auto text-center relative z-10;
+}
+
+.badge {
+  @apply mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border border-border/50 backdrop-blur-sm;
+}
+
+.badgeText {
+  @apply text-sm text-muted-foreground;
+}
+
+.heading {
+  @apply text-5xl md:text-7xl font-bold mb-6 overflow-hidden;
+}
+
+.nameChar {
+  @apply gradient-text inline-block;
+}
+
+.titleWrapper {
+  @apply h-8 mb-4;
+}
+
+.title {
+  @apply text-xl md:text-2xl text-muted-foreground;
+}
+
+.bio {
+  @apply text-lg text-muted-foreground mb-12 max-w-2xl mx-auto;
+}
+
+.ctaWrapper {
+  @apply flex flex-wrap gap-4 justify-center mb-12;
+}
+
+.magneticButton {
+  @apply relative;
+}
+
+.primaryButton {
+  @apply gap-2 cursor-hover relative overflow-hidden;
+}
+
+.buttonOverlay {
+  @apply absolute inset-0 bg-primary/20;
+}
+
+.buttonContent {
+  @apply relative z-10;
+}
+
+.secondaryButton {
+  @apply gap-2 cursor-hover;
+}
+
+.socialWrapper {
+  @apply flex gap-4 justify-center;
+}
+
+.socialLink {
+  @apply p-3 rounded-full bg-secondary/50 hover:bg-secondary border border-border/50 transition-all;
+}

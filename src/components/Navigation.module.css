@@ -1,0 +1,72 @@
+/* Navigation Styles */
+.nav {
+  @apply fixed top-0 left-0 right-0 z-40 transition-all duration-300;
+}
+
+.navScrolled {
+  @apply bg-background/80 backdrop-blur-lg border-b border-border/50 py-4;
+}
+
+.navDefault {
+  @apply bg-transparent py-6;
+}
+
+.container {
+  @apply max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between;
+}
+
+.logo {
+  @apply text-2xl font-bold gradient-text cursor-hover;
+}
+
+.desktopMenu {
+  @apply hidden md:flex gap-8;
+}
+
+.navLink {
+  @apply relative text-sm font-medium transition-colors cursor-hover;
+}
+
+.navLinkActive {
+  @apply text-primary;
+}
+
+.navLinkInactive {
+  @apply text-muted-foreground hover:text-foreground;
+}
+
+.activeIndicator {
+  @apply absolute -bottom-1 left-0 right-0 h-0.5 bg-primary;
+}
+
+.mobileMenuButton {
+  @apply md:hidden p-2 cursor-hover;
+}
+
+.mobileMenuOverlay {
+  @apply fixed inset-0 z-30 md:hidden;
+}
+
+.mobileMenuBackground {
+  @apply absolute inset-0 bg-background/95 backdrop-blur-lg;
+}
+
+.mobileMenuContent {
+  @apply absolute inset-0 flex items-center justify-center;
+}
+
+.mobileMenuNav {
+  @apply flex flex-col gap-8;
+}
+
+.mobileNavLink {
+  @apply text-3xl font-bold text-center cursor-hover;
+}
+
+.mobileNavLinkActive {
+  @apply gradient-text;
+}
+
+.mobileNavLinkInactive {
+  @apply text-foreground hover:text-primary;
+}
