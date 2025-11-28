@@ -255,8 +255,8 @@ export const portfolioData: PortfolioData = {
     name: "Rohan P. Suresh",
     copyright: "© 2025 All rights reserved.",
     socialLinks: [
-      { name: "GitHub", url: "https://github.com", icon: "github" },
-      { name: "LinkedIn", url: "https://linkedin.com", icon: "linkedin" },
+      { name: "GitHub", url: "https://github.com/rohanps630", icon: "github" },
+      { name: "LinkedIn", url: "https://www.linkedin.com/in/rohanpsuresh", icon: "linkedin" },
       { name: "Email", url: "mailto:rohanpsuresh@gmail.com", icon: "email" },
     ],
   },
