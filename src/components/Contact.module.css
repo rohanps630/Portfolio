@@ -1,3 +1,4 @@
+@reference "../index.css";
 /* Contact Section Styles */
 .section {
   @apply py-20 px-4 md:px-8;

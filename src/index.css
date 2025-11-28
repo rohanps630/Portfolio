@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.ts";
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
@@ -136,13 +135,12 @@ All colors MUST be HSL.
   }
 }
 
-@layer components {
-  .gradient-text {
+        @utility gradient-text {
     @apply bg-clip-text text-transparent;
     background-image: var(--gradient-primary);
   }
 
-  .card-glass {
+                @utility card-glass {
     @apply backdrop-blur-sm bg-card/50 border border-border/50;
     box-shadow: var(--shadow-card);
   }
@@ -168,11 +166,11 @@ All colors MUST be HSL.
     transform: translateY(-3px) rotate(2deg);
   }
 
-  .section-padding {
+                @utility section-padding {
     @apply py-20 px-4 md:px-8;
   }
 
-  .cursor-hover {
+    @utility cursor-hover {
     cursor: pointer;
   }
 
@@ -197,5 +195,4 @@ All colors MUST be HSL.
       scroll-behavior: smooth;
       scroll-snap-type: y proximity;
     }
-  }
-}
+        }

@@ -1,3 +1,4 @@
+@reference "../index.css";
 /* Hero Section Styles */
 .section {
   @apply min-h-screen flex items-center justify-center py-20 px-4 md:px-8 relative overflow-hidden;
