@@ -10,7 +10,7 @@ import { PortfolioData } from '@/types/portfolio';
 export const portfolioData: PortfolioData = {
   // Navigation Configuration
   navigation: {
-    logo: "AJ",
+    logo: "RPS",
     sections: [
       { id: "home", label: "Home" },
       { id: "about", label: "About" },
@@ -23,22 +23,22 @@ export const portfolioData: PortfolioData = {
 
   // Hero Section
   hero: {
-    name: "Alex Johnson",
+    name: "Rohan P. Suresh",
     titles: [
-      "Full-Stack Developer",
+      "Senior Full Stack Developer",
+      "AI Engineer",
       "Mobile App Developer",
-      "Backend Specialist",
-      "UI/UX Enthusiast",
+      "DevOps Enthusiast",
     ],
-    bio: "Crafting exceptional digital experiences with clean code and innovative solutions. Specialized in building scalable web applications, responsive mobile apps, and robust backend systems.",
+    bio: "Results-driven Senior Full Stack Developer with 4 years of experience in building scalable web and mobile applications. Expertise in React.js, React Native, Next.js, NestJS, Django, and AI-driven development.",
     ctaButtons: {
       primary: { text: "View My Work", href: "#projects" },
       secondary: { text: "Get In Touch", href: "#contact" },
     },
     socialLinks: [
-      { name: "GitHub", url: "https://github.com", icon: "github" },
-      { name: "LinkedIn", url: "https://linkedin.com", icon: "linkedin" },
-      { name: "Email", url: "mailto:alex@example.com", icon: "email" },
+      { name: "GitHub", url: "https://github.com/rohanps630", icon: "github" },
+      { name: "LinkedIn", url: "https://www.linkedin.com/in/rohanpsuresh", icon: "linkedin" },
+      { name: "Email", url: "mailto:rohanpsuresh@gmail.com", icon: "email" },
     ],
   },
 
@@ -46,31 +46,31 @@ export const portfolioData: PortfolioData = {
   about: {
     title: "About Me",
     description:
-      "I'm a passionate full-stack developer with 5 years of experience building modern web applications, mobile apps, and scalable backend systems. I love turning complex problems into simple, beautiful, and intuitive solutions.",
+      "I'm a passionate Senior Full Stack Developer with a strong focus on performance optimization, UX, cloud solutions, and DevOps. I have experience leading teams, mentoring developers, and delivering high-impact solutions. I am passionate about building innovative, user-centric applications that enhance engagement and efficiency.",
     highlights: [
       {
         icon: "code",
-        title: "Clean Code Advocate",
+        title: "Full-Stack Expertise",
         description:
-          "Writing maintainable, scalable code that stands the test of time",
+          "React.js, Next.js, Node.js, Django, and modern web frameworks",
+      },
+      {
+        icon: "zap",
+        title: "AI & Automation",
+        description:
+          "Developing chatbots, voice AI, and automation using OpenAI and Twilio",
       },
       {
         icon: "rocket",
-        title: "Performance Focused",
+        title: "Cloud & DevOps",
         description:
-          "Optimizing applications for speed and user experience",
+          "Docker, Nginx, CI/CD pipelines, and scalable infrastructure",
       },
       {
-        icon: "users",
-        title: "Team Collaboration",
+        icon: "target",
+        title: "Mobile Development",
         description:
-          "Working effectively with designers, developers, and stakeholders",
-      },
-      {
-        icon: "trophy",
-        title: "Problem Solver",
-        description:
-          "Finding creative solutions to complex technical challenges",
+          "High-performance cross-platform apps using React Native",
       },
     ],
   },
@@ -79,55 +79,51 @@ export const portfolioData: PortfolioData = {
   skills: {
     title: "Skills & Technologies",
     description:
-      "A comprehensive toolkit built over 5 years of professional development",
+      "A comprehensive toolkit built over 4 years of professional development",
     categories: [
       {
         title: "Frontend Development",
         skills: [
-          "React",
-          "TypeScript",
+          "React.js",
+          "React Native",
           "Next.js",
-          "Vue.js",
+          "TypeScript",
+          "HTML5/CSS3",
           "Tailwind CSS",
           "Framer Motion",
-          "HTML5/CSS3",
-          "JavaScript (ES6+)",
         ],
       },
       {
         title: "Backend Development",
         skills: [
           "Node.js",
-          "Express",
-          "Python",
+          "NestJS",
+          "Express.js",
           "Django",
+          "Python",
           "REST APIs",
-          "GraphQL",
-          "PostgreSQL",
+          "WebSockets",
+        ],
+      },
+      {
+        title: "Database",
+        skills: [
           "MongoDB",
+          "PostgreSQL",
+          "Database Design",
+          "Query Optimization",
         ],
       },
       {
-        title: "Mobile Development",
+        title: "DevOps & AI",
         skills: [
-          "React Native",
-          "Flutter",
-          "iOS Development",
-          "Android Development",
-          "Mobile UI/UX",
-        ],
-      },
-      {
-        title: "Tools & Others",
-        skills: [
-          "Git",
           "Docker",
-          "AWS",
+          "Nginx",
           "CI/CD",
-          "Jest",
-          "Webpack",
-          "Figma",
-          "Agile/Scrum",
+          "AWS",
+          "OpenAI API",
+          "Twilio",
+          "Git/GitHub",
         ],
       },
     ],
@@ -136,54 +132,43 @@ export const portfolioData: PortfolioData = {
   // Experience Section
   experience: {
     title: "Professional Journey",
-    description: "5 years of building impactful solutions across web, mobile, and backend",
+    description: "Experience in building impactful solutions across web, mobile, and backend",
     items: [
       {
-        year: "2023 - Present",
-        title: "Senior Full-Stack Developer",
-        company: "Tech Innovations Inc.",
+        year: "Jun 2025 - Present",
+        title: "Software Engineer",
+        company: "Innovation Incubator Advisory",
         description:
-          "Leading development of enterprise-scale applications with a focus on performance and scalability.",
+          "Contributing to innovative software solutions and full-stack development.",
         achievements: [
-          "Architected and deployed microservices infrastructure serving 100k+ users",
-          "Reduced application load time by 60% through optimization techniques",
-          "Mentored junior developers and established coding standards",
+          "Working on cutting-edge web and mobile applications",
+          "Collaborating with cross-functional teams to deliver high-quality software",
         ],
       },
       {
-        year: "2021 - 2023",
-        title: "Full-Stack Developer",
-        company: "Digital Solutions Co.",
+        year: "Aug 2023 – May 2025",
+        title: "Full Stack Developer",
+        company: "Elsys Intelligent Devices Pvt Ltd",
         description:
-          "Developed modern web applications and mobile apps for diverse clients.",
+          "Led a team of junior developers & AI engineers in frontend, backend, and AI-driven development.",
         achievements: [
-          "Built 15+ responsive web applications using React and Node.js",
-          "Created cross-platform mobile apps with React Native",
-          "Implemented CI/CD pipelines reducing deployment time by 80%",
+          "Redesigned key modules, increasing user engagement by 20% through UX improvements",
+          "Developed scalable React.js frontends with optimized performance and responsiveness",
+          "Built a cross-platform React Native mobile app, transforming children's language learning",
+          "Mentored developers, promoting best practices and code quality",
         ],
       },
       {
-        year: "2020 - 2021",
-        title: "Frontend Developer",
-        company: "StartUp Labs",
+        year: "July 2021 – July 2023",
+        title: "Full Stack Developer",
+        company: "JitTech Technology Services",
         description:
-          "Focused on creating exceptional user interfaces and experiences.",
+          "Developed cross-platform mobile apps and secure backend services.",
         achievements: [
-          "Designed and implemented UI component library used across 5 products",
-          "Improved accessibility scores to 95+ on all projects",
-          "Collaborated with UX team to refine user workflows",
-        ],
-      },
-      {
-        year: "2019 - 2020",
-        title: "Junior Developer",
-        company: "WebDev Agency",
-        description:
-          "Started professional journey building websites and learning best practices.",
-        achievements: [
-          "Delivered 20+ client websites on time and within budget",
-          "Learned modern development workflows and version control",
-          "Contributed to team knowledge base and documentation",
+          "Developed cross-platform mobile apps (React Native) ensuring smooth, consistent UX",
+          "Built secure, scalable backend services (Node.js, NestJS) with API optimization",
+          "Delivered end-to-end web solutions (Next.js, Django) with seamless frontend-backend integration",
+          "Implemented real-time features (WebSockets, push notifications) for improved user engagement",
         ],
       },
     ],
@@ -193,45 +178,45 @@ export const portfolioData: PortfolioData = {
   projects: {
     title: "Featured Projects",
     description:
-      "Showcasing my skills in full-stack development, mobile apps, and scalable backend systems",
+      "Showcasing my skills in full-stack development, mobile apps, and AI integration",
     projects: [
       {
-        title: "E-Commerce Platform",
+        title: "AI Automation Platform",
         description:
-          "A full-stack e-commerce solution built with React, Node.js, and MongoDB. Features include real-time inventory, payment processing, and admin dashboard.",
-        tags: ["React", "Node.js", "MongoDB", "Stripe"],
+          "AI-driven automation platform with AI-powered bots for customer support, lead generation, and research. Integrated Twilio for automated AI call agents.",
+        tags: ["React.js", "NestJS", "MongoDB", "OpenAI", "Twilio"],
         image:
-          "https://images.unsplash.com/photo-1557821552-17105176677c?w=800&q=80",
+          "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80",
         github: "#",
         demo: "#",
       },
       {
-        title: "Task Management App",
+        title: "Real-Time Accessible Chat",
         description:
-          "Collaborative task manager with real-time updates using WebSockets. Drag-and-drop interface with team collaboration features.",
-        tags: ["React", "TypeScript", "Socket.io", "PostgreSQL"],
+          "Real-time chat app for users with hearing and speech impairments. Implemented instant text-to-text & text-to-audio communication features.",
+        tags: ["React.js", "React Native", "WebSockets", "Accessibility"],
         image:
-          "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?w=800&q=80",
+          "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&q=80",
         github: "#",
         demo: "#",
       },
       {
-        title: "Weather Dashboard",
+        title: "Interactive Learning Platform",
         description:
-          "Real-time weather application with interactive maps and forecasting. Integrated with multiple weather APIs for accurate data.",
-        tags: ["Vue.js", "Chart.js", "REST API", "Tailwind"],
+          "Web & mobile learning platform with interactive lessons & real-time video interactions. Integrated personalized learning paths and cross-platform synchronization.",
+        tags: ["React.js", "React Native", "Node.js", "MongoDB"],
         image:
-          "https://images.unsplash.com/photo-1592210454359-9043f067919b?w=800&q=80",
+          "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&q=80",
         github: "#",
         demo: "#",
       },
       {
-        title: "Social Media Analytics",
+        title: "Roofing CRM Solution",
         description:
-          "Analytics dashboard for tracking social media performance. Features data visualization and automated reporting.",
-        tags: ["Next.js", "D3.js", "Express", "Redis"],
+          "Cross-platform CRM solution tailored for roofing companies. Features job management, appointment scheduling, invoicing, and real-time analytics.",
+        tags: ["React Native", "CRM", "Analytics", "Mobile"],
         image:
-          "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+          "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80",
         github: "#",
         demo: "#",
       },
@@ -247,19 +232,19 @@ export const portfolioData: PortfolioData = {
       {
         icon: "mail",
         label: "Email",
-        value: "alex@example.com",
-        href: "mailto:alex@example.com",
+        value: "rohanpsuresh@gmail.com",
+        href: "mailto:rohanpsuresh@gmail.com",
       },
       {
         icon: "phone",
         label: "Phone",
-        value: "+1 (555) 123-4567",
-        href: "tel:+15551234567",
+        value: "+91 8921355003",
+        href: "tel:+918921355003",
       },
       {
         icon: "map-pin",
         label: "Location",
-        value: "San Francisco, CA",
+        value: "Kottayam, Kerala",
       },
     ],
     formEnabled: true,
@@ -267,12 +252,12 @@ export const portfolioData: PortfolioData = {
 
   // Footer Section
   footer: {
-    name: "Alex Johnson",
-    copyright: "© 2024 All rights reserved.",
+    name: "Rohan P. Suresh",
+    copyright: "© 2025 All rights reserved.",
     socialLinks: [
       { name: "GitHub", url: "https://github.com", icon: "github" },
       { name: "LinkedIn", url: "https://linkedin.com", icon: "linkedin" },
-      { name: "Email", url: "mailto:alex@example.com", icon: "email" },
+      { name: "Email", url: "mailto:rohanpsuresh@gmail.com", icon: "email" },
     ],
   },
 };
