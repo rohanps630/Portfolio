@@ -1,12 +1,13 @@
 "use client";
 
-import { siteConfig } from "@/content/site";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { SectionContainer } from "@/components/layout/SectionContainer";
 
-export function TechStackBar() {
-  const techs = siteConfig.techStack;
+interface TechStackBarProps {
+  techs: string[];
+}
 
+export function TechStackBar({ techs }: TechStackBarProps) {
   return (
     <SectionContainer>
       <FadeIn>

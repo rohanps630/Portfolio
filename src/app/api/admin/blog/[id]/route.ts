@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { verifySession } from "@/lib/auth";
-import { getDb } from "@/lib/db";
+import sql from "@/lib/db";
 
 const blogPostUpdateSchema = z.object({
   title: z.string().min(1).optional(),
@@ -15,14 +15,6 @@ const blogPostUpdateSchema = z.object({
   published: z.boolean().optional(),
 });
 
-function parsePost(row: Record<string, unknown>) {
-  return {
-    ...row,
-    published: Boolean(row.published),
-    tags: row.tags ? JSON.parse(row.tags as string) : [],
-  };
-}
-
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -33,14 +25,13 @@ export async function GET(
   }
 
   const { id } = await params;
-  const db = getDb();
-  const post = db.prepare("SELECT * FROM blog_posts WHERE id = ?").get(id);
+  const [post] = await sql`SELECT * FROM blog_posts WHERE id = ${id}`;
 
   if (!post) {
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 
-  return NextResponse.json(parsePost(post as Record<string, unknown>));
+  return NextResponse.json(post);
 }
 
 export async function PUT(
@@ -58,36 +49,30 @@ export async function PUT(
     const body = await request.json();
     const data = blogPostUpdateSchema.parse(body);
 
-    const db = getDb();
-    const existing = db.prepare("SELECT * FROM blog_posts WHERE id = ?").get(id);
+    const [existing] = await sql`SELECT * FROM blog_posts WHERE id = ${id}`;
     if (!existing) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    const fields: string[] = [];
-    const values: Record<string, unknown> = { id };
+    // Merge changes into existing row — existing has all fields, data overrides selectively
+    const merged = { ...existing, ...data } as Record<string, unknown>;
 
-    for (const [key, value] of Object.entries(data)) {
-      if (value === undefined) continue;
+    const [updated] = await sql`
+      UPDATE blog_posts SET
+        title = ${merged.title as string},
+        slug = ${merged.slug as string},
+        excerpt = ${merged.excerpt as string},
+        content = ${merged.content as string},
+        category = ${merged.category as string},
+        tags = ${sql.json(merged.tags as never)},
+        cover_image = ${merged.cover_image as string},
+        date = ${merged.date as string},
+        published = ${merged.published as boolean}
+      WHERE id = ${id}
+      RETURNING *
+    `;
 
-      if (key === "published") {
-        fields.push(`${key} = @${key}`);
-        values[key] = value ? 1 : 0;
-      } else if (key === "tags") {
-        fields.push(`${key} = @${key}`);
-        values[key] = JSON.stringify(value);
-      } else {
-        fields.push(`${key} = @${key}`);
-        values[key] = value;
-      }
-    }
-
-    if (fields.length > 0) {
-      db.prepare(`UPDATE blog_posts SET ${fields.join(", ")} WHERE id = @id`).run(values);
-    }
-
-    const updated = db.prepare("SELECT * FROM blog_posts WHERE id = ?").get(id);
-    return NextResponse.json(parsePost(updated as Record<string, unknown>));
+    return NextResponse.json(updated);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });
@@ -106,13 +91,12 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  const db = getDb();
-  const existing = db.prepare("SELECT * FROM blog_posts WHERE id = ?").get(id);
+  const [existing] = await sql`SELECT * FROM blog_posts WHERE id = ${id}`;
 
   if (!existing) {
     return NextResponse.json({ error: "Post not found" }, { status: 404 });
   }
 
-  db.prepare("DELETE FROM blog_posts WHERE id = ?").run(id);
+  await sql`DELETE FROM blog_posts WHERE id = ${id}`;
   return NextResponse.json({ success: true });
 }

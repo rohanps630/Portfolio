@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getDb } from "@/lib/db";
+import sql from "@/lib/db";
 import { Plus, Pencil, Star } from "lucide-react";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 
@@ -8,15 +8,14 @@ interface ProjectRow {
   title: string;
   slug: string;
   category: string;
-  featured: number;
+  featured: boolean;
   sort_order: number;
 }
 
-export default function AdminProjectsPage() {
-  const db = getDb();
-  const projects = db
-    .prepare("SELECT id, title, slug, category, featured, sort_order FROM projects ORDER BY sort_order ASC")
-    .all() as ProjectRow[];
+export default async function AdminProjectsPage() {
+  const projects = await sql`
+    SELECT id, title, slug, category, featured, sort_order FROM projects ORDER BY sort_order ASC
+  ` as ProjectRow[];
 
   return (
     <div className="space-y-6">

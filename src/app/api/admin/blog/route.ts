@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { verifySession } from "@/lib/auth";
-import { getDb } from "@/lib/db";
+import sql from "@/lib/db";
 
 const blogPostSchema = z.object({
   title: z.string().min(1),
@@ -15,23 +15,14 @@ const blogPostSchema = z.object({
   published: z.boolean().default(false),
 });
 
-function parsePost(row: Record<string, unknown>) {
-  return {
-    ...row,
-    published: Boolean(row.published),
-    tags: row.tags ? JSON.parse(row.tags as string) : [],
-  };
-}
-
 export async function GET() {
   const authenticated = await verifySession();
   if (!authenticated) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const db = getDb();
-  const posts = db.prepare("SELECT * FROM blog_posts ORDER BY date DESC").all();
-  return NextResponse.json(posts.map((p) => parsePost(p as Record<string, unknown>)));
+  const posts = await sql`SELECT * FROM blog_posts ORDER BY date DESC`;
+  return NextResponse.json(posts);
 }
 
 export async function POST(request: NextRequest) {
@@ -44,29 +35,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = blogPostSchema.parse(body);
 
-    const db = getDb();
-    const stmt = db.prepare(`
+    const [created] = await sql`
       INSERT INTO blog_posts (title, slug, excerpt, content, category, tags, cover_image, date, published)
-      VALUES (@title, @slug, @excerpt, @content, @category, @tags, @cover_image, @date, @published)
-    `);
+      VALUES (${data.title}, ${data.slug}, ${data.excerpt}, ${data.content}, ${data.category}, ${sql.json(data.tags)}, ${data.cover_image}, ${data.date}, ${data.published})
+      RETURNING *
+    `;
 
-    const result = stmt.run({
-      title: data.title,
-      slug: data.slug,
-      excerpt: data.excerpt,
-      content: data.content,
-      category: data.category,
-      tags: JSON.stringify(data.tags),
-      cover_image: data.cover_image,
-      date: data.date,
-      published: data.published ? 1 : 0,
-    });
-
-    const created = db
-      .prepare("SELECT * FROM blog_posts WHERE id = ?")
-      .get(result.lastInsertRowid);
-
-    return NextResponse.json(parsePost(created as Record<string, unknown>), { status: 201 });
+    return NextResponse.json(created, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });

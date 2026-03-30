@@ -1,0 +1,99 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod/v4";
+import { verifySession } from "@/lib/auth";
+import sql from "@/lib/db";
+
+const testimonialUpdateSchema = z.object({
+  name: z.string().min(1).optional(),
+  role: z.string().optional(),
+  company: z.string().optional(),
+  content: z.string().min(1).optional(),
+  avatar: z.string().optional(),
+  rating: z.number().int().min(1).max(5).optional(),
+  sort_order: z.number().int().optional(),
+  visible: z.boolean().optional(),
+});
+
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const authenticated = await verifySession();
+  if (!authenticated) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const [testimonial] = await sql`SELECT * FROM testimonials WHERE id = ${id}`;
+
+  if (!testimonial) {
+    return NextResponse.json({ error: "Testimonial not found" }, { status: 404 });
+  }
+
+  return NextResponse.json(testimonial);
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const authenticated = await verifySession();
+  if (!authenticated) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  try {
+    const body = await request.json();
+    const data = testimonialUpdateSchema.parse(body);
+
+    const [existing] = await sql`SELECT * FROM testimonials WHERE id = ${id}`;
+    if (!existing) {
+      return NextResponse.json({ error: "Testimonial not found" }, { status: 404 });
+    }
+
+    const merged = { ...existing, ...data };
+
+    const [updated] = await sql`
+      UPDATE testimonials SET
+        name = ${merged.name as string},
+        role = ${merged.role as string},
+        company = ${merged.company as string},
+        content = ${merged.content as string},
+        avatar = ${merged.avatar as string},
+        rating = ${merged.rating as number},
+        sort_order = ${merged.sort_order as number},
+        visible = ${merged.visible as boolean}
+      WHERE id = ${id}
+      RETURNING *
+    `;
+
+    return NextResponse.json(updated);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });
+    }
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const authenticated = await verifySession();
+  if (!authenticated) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const [existing] = await sql`SELECT * FROM testimonials WHERE id = ${id}`;
+
+  if (!existing) {
+    return NextResponse.json({ error: "Testimonial not found" }, { status: 404 });
+  }
+
+  await sql`DELETE FROM testimonials WHERE id = ${id}`;
+  return NextResponse.json({ success: true });
+}

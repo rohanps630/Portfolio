@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { verifySession } from "@/lib/auth";
-import { getDb } from "@/lib/db";
+import sql from "@/lib/db";
 
 const projectSchema = z.object({
   title: z.string().min(1),
@@ -27,26 +27,14 @@ const projectSchema = z.object({
   screenshots: z.array(z.string()).default([]),
 });
 
-function parseProject(row: Record<string, unknown>) {
-  return {
-    ...row,
-    featured: Boolean(row.featured),
-    features: row.features ? JSON.parse(row.features as string) : [],
-    impact: row.impact ? JSON.parse(row.impact as string) : [],
-    tech_stack: row.tech_stack ? JSON.parse(row.tech_stack as string) : [],
-    screenshots: row.screenshots ? JSON.parse(row.screenshots as string) : [],
-  };
-}
-
 export async function GET() {
   const authenticated = await verifySession();
   if (!authenticated) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const db = getDb();
-  const projects = db.prepare("SELECT * FROM projects ORDER BY sort_order ASC").all();
-  return NextResponse.json(projects.map((p) => parseProject(p as Record<string, unknown>)));
+  const projects = await sql`SELECT * FROM projects ORDER BY sort_order ASC`;
+  return NextResponse.json(projects);
 }
 
 export async function POST(request: NextRequest) {
@@ -59,42 +47,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const data = projectSchema.parse(body);
 
-    const db = getDb();
-    const stmt = db.prepare(`
+    const [created] = await sql`
       INSERT INTO projects (title, slug, tagline, description, category, featured, sort_order, challenge, role, approach, features, impact, tech_stack, duration, year, live_url, github_url, cover_image, screenshots)
-      VALUES (@title, @slug, @tagline, @description, @category, @featured, @sort_order, @challenge, @role, @approach, @features, @impact, @tech_stack, @duration, @year, @live_url, @github_url, @cover_image, @screenshots)
-    `);
+      VALUES (${data.title}, ${data.slug}, ${data.tagline}, ${data.description}, ${data.category}, ${data.featured}, ${data.sort_order}, ${data.challenge}, ${data.role}, ${data.approach}, ${sql.json(data.features)}, ${sql.json(data.impact)}, ${sql.json(data.tech_stack)}, ${data.duration}, ${data.year}, ${data.live_url}, ${data.github_url}, ${data.cover_image}, ${sql.json(data.screenshots)})
+      RETURNING *
+    `;
 
-    const result = stmt.run({
-      title: data.title,
-      slug: data.slug,
-      tagline: data.tagline,
-      description: data.description,
-      category: data.category,
-      featured: data.featured ? 1 : 0,
-      sort_order: data.sort_order,
-      challenge: data.challenge,
-      role: data.role,
-      approach: data.approach,
-      features: JSON.stringify(data.features),
-      impact: JSON.stringify(data.impact),
-      tech_stack: JSON.stringify(data.tech_stack),
-      duration: data.duration,
-      year: data.year,
-      live_url: data.live_url,
-      github_url: data.github_url,
-      cover_image: data.cover_image,
-      screenshots: JSON.stringify(data.screenshots),
-    });
-
-    const created = db
-      .prepare("SELECT * FROM projects WHERE id = ?")
-      .get(result.lastInsertRowid);
-
-    return NextResponse.json(
-      parseProject(created as Record<string, unknown>),
-      { status: 201 }
-    );
+    return NextResponse.json(created, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });

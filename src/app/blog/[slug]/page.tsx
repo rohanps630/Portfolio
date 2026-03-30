@@ -15,7 +15,7 @@ interface BlogPostPageProps {
 }
 
 export async function generateStaticParams() {
-  const slugs = getPostSlugs();
+  const slugs = await getPostSlugs();
   return slugs.map((slug) => ({ slug }));
 }
 
@@ -25,7 +25,7 @@ export async function generateMetadata({
   const { slug } = await params;
 
   try {
-    const post = getPostBySlug(slug);
+    const post = await getPostBySlug(slug);
     return createMetadata({
       title: post.title,
       description: post.excerpt,
@@ -60,7 +60,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   let post;
   try {
-    post = getPostBySlug(slug);
+    post = await getPostBySlug(slug);
   } catch {
     notFound();
   }
@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const headings = extractHeadings(post.content);
 
-  const allPosts = getAllPosts();
+  const allPosts = await getAllPosts();
   const relatedPosts = allPosts
     .filter((p) => p.category === post.category && p.slug !== post.slug)
     .slice(0, 3);

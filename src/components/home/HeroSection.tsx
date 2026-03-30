@@ -8,7 +8,6 @@ import { TextScramble } from "@/components/animations/TextScramble";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { MagneticButton } from "@/components/ui/MagneticButton";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
-import { siteConfig } from "@/content/site";
 import { SectionContainer } from "@/components/layout/SectionContainer";
 
 const HeroScene = dynamic(
@@ -16,7 +15,12 @@ const HeroScene = dynamic(
   { ssr: false }
 );
 
-export function HeroSection() {
+interface HeroSectionProps {
+  tagline: string;
+  stats: { label: string; value: string }[];
+}
+
+export function HeroSection({ tagline, stats }: HeroSectionProps) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
@@ -53,7 +57,7 @@ export function HeroSection() {
         <FadeIn direction="up" delay={0}>
           <div className="max-w-xl">
             <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-              <TextScramble text={siteConfig.tagline} />
+              <TextScramble text={tagline} />
             </h1>
 
             <FadeIn direction="up" delay={0.15}>
@@ -99,7 +103,7 @@ export function HeroSection() {
       {/* Stats bar */}
       <FadeIn direction="up" delay={0.5}>
         <div className="mt-20 lg:mt-24 flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-0 sm:divide-x sm:divide-border">
-          {siteConfig.stats.map((stat) => (
+          {stats.map((stat) => (
             <div key={stat.label} className="sm:px-12 first:sm:pl-0 last:sm:pr-0">
               <AnimatedCounter value={stat.value} label={stat.label} />
             </div>

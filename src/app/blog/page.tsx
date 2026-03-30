@@ -19,12 +19,14 @@ interface BlogPageProps {
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { category } = await searchParams;
-  const allPosts = getAllPosts();
-  const categories = getAllCategories();
 
-  const filteredPosts = category
-    ? getPostsByCategory(category as BlogCategory)
-    : allPosts;
+  const [allPosts, categories, filteredPosts] = await Promise.all([
+    getAllPosts(),
+    getAllCategories(),
+    category
+      ? getPostsByCategory(category as BlogCategory)
+      : getAllPosts(),
+  ]);
 
   return (
     <main className="pt-24 pb-16">

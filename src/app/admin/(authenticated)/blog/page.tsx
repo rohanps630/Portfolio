@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getDb } from "@/lib/db";
+import sql from "@/lib/db";
 import { Plus, Pencil, Eye, EyeOff } from "lucide-react";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 
@@ -9,16 +9,13 @@ interface BlogRow {
   slug: string;
   category: string;
   date: string;
-  published: number;
+  published: boolean;
 }
 
-export default function AdminBlogPage() {
-  const db = getDb();
-  const posts = db
-    .prepare(
-      "SELECT id, title, slug, category, date, published FROM blog_posts ORDER BY date DESC"
-    )
-    .all() as BlogRow[];
+export default async function AdminBlogPage() {
+  const posts = await sql`
+    SELECT id, title, slug, category, date, published FROM blog_posts ORDER BY date DESC
+  ` as BlogRow[];
 
   return (
     <div className="space-y-6">

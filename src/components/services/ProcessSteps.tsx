@@ -12,40 +12,11 @@ interface ProcessStep {
   description: string;
 }
 
-const steps: ProcessStep[] = [
-  {
-    number: 1,
-    title: "Discovery",
-    description: "Understanding your vision and requirements",
-  },
-  {
-    number: 2,
-    title: "Architecture",
-    description: "Designing the technical foundation",
-  },
-  {
-    number: 3,
-    title: "Development",
-    description: "Building with clean, tested code",
-  },
-  {
-    number: 4,
-    title: "Testing",
-    description: "Ensuring quality across all scenarios",
-  },
-  {
-    number: 5,
-    title: "Launch",
-    description: "Deploying to production with confidence",
-  },
-  {
-    number: 6,
-    title: "Support",
-    description: "Ongoing maintenance and optimization",
-  },
-];
+interface ProcessStepsProps {
+  steps: ProcessStep[];
+}
 
-export function ProcessSteps() {
+export function ProcessSteps({ steps }: ProcessStepsProps) {
   return (
     <StaggerChildren className="relative">
       {/* Desktop: horizontal layout */}

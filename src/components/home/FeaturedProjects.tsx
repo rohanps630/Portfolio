@@ -2,16 +2,18 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { getFeaturedProjects } from "@/lib/projects";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { Button } from "@/components/ui/Button";
 import { SectionContainer } from "@/components/layout/SectionContainer";
+import type { Project } from "@/types/project";
 
-export function FeaturedProjects() {
-  const projects = getFeaturedProjects().slice(0, 3);
+interface FeaturedProjectsProps {
+  projects: Project[];
+}
 
+export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   return (
     <SectionContainer>
       <FadeIn>

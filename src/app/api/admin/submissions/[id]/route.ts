@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
-import { getDb } from "@/lib/db";
+import sql from "@/lib/db";
 
 export async function PUT(
   _request: NextRequest,
@@ -12,15 +12,16 @@ export async function PUT(
   }
 
   const { id } = await params;
-  const db = getDb();
 
-  const existing = db.prepare("SELECT * FROM contact_submissions WHERE id = ?").get(id);
+  const [existing] = await sql`SELECT * FROM contact_submissions WHERE id = ${id}`;
   if (!existing) {
     return NextResponse.json({ error: "Submission not found" }, { status: 404 });
   }
 
-  db.prepare("UPDATE contact_submissions SET read = 1 WHERE id = ?").run(id);
+  const [updated] = await sql`
+    UPDATE contact_submissions SET read = true WHERE id = ${id}
+    RETURNING *
+  `;
 
-  const updated = db.prepare("SELECT * FROM contact_submissions WHERE id = ?").get(id);
   return NextResponse.json(updated);
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { verifySession } from "@/lib/auth";
-import { getDb } from "@/lib/db";
+import sql from "@/lib/db";
 
 const projectUpdateSchema = z.object({
   title: z.string().min(1).optional(),
@@ -27,17 +27,6 @@ const projectUpdateSchema = z.object({
   screenshots: z.array(z.string()).optional(),
 });
 
-function parseProject(row: Record<string, unknown>) {
-  return {
-    ...row,
-    featured: Boolean(row.featured),
-    features: row.features ? JSON.parse(row.features as string) : [],
-    impact: row.impact ? JSON.parse(row.impact as string) : [],
-    tech_stack: row.tech_stack ? JSON.parse(row.tech_stack as string) : [],
-    screenshots: row.screenshots ? JSON.parse(row.screenshots as string) : [],
-  };
-}
-
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -48,14 +37,13 @@ export async function GET(
   }
 
   const { id } = await params;
-  const db = getDb();
-  const project = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
+  const [project] = await sql`SELECT * FROM projects WHERE id = ${id}`;
 
   if (!project) {
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
   }
 
-  return NextResponse.json(parseProject(project as Record<string, unknown>));
+  return NextResponse.json(project);
 }
 
 export async function PUT(
@@ -73,36 +61,40 @@ export async function PUT(
     const body = await request.json();
     const data = projectUpdateSchema.parse(body);
 
-    const db = getDb();
-    const existing = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
+    const [existing] = await sql`SELECT * FROM projects WHERE id = ${id}`;
     if (!existing) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    const fields: string[] = [];
-    const values: Record<string, unknown> = { id };
+    // Merge changes into existing row — existing has all fields, data overrides selectively
+    const merged = { ...existing, ...data } as Record<string, unknown>;
 
-    for (const [key, value] of Object.entries(data)) {
-      if (value === undefined) continue;
+    const [updated] = await sql`
+      UPDATE projects SET
+        title = ${merged.title as string},
+        slug = ${merged.slug as string},
+        tagline = ${merged.tagline as string},
+        description = ${merged.description as string},
+        category = ${merged.category as string},
+        featured = ${merged.featured as boolean},
+        sort_order = ${merged.sort_order as number},
+        challenge = ${merged.challenge as string},
+        role = ${merged.role as string},
+        approach = ${merged.approach as string},
+        features = ${sql.json(merged.features as never)},
+        impact = ${sql.json(merged.impact as never)},
+        tech_stack = ${sql.json(merged.tech_stack as never)},
+        duration = ${merged.duration as string},
+        year = ${merged.year as string},
+        live_url = ${merged.live_url as string},
+        github_url = ${merged.github_url as string},
+        cover_image = ${merged.cover_image as string},
+        screenshots = ${sql.json(merged.screenshots as never)}
+      WHERE id = ${id}
+      RETURNING *
+    `;
 
-      if (key === "featured") {
-        fields.push(`${key} = @${key}`);
-        values[key] = value ? 1 : 0;
-      } else if (["features", "impact", "tech_stack", "screenshots"].includes(key)) {
-        fields.push(`${key} = @${key}`);
-        values[key] = JSON.stringify(value);
-      } else {
-        fields.push(`${key} = @${key}`);
-        values[key] = value;
-      }
-    }
-
-    if (fields.length > 0) {
-      db.prepare(`UPDATE projects SET ${fields.join(", ")} WHERE id = @id`).run(values);
-    }
-
-    const updated = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
-    return NextResponse.json(parseProject(updated as Record<string, unknown>));
+    return NextResponse.json(updated);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Validation failed", details: error.issues }, { status: 400 });
@@ -121,13 +113,12 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  const db = getDb();
-  const existing = db.prepare("SELECT * FROM projects WHERE id = ?").get(id);
+  const [existing] = await sql`SELECT * FROM projects WHERE id = ${id}`;
 
   if (!existing) {
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
   }
 
-  db.prepare("DELETE FROM projects WHERE id = ?").run(id);
+  await sql`DELETE FROM projects WHERE id = ${id}`;
   return NextResponse.json({ success: true });
 }

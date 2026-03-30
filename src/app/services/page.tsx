@@ -2,10 +2,10 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { createMetadata, buildServiceJsonLd } from "@/lib/seo";
 import { SectionHeading } from "@/components/shared/SectionHeading";
-import services from "@/content/services";
 import { ServiceGrid } from "@/components/services/ServiceGrid";
 import { ProcessSteps } from "@/components/services/ProcessSteps";
 import { FAQSection } from "@/components/services/FAQSection";
+import { getServices, getProcessSteps, getFaqs } from "@/lib/data";
 
 export const metadata = createMetadata({
   title: "Services",
@@ -14,8 +14,26 @@ export const metadata = createMetadata({
   path: "/services",
 });
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const [dbServices, processSteps, faqs] = await Promise.all([
+    getServices(),
+    getProcessSteps(),
+    getFaqs(),
+  ]);
+
   const jsonLd = buildServiceJsonLd();
+
+  // Map DB service format to ServiceTier format for the grid
+  const services = dbServices.map((s) => ({
+    id: s.id,
+    title: s.title,
+    description: s.description,
+    price: s.price,
+    timeline: s.timeline,
+    features: s.features,
+    highlighted: s.highlighted,
+    ctaText: s.cta_text,
+  }));
 
   return (
     <main className="pt-24 pb-16">
@@ -42,7 +60,7 @@ export default function ServicesPage() {
             title="How I Work"
             subtitle="A transparent, structured approach to delivering high-quality software."
           />
-          <ProcessSteps />
+          <ProcessSteps steps={processSteps} />
         </section>
 
         {/* FAQ */}
@@ -52,7 +70,7 @@ export default function ServicesPage() {
             title="Frequently Asked Questions"
             subtitle="Answers to common questions about working together."
           />
-          <FAQSection />
+          <FAQSection faqs={faqs} />
         </section>
 
         {/* CTA */}

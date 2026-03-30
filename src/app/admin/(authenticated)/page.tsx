@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getDb } from "@/lib/db";
+import sql from "@/lib/db";
 import { FolderKanban, FileText, Mail, MailWarning, Plus } from "lucide-react";
 
 interface Submission {
@@ -9,34 +9,17 @@ interface Submission {
   project_type: string;
   budget: string;
   message: string;
-  read: number;
+  read: boolean;
   created_at: string;
 }
 
-export default function AdminDashboardPage() {
-  const db = getDb();
+export default async function AdminDashboardPage() {
+  const [{ count: totalProjects }] = await sql`SELECT COUNT(*)::int as count FROM projects`;
+  const [{ count: totalPosts }] = await sql`SELECT COUNT(*)::int as count FROM blog_posts`;
+  const [{ count: totalSubmissions }] = await sql`SELECT COUNT(*)::int as count FROM contact_submissions`;
+  const [{ count: unreadSubmissions }] = await sql`SELECT COUNT(*)::int as count FROM contact_submissions WHERE read = false`;
 
-  const totalProjects = (
-    db.prepare("SELECT COUNT(*) as count FROM projects").get() as { count: number }
-  ).count;
-
-  const totalPosts = (
-    db.prepare("SELECT COUNT(*) as count FROM blog_posts").get() as { count: number }
-  ).count;
-
-  const totalSubmissions = (
-    db.prepare("SELECT COUNT(*) as count FROM contact_submissions").get() as { count: number }
-  ).count;
-
-  const unreadSubmissions = (
-    db.prepare("SELECT COUNT(*) as count FROM contact_submissions WHERE read = 0").get() as {
-      count: number;
-    }
-  ).count;
-
-  const recentSubmissions = db
-    .prepare("SELECT * FROM contact_submissions ORDER BY created_at DESC LIMIT 5")
-    .all() as Submission[];
+  const recentSubmissions = await sql`SELECT * FROM contact_submissions ORDER BY created_at DESC LIMIT 5` as Submission[];
 
   const stats = [
     { label: "Projects", value: totalProjects, icon: FolderKanban, color: "text-[#6366f1]", bg: "bg-[#6366f1]/10" },

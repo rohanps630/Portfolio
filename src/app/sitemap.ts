@@ -3,7 +3,7 @@ import { siteConfig } from "@/content/site";
 import { getProjects } from "@/lib/projects";
 import { getAllPosts } from "@/lib/mdx";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteConfig.url;
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -15,14 +15,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.7 },
   ];
 
-  const projectPages: MetadataRoute.Sitemap = getProjects().map((project) => ({
+  const [projects, posts] = await Promise.all([getProjects(), getAllPosts()]);
+
+  const projectPages: MetadataRoute.Sitemap = projects.map((project) => ({
     url: `${baseUrl}/projects/${project.slug}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
 
-  const blogPages: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
+  const blogPages: MetadataRoute.Sitemap = posts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.date),
     changeFrequency: "yearly" as const,

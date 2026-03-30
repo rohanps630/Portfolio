@@ -8,27 +8,36 @@ import { TestimonialSection } from "@/components/home/TestimonialSection";
 import { BlogPreview } from "@/components/home/BlogPreview";
 import { CTASection } from "@/components/home/CTASection";
 import { getAllPosts } from "@/lib/mdx";
+import { getFeaturedProjects } from "@/lib/projects";
+import { getTechStack, getStats, getTestimonials } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: siteConfig.title,
   description: siteConfig.description,
 };
 
-export default function Home() {
-  const blogPosts = getAllPosts().slice(0, 3);
+export default async function Home() {
+  const [blogPosts, featuredProjects, techStack, stats, testimonials] =
+    await Promise.all([
+      getAllPosts(),
+      getFeaturedProjects(),
+      getTechStack(),
+      getStats(),
+      getTestimonials(),
+    ]);
 
   return (
     <>
       <section className="py-8 md:py-12">
-        <HeroSection />
+        <HeroSection tagline={siteConfig.tagline} stats={stats} />
       </section>
 
       <section className="py-20 md:py-28">
-        <FeaturedProjects />
+        <FeaturedProjects projects={featuredProjects.slice(0, 3)} />
       </section>
 
       <section className="py-20 md:py-28">
-        <TechStackBar />
+        <TechStackBar techs={techStack} />
       </section>
 
       <section className="py-20 md:py-28">
@@ -36,11 +45,11 @@ export default function Home() {
       </section>
 
       <section className="py-20 md:py-28">
-        <TestimonialSection />
+        <TestimonialSection testimonials={testimonials} />
       </section>
 
       <section className="py-20 md:py-28">
-        <BlogPreview posts={blogPosts} />
+        <BlogPreview posts={blogPosts.slice(0, 3)} />
       </section>
 
       <section className="py-20 md:py-28">

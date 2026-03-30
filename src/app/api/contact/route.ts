@@ -26,12 +26,11 @@ export async function POST(request: Request) {
 
     // Save to database
     try {
-      const { getDb } = await import("@/lib/db");
-      const db = getDb();
-      db.prepare(
-        `INSERT INTO contact_submissions (name, email, project_type, budget, timeline, message)
-         VALUES (?, ?, ?, ?, ?, ?)`
-      ).run(data.name, data.email, data.projectType, data.budget, data.timeline, data.message);
+      const sql = (await import("@/lib/db")).default;
+      await sql`
+        INSERT INTO contact_submissions (name, email, project_type, budget, timeline, message)
+        VALUES (${data.name}, ${data.email}, ${data.projectType}, ${data.budget}, ${data.timeline}, ${data.message})
+      `;
     } catch (dbError) {
       console.error("Failed to save contact submission to database:", dbError);
       // Don't break the form submission if DB fails

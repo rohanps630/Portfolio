@@ -1,3 +1,4 @@
+import sql from "@/lib/db";
 import type { Project, ProjectCategory } from "@/types/project";
 
 // File-based imports (fallback)
@@ -24,22 +25,31 @@ interface ProjectRow {
   tagline: string;
   description: string;
   category: string;
-  featured: number;
+  featured: boolean;
   sort_order: number;
   challenge: string;
   role: string;
   approach: string;
-  features: string;
-  impact: string;
-  tech_stack: string;
+  features: { title: string; description: string }[] | string;
+  impact: { label: string; value: string; description: string }[] | string;
+  tech_stack: string[] | string;
   live_url: string | null;
   github_url: string | null;
   cover_image: string | null;
-  screenshots: string | null;
+  screenshots: string[] | string | null;
   duration: string | null;
   year: string | null;
+  visible: boolean;
   created_at: string;
   updated_at: string;
+}
+
+// Parse a value that may be a JSON string or already-parsed object/array
+function parseJson<T>(value: T | string): T {
+  if (typeof value === "string") {
+    return JSON.parse(value) as T;
+  }
+  return value;
 }
 
 function rowToProject(row: ProjectRow): Project {
@@ -49,82 +59,64 @@ function rowToProject(row: ProjectRow): Project {
     tagline: row.tagline,
     description: row.description,
     category: row.category as ProjectCategory,
-    featured: row.featured === 1,
+    featured: row.featured,
     sortOrder: row.sort_order,
     challenge: row.challenge,
     role: row.role,
     approach: row.approach,
-    features: JSON.parse(row.features),
-    impact: JSON.parse(row.impact),
-    techStack: JSON.parse(row.tech_stack),
+    features: parseJson(row.features),
+    impact: parseJson(row.impact),
+    techStack: parseJson(row.tech_stack),
     liveUrl: row.live_url ?? undefined,
     githubUrl: row.github_url ?? undefined,
     coverImage: row.cover_image ?? "",
-    screenshots: row.screenshots ? JSON.parse(row.screenshots) : [],
+    screenshots: row.screenshots ? parseJson(row.screenshots) : [],
     duration: row.duration ?? "",
     year: row.year ?? "",
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function tryGetDb(): any {
-  if (typeof window !== "undefined") return null;
+export async function getProjects(): Promise<Project[]> {
   try {
-    // Dynamic path to prevent bundler from following the import
-    const dbModule = "db";
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require(`@/lib/${dbModule}`);
-    return mod.getDb();
+    const rows = await sql<ProjectRow[]>`
+      SELECT * FROM projects WHERE visible = true ORDER BY sort_order ASC
+    `;
+    if (rows.length > 0) return rows.map(rowToProject);
   } catch {
-    return null;
+    // fall through to file fallback
   }
-}
-
-function queryProjects(sql: string, params?: unknown[]): ProjectRow[] {
-  const db = tryGetDb();
-  if (!db) return [];
-  try {
-    const stmt = db.prepare(sql);
-    return params ? stmt.all(...params) : stmt.all();
-  } catch {
-    return [];
-  }
-}
-
-export function getProjects(): Project[] {
-  const rows = queryProjects("SELECT * FROM projects ORDER BY sort_order ASC");
-  if (rows.length > 0) return rows.map(rowToProject);
   return fileProjects;
 }
 
-export function getFeaturedProjects(): Project[] {
-  const rows = queryProjects(
-    "SELECT * FROM projects WHERE featured = 1 ORDER BY sort_order ASC"
-  );
-  if (rows.length > 0) return rows.map(rowToProject);
+export async function getFeaturedProjects(): Promise<Project[]> {
+  try {
+    const rows = await sql<ProjectRow[]>`
+      SELECT * FROM projects WHERE visible = true AND featured = true ORDER BY sort_order ASC
+    `;
+    if (rows.length > 0) return rows.map(rowToProject);
+  } catch {
+    // fall through to file fallback
+  }
   return fileProjects.filter((project) => project.featured);
 }
 
-export function getProjectBySlug(slug: string): Project | undefined {
-  const db = tryGetDb();
-  if (db) {
-    try {
-      const row = db
-        .prepare("SELECT * FROM projects WHERE slug = ?")
-        .get(slug) as ProjectRow | undefined;
-      if (row) return rowToProject(row);
-    } catch {
-      // fall through
-    }
+export async function getProjectBySlug(slug: string): Promise<Project | undefined> {
+  try {
+    const rows = await sql<ProjectRow[]>`
+      SELECT * FROM projects WHERE slug = ${slug} AND visible = true
+    `;
+    if (rows.length > 0) return rowToProject(rows[0]);
+  } catch {
+    // fall through to file fallback
   }
   return fileProjects.find((project) => project.slug === slug);
 }
 
-export function getProjectCategories(): {
+export async function getProjectCategories(): Promise<{
   value: ProjectCategory;
   label: string;
   count: number;
-}[] {
+}[]> {
   const categoryLabels: Record<ProjectCategory, string> = {
     "web-app": "Web Apps",
     "mobile-app": "Mobile Apps",
@@ -132,8 +124,24 @@ export function getProjectCategories(): {
     "ai-ml": "AI & ML",
   };
 
-  const allProjects = getProjects();
+  try {
+    const rows = await sql<{ category: string; count: string }[]>`
+      SELECT category, COUNT(*) as count FROM projects WHERE visible = true GROUP BY category
+    `;
+    if (rows.length > 0) {
+      return rows
+        .filter((row) => row.category in categoryLabels)
+        .map((row) => ({
+          value: row.category as ProjectCategory,
+          label: categoryLabels[row.category as ProjectCategory],
+          count: parseInt(row.count, 10),
+        }));
+    }
+  } catch {
+    // fall through to file fallback
+  }
 
+  const allProjects = fileProjects;
   const categoryCounts = allProjects.reduce(
     (acc, project) => {
       acc[project.category] = (acc[project.category] || 0) + 1;

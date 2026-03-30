@@ -1,4 +1,4 @@
-import { getDb } from "@/lib/db";
+import sql from "@/lib/db";
 import { SubmissionsList } from "@/components/admin/SubmissionsList";
 
 interface SubmissionRow {
@@ -9,20 +9,14 @@ interface SubmissionRow {
   budget: string;
   timeline: string;
   message: string;
-  read: number;
+  read: boolean;
   created_at: string;
 }
 
-export default function AdminSubmissionsPage() {
-  const db = getDb();
-  const rows = db
-    .prepare("SELECT * FROM contact_submissions ORDER BY created_at DESC")
-    .all() as SubmissionRow[];
-
-  const submissions = rows.map((row) => ({
-    ...row,
-    read: Boolean(row.read),
-  }));
+export default async function AdminSubmissionsPage() {
+  const submissions = await sql`
+    SELECT * FROM contact_submissions ORDER BY created_at DESC
+  ` as SubmissionRow[];
 
   return (
     <div className="space-y-6">

@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import readingTime from "reading-time";
+import sql from "@/lib/db";
 import type { BlogPostMeta, BlogPost, BlogCategory } from "@/types/blog";
 
 const BLOG_DIR = path.join(process.cwd(), "src/content/blog");
@@ -58,9 +59,10 @@ interface BlogPostRow {
   content: string;
   date: string;
   category: string;
-  tags: string;
+  tags: string[] | string;
   cover_image: string | null;
-  published: number;
+  published: boolean;
+  visible: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -73,9 +75,9 @@ function rowToMeta(row: BlogPostRow): BlogPostMeta {
     excerpt: row.excerpt,
     date: row.date,
     category: row.category as BlogCategory,
-    tags: JSON.parse(row.tags),
+    tags: typeof row.tags === "string" ? JSON.parse(row.tags) : row.tags,
     coverImage: row.cover_image ?? "",
-    published: row.published === 1,
+    published: row.published,
     readingTime: stats.text,
   };
 }
@@ -87,89 +89,57 @@ function rowToPost(row: BlogPostRow): BlogPost {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function tryGetDb(): any {
-  if (typeof window !== "undefined") return null;
+// --- Exported functions (async) ---
+
+export async function getPostSlugs(): Promise<string[]> {
   try {
-    const dbModule = "db";
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require(`@/lib/${dbModule}`);
-    return mod.getDb();
+    const rows = await sql<{ slug: string }[]>`
+      SELECT slug FROM blog_posts WHERE published = true AND visible = true
+    `;
+    if (rows.length > 0) return rows.map((r) => r.slug);
   } catch {
-    return null;
-  }
-}
-
-// --- Exported functions (same signatures as before) ---
-
-export function getPostSlugs(): string[] {
-  const db = tryGetDb();
-  if (db) {
-    try {
-      const rows = db
-        .prepare("SELECT slug FROM blog_posts")
-        .all() as { slug: string }[];
-      if (rows.length > 0) return rows.map((r: { slug: string }) => r.slug);
-    } catch {
-      // fall through
-    }
+    // fall through to file fallback
   }
   return getPostSlugsFromFiles();
 }
 
-export function getPostBySlug(slug: string): BlogPost {
-  const db = tryGetDb();
-  if (db) {
-    try {
-      const row = db
-        .prepare("SELECT * FROM blog_posts WHERE slug = ?")
-        .get(slug) as BlogPostRow | undefined;
-      if (row) return rowToPost(row);
-    } catch {
-      // fall through
-    }
+export async function getPostBySlug(slug: string): Promise<BlogPost> {
+  try {
+    const rows = await sql<BlogPostRow[]>`
+      SELECT * FROM blog_posts WHERE slug = ${slug}
+    `;
+    if (rows.length > 0) return rowToPost(rows[0]);
+  } catch {
+    // fall through to file fallback
   }
   return getPostBySlugFromFile(slug);
 }
 
-export function getAllPosts(): BlogPostMeta[] {
-  const db = tryGetDb();
-  if (db) {
-    try {
-      const rows = db
-        .prepare("SELECT * FROM blog_posts WHERE published = 1 ORDER BY date DESC")
-        .all() as BlogPostRow[];
-      if (rows.length > 0) return rows.map(rowToMeta);
-    } catch {
-      // fall through
-    }
+export async function getAllPosts(): Promise<BlogPostMeta[]> {
+  try {
+    const rows = await sql<BlogPostRow[]>`
+      SELECT * FROM blog_posts WHERE published = true AND visible = true ORDER BY date DESC
+    `;
+    if (rows.length > 0) return rows.map(rowToMeta);
+  } catch {
+    // fall through to file fallback
   }
   return getAllPostsFromFiles();
 }
 
-export function getPostsByCategory(category: BlogCategory): BlogPostMeta[] {
-  const db = tryGetDb();
-  if (db) {
-    try {
-      const rows = db
-        .prepare("SELECT * FROM blog_posts WHERE published = 1 AND category = ? ORDER BY date DESC")
-        .all(category) as BlogPostRow[];
-      if (rows.length > 0) return rows.map(rowToMeta);
-    } catch {
-      // fall through
-    }
+export async function getPostsByCategory(category: BlogCategory): Promise<BlogPostMeta[]> {
+  try {
+    const rows = await sql<BlogPostRow[]>`
+      SELECT * FROM blog_posts WHERE published = true AND visible = true AND category = ${category} ORDER BY date DESC
+    `;
+    if (rows.length > 0) return rows.map(rowToMeta);
+  } catch {
+    // fall through to file fallback
   }
   return getAllPostsFromFiles().filter((post) => post.category === category);
 }
 
-export function getAllCategories(): { value: BlogCategory; label: string; count: number }[] {
-  const posts = getAllPosts();
-  const categoryMap = new Map<BlogCategory, number>();
-
-  for (const post of posts) {
-    categoryMap.set(post.category, (categoryMap.get(post.category) || 0) + 1);
-  }
-
+export async function getAllCategories(): Promise<{ value: BlogCategory; label: string; count: number }[]> {
   const labels: Record<BlogCategory, string> = {
     architecture: "Architecture",
     react: "React",
@@ -179,6 +149,30 @@ export function getAllCategories(): { value: BlogCategory; label: string; count:
     career: "Career",
     accessibility: "Accessibility",
   };
+
+  try {
+    const rows = await sql<{ category: string; count: string }[]>`
+      SELECT category, COUNT(*) as count FROM blog_posts WHERE published = true AND visible = true GROUP BY category
+    `;
+    if (rows.length > 0) {
+      return rows
+        .map((row) => ({
+          value: row.category as BlogCategory,
+          label: labels[row.category as BlogCategory] || row.category,
+          count: parseInt(row.count, 10),
+        }))
+        .sort((a, b) => b.count - a.count);
+    }
+  } catch {
+    // fall through to file fallback
+  }
+
+  const posts = getAllPostsFromFiles();
+  const categoryMap = new Map<BlogCategory, number>();
+
+  for (const post of posts) {
+    categoryMap.set(post.category, (categoryMap.get(post.category) || 0) + 1);
+  }
 
   return Array.from(categoryMap.entries())
     .map(([value, count]) => ({

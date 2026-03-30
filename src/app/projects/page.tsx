@@ -19,8 +19,10 @@ interface ProjectsPageProps {
 
 export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
   const { category } = await searchParams;
-  const allProjects = getProjects();
-  const categories = getProjectCategories();
+  const [allProjects, categories] = await Promise.all([
+    getProjects(),
+    getProjectCategories(),
+  ]);
 
   const filteredProjects = category
     ? allProjects.filter((p) => p.category === (category as ProjectCategory))
