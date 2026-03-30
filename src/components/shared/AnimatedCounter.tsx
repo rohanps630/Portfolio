@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useInView, useSpring, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { useInView, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface AnimatedCounterProps {
@@ -16,39 +16,69 @@ function parseValue(value: string) {
   return { number: parseFloat(match[1]), suffix: match[2] };
 }
 
+/** A single digit that "rolls" from 0 to its target via translateY. */
+function RollingDigit({
+  digit,
+  delay,
+  isInView,
+}: {
+  digit: string;
+  delay: number;
+  isInView: boolean;
+}) {
+  const target = parseInt(digit, 10);
+  const [settled, setSettled] = useState(false);
+
+  useEffect(() => {
+    if (!isInView) return;
+    const timer = setTimeout(() => setSettled(true), delay * 1000 + 800);
+    return () => clearTimeout(timer);
+  }, [isInView, delay]);
+
+  // Build a column of digits 0-9, then show the target at the end
+  const digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  return (
+    <span
+      className="inline-block overflow-hidden relative"
+      style={{ height: "1em", width: "0.65em" }}
+    >
+      <span
+        className="inline-flex flex-col"
+        style={{
+          transform: isInView
+            ? `translateY(-${target * 10}%)`
+            : "translateY(0%)",
+          transition: isInView
+            ? `transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`
+            : "none",
+        }}
+      >
+        {digits.map((d) => (
+          <span
+            key={d}
+            className="block text-center leading-[1em]"
+            aria-hidden={d !== target}
+          >
+            {d}
+          </span>
+        ))}
+      </span>
+      {/* Screen reader accessible value */}
+      <span className="sr-only">{digit}</span>
+    </span>
+  );
+}
+
 export function AnimatedCounter({
   value,
   label,
   className,
 }: AnimatedCounterProps) {
   const { number, suffix } = parseValue(value);
-  const ref = useRef<HTMLSpanElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const prefersReducedMotion = useReducedMotion();
-
-  const spring = useSpring(0, {
-    stiffness: 50,
-    damping: 20,
-    duration: 1.5,
-  });
-
-  useEffect(() => {
-    if (isInView) {
-      spring.set(number);
-    }
-  }, [isInView, spring, number]);
-
-  useEffect(() => {
-    const unsubscribe = spring.on("change", (latest) => {
-      if (ref.current) {
-        const isDecimal = number % 1 !== 0;
-        ref.current.textContent = isDecimal
-          ? latest.toFixed(1)
-          : Math.round(latest).toString();
-      }
-    });
-    return unsubscribe;
-  }, [spring, number]);
 
   if (prefersReducedMotion) {
     return (
@@ -61,10 +91,31 @@ export function AnimatedCounter({
     );
   }
 
+  // Split the numeric portion into individual characters (digits and dots)
+  const isDecimal = number % 1 !== 0;
+  const displayNumber = isDecimal ? number.toFixed(1) : Math.round(number).toString();
+  const chars = displayNumber.split("");
+
   return (
-    <div className={cn("text-center", className)}>
+    <div ref={ref} className={cn("text-center", className)}>
       <p className="font-heading text-4xl md:text-5xl font-bold tracking-tight">
-        <span ref={ref}>0</span>
+        {chars.map((char, i) => {
+          if (char === ".") {
+            return (
+              <span key={`dot-${i}`} className="inline-block">
+                .
+              </span>
+            );
+          }
+          return (
+            <RollingDigit
+              key={`digit-${i}`}
+              digit={char}
+              delay={i * 0.08}
+              isInView={isInView}
+            />
+          );
+        })}
         {suffix}
       </p>
       <p className="mt-2 text-sm text-muted-foreground">{label}</p>

@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/Button";
-import { TextReveal } from "@/components/animations/TextReveal";
+import { TextScramble } from "@/components/animations/TextScramble";
 import { FadeIn } from "@/components/animations/FadeIn";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
 import { siteConfig } from "@/content/site";
 import { SectionContainer } from "@/components/layout/SectionContainer";
 
-const codeDecorations = [
-  { text: "</>", className: "top-4 left-4 animate-float-slow" },
-  { text: "{ }", className: "top-12 right-8 animate-float-slower" },
-  { text: "//", className: "bottom-16 left-12 animate-float-slower" },
-  { text: "=>", className: "bottom-8 right-4 animate-float-slow" },
-];
+const HeroScene = dynamic(
+  () => import("./HeroScene").then((m) => ({ default: m.HeroScene })),
+  { ssr: false }
+);
 
 export function HeroSection() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -53,7 +53,7 @@ export function HeroSection() {
         <FadeIn direction="up" delay={0}>
           <div className="max-w-xl">
             <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-              <TextReveal text={siteConfig.tagline} />
+              <TextScramble text={siteConfig.tagline} />
             </h1>
 
             <FadeIn direction="up" delay={0.15}>
@@ -66,16 +66,20 @@ export function HeroSection() {
 
             <FadeIn direction="up" delay={0.25}>
               <div className="mt-8 flex flex-wrap gap-4">
-                <Link href="/projects">
-                  <Button variant="primary" size="lg">
-                    View My Work
-                  </Button>
-                </Link>
-                <Link href="/contact">
-                  <Button variant="secondary" size="lg">
-                    Let&apos;s Talk
-                  </Button>
-                </Link>
+                <MagneticButton>
+                  <Link href="/projects">
+                    <Button variant="primary" size="lg">
+                      View My Work
+                    </Button>
+                  </Link>
+                </MagneticButton>
+                <MagneticButton>
+                  <Link href="/contact">
+                    <Button variant="secondary" size="lg">
+                      Let&apos;s Talk
+                    </Button>
+                  </Link>
+                </MagneticButton>
               </div>
             </FadeIn>
           </div>
@@ -84,25 +88,8 @@ export function HeroSection() {
         {/* Right column - animated orb */}
         <FadeIn direction="up" delay={0.3}>
           <div className="relative hidden lg:flex items-center justify-center">
-            <div className="hero-orb relative h-[420px] w-[420px]">
-              {/* Primary orb layer */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-accent/40 via-purple-500/30 to-blue-500/20 blur-3xl animate-pulse" />
-              {/* Secondary orb layer */}
-              <div className="absolute inset-8 rounded-full bg-gradient-to-tr from-blue-600/30 via-accent/20 to-violet-500/30 blur-2xl animate-pulse [animation-delay:1s]" />
-              {/* Inner glow */}
-              <div className="absolute inset-16 rounded-full bg-gradient-to-b from-purple-500/25 to-accent/15 blur-xl animate-pulse [animation-delay:2s]" />
-              {/* Core highlight */}
-              <div className="absolute inset-24 rounded-full bg-accent/10 blur-lg" />
-
-              {/* Floating code decorations */}
-              {codeDecorations.map((dec) => (
-                <span
-                  key={dec.text}
-                  className={`absolute text-accent/10 text-sm font-mono select-none pointer-events-none ${dec.className}`}
-                >
-                  {dec.text}
-                </span>
-              ))}
+            <div className="relative h-[420px] w-[420px]">
+              <HeroScene />
             </div>
           </div>
         </FadeIn>

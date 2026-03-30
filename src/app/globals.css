@@ -337,3 +337,26 @@ select:focus {
   padding: 2px 4px;
   margin: -2px -4px;
 }
+
+/* Animated link underline */
+.link-underline {
+  background-image: linear-gradient(var(--color-accent), var(--color-accent));
+  background-size: 0% 2px;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s ease;
+  padding-bottom: 2px;
+}
+
+.link-underline:hover {
+  background-size: 100% 2px;
+}
+
+/* Cursor spotlight — dark mode only */
+.cursor-spotlight {
+  opacity: 0;
+}
+
+[data-theme="dark"] .cursor-spotlight {
+  opacity: 1;
+}
