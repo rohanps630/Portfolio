@@ -57,8 +57,8 @@ export function SubmissionsList({
   };
 
   return (
-    <div className="bg-[#111128] border border-[#1e1e3a] rounded-xl overflow-hidden">
-      <table className="w-full">
+    <div className="bg-[#111128] border border-[#1e1e3a] rounded-xl overflow-x-auto">
+      <table className="w-full min-w-[700px]">
         <thead>
           <tr className="border-b border-[#1e1e3a]">
             <th className="px-5 py-3 text-left text-xs font-medium text-[#8888a0] uppercase tracking-wider w-8" />

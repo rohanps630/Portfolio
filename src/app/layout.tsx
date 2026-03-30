@@ -2,12 +2,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { siteConfig } from "@/content/site";
 import { buildPersonJsonLd } from "@/lib/seo";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { BackToTop } from "@/components/ui/BackToTop";
-import { ScrollProgress } from "@/components/ui/ScrollProgress";
-import { SmoothScroll } from "@/components/layout/SmoothScroll";
-import { CursorSpotlight } from "@/components/ui/CursorSpotlight";
+import { PublicShell } from "@/components/layout/PublicShell";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
@@ -102,19 +97,7 @@ export default function RootLayout({
           enableSystem
           storageKey="portfolio-theme"
         >
-          <SmoothScroll>
-            <CursorSpotlight />
-            <a href="#main-content" className="skip-link">
-              Skip to main content
-            </a>
-            <Navbar />
-            <ScrollProgress />
-            <main id="main-content" className="pt-16">
-              {children}
-            </main>
-            <Footer />
-            <BackToTop />
-          </SmoothScroll>
+          <PublicShell>{children}</PublicShell>
         </ThemeProvider>
       </body>
     </html>

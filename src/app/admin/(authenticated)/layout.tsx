@@ -16,7 +16,7 @@ export default async function AuthenticatedAdminLayout({
   return (
     <div data-theme="dark" className="flex min-h-screen bg-[#0a0a12]">
       <AdminSidebar />
-      <main className="flex-1 ml-64 p-8">{children}</main>
+      <main className="flex-1 lg:ml-64 px-4 pb-4 pt-20 lg:p-8">{children}</main>
     </div>
   );
 }
