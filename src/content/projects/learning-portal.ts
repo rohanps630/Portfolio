@@ -6,15 +6,15 @@ const learningPortal: Project = {
   tagline:
     "Cross-platform educational ecosystem bridging web and mobile learning",
   description:
-    "A unified educational platform that brings together a feature-rich web dashboard for educators and a student-focused mobile experience, powered by a shared API architecture that keeps learning seamless across every device.",
+    "A unified educational platform that brings together a feature-rich web dashboard for educators and a student-focused mobile experience. Powered by a shared API architecture with real-time collaboration features, it keeps learning seamless across every device while giving institutions actionable analytics on student engagement and outcomes.",
   category: "full-stack",
   featured: true,
   sortOrder: 2,
   challenge:
-    "Educational institutions needed a unified platform that works seamlessly across web and mobile, where the web app provides full administrative and content features while the mobile app focuses on student engagement.",
+    "Educational institutions needed a unified platform that works seamlessly across web and mobile, where the web app provides full administrative and content features while the mobile app focuses on student engagement. Existing solutions forced a choice between a powerful desktop tool and a limited mobile companion, resulting in fragmented data and poor adoption among students. The system had to support real-time video sessions and collaborative tools without sacrificing offline functionality for students in low-connectivity areas. Additionally, educators needed granular analytics to identify at-risk learners early without adding to their administrative burden.",
   role: "Full Stack Developer",
   approach:
-    "Shared API architecture serving both web and mobile clients, with React for the feature-rich web dashboard and React Native for the student-focused mobile experience.",
+    "Designed a monorepo with a shared RESTful API layer built on Node.js and Express, serving both the React web dashboard and the React Native mobile client from identical data contracts. Implemented WebSocket channels via Socket.IO for real-time video session signaling and live collaboration features like shared whiteboards. Used MongoDB with Redis caching to handle concurrent read-heavy workloads from thousands of active learners, and built an offline-first data layer in the mobile app using WatermelonDB for seamless sync. Developed a configurable analytics pipeline that aggregates engagement metrics and surfaces actionable insights for educators without manual report generation.",
   features: [
     {
       title: "Adaptive Learning Paths with Progress Tracking",
@@ -73,6 +73,7 @@ const learningPortal: Project = {
     "/images/projects/learning-portal/screenshot-2.webp",
     "/images/projects/learning-portal/screenshot-3.webp",
   ],
+  githubUrl: "https://github.com/rohanps630/learning-portal",
   duration: "6 months",
   year: "2022",
 };

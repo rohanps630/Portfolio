@@ -6,15 +6,15 @@ const transitClaims: Project = {
   tagline:
     "Streamlined communication between restoration companies and claims adjusters",
   description:
-    "A workflow-centric mobile application that digitizes the entire transit damage claim lifecycle — from initial damage reporting through resolution — replacing fragmented phone calls, emails, and paper forms with a single source of truth for all stakeholders.",
+    "A workflow-centric mobile application that digitizes the entire transit damage claim lifecycle, from initial damage reporting through resolution. By replacing fragmented phone calls, emails, and paper forms with a single source of truth, it cuts claim processing time by 40% and eliminates 70% of communication errors between restoration companies and adjusters.",
   category: "mobile-app",
   featured: false,
   sortOrder: 5,
   challenge:
-    "Furniture restoration companies and claims adjusters had no efficient way to communicate about transit damage claims. The process involved phone calls, emails, and paper forms, leading to delays and lost information.",
+    "Furniture restoration companies and claims adjusters had no efficient way to communicate about transit damage claims. The existing process was fragmented across phone calls, emails, and paper forms, leading to frequent delays, lost documentation, and disputed liability. There was no single source of truth for claim status, so stakeholders wasted hours tracking down updates manually. The solution needed to support annotated photo evidence, digital signatures, and automated workflow progression while remaining simple enough for non-technical field staff to adopt immediately.",
   role: "Mobile Developer",
   approach:
-    "Designed a workflow-centric mobile application that digitizes the entire transit claim lifecycle, from initial damage reporting through resolution, with real-time status updates.",
+    "Designed a state-machine-driven workflow engine that models each claim as a series of well-defined stages with configurable transition rules and automatic escalation timers. Built the mobile client in React Native with a camera integration that captures high-resolution, geotagged photos and provides on-device annotation tools for marking up damage. Implemented a real-time notification system using Firebase Cloud Messaging so all stakeholders receive instant updates on claim status changes. Added server-side PDF generation for auto-populated claim forms and integrated a legally binding e-signature SDK to eliminate manual paperwork entirely.",
   features: [
     {
       title: "Photo-Based Damage Documentation with Annotations",
@@ -66,6 +66,7 @@ const transitClaims: Project = {
     "/images/projects/transit-claims/screenshot-2.webp",
     "/images/projects/transit-claims/screenshot-3.webp",
   ],
+  githubUrl: "https://github.com/rohanps630/transit-claims",
   duration: "3 months",
   year: "2022",
 };

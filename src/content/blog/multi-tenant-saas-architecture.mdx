@@ -14,25 +14,206 @@ When I started building a project management SaaS for a client, the first major 
 
 We chose the shared database with row-level security approach. Each table includes a `tenant_id` column, and PostgreSQL's row-level security policies ensure that queries can only access rows belonging to the authenticated tenant. This gives us the cost efficiency of a single database while maintaining strong data isolation.
 
+The decision came down to economics. Running a separate database per tenant works well for enterprise customers willing to pay a premium, but our pricing model needed to support hundreds of small teams at a low price point. At roughly $15 per month per RDS instance, separate databases would have eaten the entire margin. The shared database approach reduced our infrastructure cost by approximately 80% compared to per-tenant isolation, while PostgreSQL's row-level security gave us confidence in the data boundaries.
+
+### Implementing Row-Level Security
+
+The RLS implementation requires careful setup. Every table that stores tenant data gets a policy, and we enforce this at the migration level so new tables cannot accidentally skip isolation.
+
+```sql
+-- Enable RLS on the projects table
+ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+
+-- Create a policy that restricts access to the current tenant
+CREATE POLICY tenant_isolation_policy ON projects
+  USING (tenant_id = current_setting('app.current_tenant')::uuid);
+
+-- Force RLS even for table owners (critical for security)
+ALTER TABLE projects FORCE ROW LEVEL SECURITY;
+
+-- Create a reusable function for consistent policy creation
+CREATE OR REPLACE FUNCTION create_tenant_policy(table_name text)
+RETURNS void AS $$
+BEGIN
+  EXECUTE format(
+    'ALTER TABLE %I ENABLE ROW LEVEL SECURITY', table_name
+  );
+  EXECUTE format(
+    'CREATE POLICY tenant_policy ON %I USING (tenant_id = current_setting(''app.current_tenant'')::uuid)',
+    table_name
+  );
+  EXECUTE format(
+    'ALTER TABLE %I FORCE ROW LEVEL SECURITY', table_name
+  );
+END;
+$$ LANGUAGE plpgsql;
+```
+
+The `FORCE ROW LEVEL SECURITY` line is easy to overlook but critical. Without it, table owners bypass RLS entirely, which means your migration user or superuser connections could leak data across tenants during maintenance scripts.
+
 ## Tenant-Aware Middleware
 
 Every request passes through middleware that extracts the tenant context from the JWT token and sets it on the database connection. This pattern ensures that even if application code forgets to filter by tenant, the database layer enforces isolation.
 
 ```typescript
-async function tenantMiddleware(req: Request, res: Response, next: Next) {
-  const token = extractBearerToken(req);
-  const { tenantId } = verifyJWT(token);
+import { Request, Response, NextFunction } from "express";
+import { Pool, PoolClient } from "pg";
 
-  await db.query("SET app.current_tenant = $1", [tenantId]);
-  req.tenantId = tenantId;
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+async function tenantMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const token = extractBearerToken(req);
+  if (!token) {
+    return res.status(401).json({ error: "Missing authentication token" });
+  }
+
+  const { tenantId, userId } = verifyJWT(token);
+
+  // Acquire a dedicated connection for this request
+  const client: PoolClient = await pool.connect();
+
+  try {
+    // Set the tenant context at the database session level
+    await client.query("SET app.current_tenant = $1", [tenantId]);
+    await client.query("SET app.current_user_id = $1", [userId]);
+
+    req.tenantId = tenantId;
+    req.dbClient = client;
+    next();
+  } catch (error) {
+    client.release();
+    return res.status(500).json({ error: "Failed to establish tenant context" });
+  }
+}
+
+// Cleanup middleware to release the connection after response
+function releaseConnection(req: Request, res: Response, next: NextFunction) {
+  res.on("finish", () => {
+    if (req.dbClient) {
+      // Reset session variables before returning to pool
+      req.dbClient.query("RESET app.current_tenant").finally(() => {
+        req.dbClient.release();
+      });
+    }
+  });
   next();
 }
 ```
+
+One detail that took us a week to debug in production: you must reset the session variables before returning the connection to the pool. Without the `RESET` call, a connection that served Tenant A could carry that context into a request for Tenant B if the pool recycles it. We caught this during a load test when a small percentage of requests returned data from the wrong tenant. That was a sobering afternoon.
+
+## Database Schema Design for Multi-Tenancy
+
+Beyond RLS, the schema itself needs to support multi-tenancy efficiently. We use a base model pattern where every tenant-scoped table inherits from a common structure.
+
+```typescript
+// Prisma schema pattern for tenant-scoped models
+// Every model that stores tenant data extends this base
+
+model Project {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  name      String
+  status    String   @default("active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  tasks     Task[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@map("projects")
+}
+
+model Tenant {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  plan        String   @default("free")
+  settings    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  projects    Project[]
+  users       User[]
+
+  @@map("tenants")
+}
+```
+
+The composite index on `[tenantId, status]` is not optional. Without it, queries that filter by tenant and status will perform a sequential scan once you pass a few thousand rows. We learned this when a tenant with 12,000 projects caused query times to spike from 3ms to 900ms. Adding the composite index brought it back to 4ms.
+
+## Caching Strategies for Multi-Tenant Systems
+
+Caching in a multi-tenant system requires strict key namespacing. Every cache key must include the tenant identifier, or you risk serving cached data from one tenant to another. We use a thin wrapper around Redis that enforces this at the type level.
+
+```typescript
+import Redis from "ioredis";
+
+class TenantCache {
+  private redis: Redis;
+
+  constructor(redisUrl: string) {
+    this.redis = new Redis(redisUrl);
+  }
+
+  private buildKey(tenantId: string, namespace: string, key: string): string {
+    return `tenant:${tenantId}:${namespace}:${key}`;
+  }
+
+  async get<T>(tenantId: string, namespace: string, key: string): Promise<T | null> {
+    const raw = await this.redis.get(this.buildKey(tenantId, namespace, key));
+    return raw ? JSON.parse(raw) : null;
+  }
+
+  async set(
+    tenantId: string,
+    namespace: string,
+    key: string,
+    value: unknown,
+    ttlSeconds: number = 300
+  ): Promise<void> {
+    await this.redis.setex(
+      this.buildKey(tenantId, namespace, key),
+      ttlSeconds,
+      JSON.stringify(value)
+    );
+  }
+
+  async invalidateNamespace(tenantId: string, namespace: string): Promise<void> {
+    const pattern = this.buildKey(tenantId, namespace, "*");
+    const keys = await this.redis.keys(pattern);
+    if (keys.length > 0) {
+      await this.redis.del(...keys);
+    }
+  }
+}
+```
+
+The `invalidateNamespace` method proved essential when tenants update their settings or schema customizations. Rather than tracking every individual cache key affected by a configuration change, we wipe the entire namespace for that tenant. On a system with 200 active tenants, our Redis memory usage stays around 450MB with a 5-minute default TTL, which is well within the budget for a single `cache.r6g.large` instance.
 
 ## Handling Tenant-Specific Customization
 
 Enterprise clients inevitably want custom fields, workflows, and branding. Rather than branching application code per tenant, we built a configuration-driven system where each tenant has a JSON schema defining their custom fields. The UI renders dynamically based on this schema, and custom field data is stored in a JSONB column.
 
+This approach kept our deployment pipeline simple. Every tenant runs on the same codebase, and customizations are data rather than code. When a tenant requests a new custom field type, we add it to the schema vocabulary once and every tenant can use it. We currently support text, number, date, select, multi-select, and URL field types, which has covered every request so far.
+
 ## Lessons in Billing and Metering
 
 Usage-based billing required instrumenting every API call with tenant-scoped counters in Redis. We aggregate these counters into daily snapshots stored in PostgreSQL, which feed into the billing system. The key lesson was to decouple metering from billing: record everything, and let the billing logic decide what to charge for.
+
+## Common Pitfalls
+
+**Forgetting RLS on new tables.** We added a CI check that runs against every migration file. If a new `CREATE TABLE` statement includes a `tenant_id` column but no corresponding `ENABLE ROW LEVEL SECURITY`, the build fails. This has caught three mistakes in six months.
+
+**Connection pool exhaustion.** Because each request acquires a dedicated connection for the tenant context, a spike in traffic can drain the pool. We set a per-tenant connection limit using a semaphore in the middleware. Each tenant can use at most 20% of the pool, preventing a single noisy tenant from starving others.
+
+**Cross-tenant joins in reporting.** Admin dashboards that aggregate data across tenants cannot use the same RLS-protected connections. We maintain a separate connection pool for admin operations that connects as a different database role with explicit cross-tenant permissions. This role is locked down to read-only access and is only available from internal services, never from the API layer.
+
+**Testing RLS policies.** Unit tests for database queries should explicitly verify that Tenant A cannot see Tenant B's data. We have a test helper that seeds two tenants, sets the session to Tenant A, and asserts that queries return zero rows from Tenant B. This simple pattern has saved us from two regressions where schema changes accidentally dropped a policy.
+
+Building a multi-tenant SaaS platform is a long series of small decisions that compound. Get the isolation model right early, invest in middleware that enforces boundaries automatically, and always assume that application code will eventually make a mistake that only the database layer can catch. The architecture should make the wrong thing hard to do, not just the right thing easy.

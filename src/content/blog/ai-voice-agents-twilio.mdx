@@ -12,30 +12,225 @@ published: true
 
 Interactive Voice Response systems have barely evolved in two decades. Users navigate rigid phone trees, pressing numbers to reach a department that may or may not handle their problem. A client in the insurance industry wanted to replace their entire IVR flow with a conversational AI agent that could understand natural language, look up policy details, and route calls intelligently.
 
+Their existing IVR had a 34 percent call abandonment rate. Customers were hanging up before reaching a human because the menu tree had seven levels and took an average of two minutes and forty seconds to navigate. The business case was straightforward: reduce abandonment, decrease average handle time, and handle simple queries like policy status checks without involving a human agent at all.
+
 ## Architecture Overview
 
 The pipeline has four stages: Twilio captures the caller's audio and streams it via WebSocket, Whisper transcribes the audio to text, GPT-4 generates a contextual response, and a text-to-speech engine sends audio back through Twilio. The critical challenge is latency. A pause longer than 800 milliseconds feels unnatural in conversation.
 
-```typescript
-twilioWs.on("message", async (audioChunk: Buffer) => {
-  transcriptionBuffer.push(audioChunk);
+The infrastructure runs on AWS. Twilio connects to an API Gateway backed by a Lambda function for the initial webhook, which then hands off to an EC2 instance running the WebSocket audio streaming server. We chose EC2 over Lambda for the streaming component because WebSocket connections are long-lived and Lambda's fifteen-minute timeout and cold start characteristics were unsuitable.
 
-  if (detectSilence(audioChunk, SILENCE_THRESHOLD_MS)) {
-    const transcript = await whisper.transcribe(
-      Buffer.concat(transcriptionBuffer)
-    );
-    const reply = await gpt4.chat(transcript, conversationHistory);
-    const audio = await tts.synthesize(reply);
-    twilioWs.send(audio);
-    transcriptionBuffer = [];
-  }
+## The Twilio Webhook Handler
+
+When a call comes in, Twilio sends an HTTP POST to your configured webhook URL. The initial response tells Twilio how to handle the call. For our voice agent, we respond with TwiML that connects Twilio's media stream to our WebSocket server:
+
+```typescript
+import express from "express";
+import twilio from "twilio";
+
+const app = express();
+app.use(express.urlencoded({ extended: false }));
+
+app.post("/voice/incoming", (req, res) => {
+  const twiml = new twilio.twiml.VoiceResponse();
+  const callSid = req.body.CallSid;
+  const callerNumber = req.body.From;
+
+  // Initialize conversation context
+  conversationStore.set(callSid, {
+    callerNumber,
+    history: [],
+    state: "greeting",
+    startedAt: Date.now(),
+  });
+
+  // Play initial greeting while connecting the stream
+  twiml.say(
+    { voice: "Polly.Joanna" },
+    "Hello, thank you for calling Meridian Insurance. How can I help you today?"
+  );
+
+  // Connect to our WebSocket server for bidirectional audio
+  const connect = twiml.connect();
+  connect.stream({
+    url: `wss://${process.env.STREAM_HOST}/media-stream`,
+    statusCallback: `${process.env.BASE_URL}/voice/stream-status`,
+    statusCallbackMethod: "POST",
+  });
+
+  res.type("text/xml");
+  res.send(twiml.toString());
 });
 ```
+
+The greeting plays immediately while the WebSocket connection is being established in the background. This eliminates dead air during setup, which was one of our early usability problems.
+
+## The Audio Processing Pipeline
+
+Once Twilio connects its media stream, audio chunks arrive as base64-encoded mulaw at 8kHz. The real-time processing pipeline handles transcription, response generation, and speech synthesis in a streaming fashion:
+
+```typescript
+import WebSocket from "ws";
+import { Readable } from "stream";
+
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.on("connection", (ws: WebSocket) => {
+  let transcriptionBuffer: Buffer[] = [];
+  let streamSid: string | null = null;
+  let callSid: string | null = null;
+
+  ws.on("message", async (data: string) => {
+    const msg = JSON.parse(data);
+
+    switch (msg.event) {
+      case "start":
+        streamSid = msg.start.streamSid;
+        callSid = msg.start.callSid;
+        break;
+
+      case "media":
+        const audioChunk = Buffer.from(msg.media.payload, "base64");
+        transcriptionBuffer.push(audioChunk);
+
+        if (detectSilence(audioChunk, SILENCE_THRESHOLD_MS)) {
+          const fullAudio = Buffer.concat(transcriptionBuffer);
+          transcriptionBuffer = [];
+
+          // Pipeline: transcribe -> generate -> synthesize -> send
+          const transcript = await whisper.transcribe(fullAudio);
+
+          if (transcript.confidence < 0.7) {
+            const fallbackAudio = await tts.synthesize(
+              "I didn't catch that, could you please repeat?"
+            );
+            sendAudioToTwilio(ws, streamSid!, fallbackAudio);
+            return;
+          }
+
+          const context = conversationStore.get(callSid!);
+          context.history.push({ role: "user", content: transcript.text });
+
+          const reply = await generateResponse(context);
+          context.history.push({ role: "assistant", content: reply });
+
+          const responseAudio = await tts.synthesize(reply);
+          sendAudioToTwilio(ws, streamSid!, responseAudio);
+        }
+        break;
+
+      case "stop":
+        conversationStore.delete(callSid!);
+        break;
+    }
+  });
+});
+
+function sendAudioToTwilio(ws: WebSocket, streamSid: string, audio: Buffer) {
+  const payload = audio.toString("base64");
+  ws.send(JSON.stringify({
+    event: "media",
+    streamSid,
+    media: { payload },
+  }));
+}
+```
+
+## Voice Agent State Machine
+
+A voice agent is not just a chatbot with audio. Calls have structure -- greetings, information gathering, lookups, confirmations, and transfers. I implemented a finite state machine to manage the conversation flow, which made the agent's behavior predictable and testable:
+
+```typescript
+type AgentState =
+  | "greeting"
+  | "identifying_caller"
+  | "understanding_intent"
+  | "policy_lookup"
+  | "providing_info"
+  | "confirming"
+  | "transferring"
+  | "closing";
+
+interface StateTransition {
+  from: AgentState;
+  to: AgentState;
+  condition: (context: ConversationContext, intent: string) => boolean;
+  action?: (context: ConversationContext) => Promise<void>;
+}
+
+const transitions: StateTransition[] = [
+  {
+    from: "greeting",
+    to: "identifying_caller",
+    condition: (_, intent) => intent !== "none",
+  },
+  {
+    from: "identifying_caller",
+    to: "policy_lookup",
+    condition: (ctx) => !!ctx.policyNumber,
+    action: async (ctx) => {
+      ctx.policyData = await policyService.lookup(ctx.policyNumber!);
+    },
+  },
+  {
+    from: "understanding_intent",
+    to: "transferring",
+    condition: (_, intent) => ["complaint", "claim_dispute", "cancel"].includes(intent),
+  },
+  {
+    from: "providing_info",
+    to: "closing",
+    condition: (_, intent) => intent === "satisfied" || intent === "goodbye",
+  },
+];
+
+async function processTransition(
+  context: ConversationContext,
+  userIntent: string
+): Promise<AgentState> {
+  const validTransitions = transitions.filter(
+    (t) => t.from === context.state && t.condition(context, userIntent)
+  );
+
+  if (validTransitions.length === 0) return context.state;
+
+  const transition = validTransitions[0];
+  if (transition.action) await transition.action(context);
+  context.state = transition.to;
+  return transition.to;
+}
+```
+
+The state machine solved a problem we hit early in development: the AI would sometimes try to answer questions it should have escalated. By constraining the conversation flow, we ensured that complaints, claim disputes, and cancellation requests always routed to a human agent regardless of what GPT-4 wanted to do.
 
 ## Achieving Sub-Second Latency
 
 The naive approach of waiting for the user to finish speaking, transcribing the entire utterance, generating a full response, and synthesizing the complete audio took about 2.4 seconds end to end. We brought this under 700 milliseconds by streaming at every stage. Whisper processes audio in chunks, GPT-4 streams tokens, and the TTS engine begins synthesizing as soon as the first sentence is complete.
 
+The latency breakdown after optimization was: silence detection at 50 milliseconds, Whisper transcription at 180 milliseconds for an average utterance, GPT-4 first token at 220 milliseconds, and TTS synthesis of the first sentence at 150 milliseconds. By pipelining these stages so that TTS starts as soon as the first GPT-4 sentence completes, the caller hears a response within 600 to 700 milliseconds of finishing their sentence.
+
+We also implemented speculative prefetching. During common flows like policy status checks, the system pre-fetches the caller's policy data from the database as soon as the caller is identified, before they even ask for it. This eliminated the 200 to 400 millisecond database lookup from the critical path for the most common query type.
+
 ## Handling Edge Cases
 
 Voice interfaces surface problems that text chat never does. Background noise, accented speech, and users who talk over the agent all required custom handling. We added a confidence threshold on transcription results and a graceful fallback that says "I didn't catch that, could you repeat?" when the score drops below 0.7.
+
+Barge-in detection was particularly tricky. When a caller interrupts the agent mid-sentence, you need to immediately stop the outgoing audio stream and begin listening. Twilio supports this through the `clear` event, but coordinating the state between the audio stream, the transcription pipeline, and the conversation context required careful synchronization.
+
+We also had to handle dual-tone multi-frequency (DTMF) input. Some callers instinctively press buttons even when talking to an AI agent. Rather than ignoring these inputs, we wired them into the state machine as alternative navigation signals. Pressing "0" at any point triggers an immediate transfer to a human agent.
+
+## Common Pitfalls
+
+**Not budgeting for silence detection tuning.** Our initial silence threshold of 500 milliseconds caused the agent to jump in too early during natural pauses. We increased it to 700 milliseconds, which felt more natural but added perceived latency. Finding the right balance took two weeks of user testing with real callers.
+
+**Ignoring the cost of GPT-4 at scale.** At 1,200 calls per day with an average of eight conversational turns per call, our OpenAI API costs reached $4,800 per month. We reduced this by 60 percent by fine-tuning a smaller model on our conversation logs for common intents and only falling back to GPT-4 for complex queries.
+
+**Forgetting about call recording compliance.** Insurance calls must be recorded in most jurisdictions. The recording needs to capture both sides of the conversation, including the AI's responses. We added a recording pipeline that merged the inbound caller audio with the synthesized agent audio into a single file stored in S3 with a 7-year retention policy.
+
+**Not testing with real phone lines.** Our staging environment used Twilio's test credentials, which skip the actual telephony network. Several audio encoding issues only surfaced when we connected to real PSTN lines. Always test with actual phone numbers before going to production.
+
+## Results
+
+After three months in production, the AI voice agent handles 68 percent of incoming calls without human intervention. Average handle time dropped from four minutes and twelve seconds to one minute and forty-eight seconds. The call abandonment rate fell from 34 percent to 11 percent. Customer satisfaction scores for AI-handled calls averaged 4.1 out of 5, compared to 3.8 for human-handled calls, likely because there is no hold time.
+
+The system processes an average of 1,200 calls per day across normal business hours and handles spikes of up to 180 concurrent calls during Monday morning peaks without degradation.

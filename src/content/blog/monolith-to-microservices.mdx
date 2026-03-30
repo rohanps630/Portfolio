@@ -12,9 +12,62 @@ published: true
 
 Our healthcare platform started as a single NestJS application with a PostgreSQL database. For the first eighteen months it served us well. Deployments were simple, debugging was straightforward, and the team of four developers could hold the entire system in their heads. The problems started when we onboarded two new enterprise clients with conflicting SLA requirements and the team grew to twelve engineers stepping on each other's toes in a single repository.
 
+Deploy frequency dropped from twice daily to twice weekly because a change in the billing module would require the entire QA suite to pass, including tests for the appointment scheduler and clinical notes features that nobody had touched. Merge conflicts became a daily ritual. The average pull request review time climbed from four hours to three days. The monolith was not broken from a technical standpoint -- it was broken from an organizational one.
+
+## Before and After: Architecture Comparison
+
+In the monolith, every module shared a single database, a single deployment artifact, and a single runtime process. A spike in appointment scheduling load would increase response times for the billing API even though they had nothing in common.
+
+After the migration, each domain service owned its own database, its own CI/CD pipeline, and could be scaled independently. The patient service ran on two containers during normal hours and four during the morning check-in rush. The billing service stayed at a single container because its traffic was steady and predictable.
+
+The communication between services shifted from direct function calls to asynchronous events via RabbitMQ, with synchronous HTTP calls reserved for the few paths that needed request-response semantics, like verifying a patient existed before creating an appointment.
+
 ## Identifying Service Boundaries
 
 The biggest mistake teams make is slicing by technical layer instead of business domain. We initially considered splitting into a "data layer service" and a "business logic service," which would have been a distributed monolith with extra network hops. Instead, we mapped bounded contexts from our domain model: patient management, appointment scheduling, billing, and clinical notes each became candidates for independent services.
+
+The tool that helped most was dependency analysis. I wrote a script that parsed our NestJS module imports and produced a graph of which modules depended on which. Two modules with heavy bidirectional dependencies were candidates for merging rather than splitting. The patient module and clinical notes module, for example, initially looked like separate domains but shared so many entities that separating them would have required duplicating half the data model.
+
+```typescript
+// Dependency analysis script that helped identify service boundaries
+import * as ts from "typescript";
+import * as path from "path";
+
+interface ModuleDependency {
+  source: string;
+  imports: string[];
+}
+
+function analyzeModuleDependencies(rootDir: string): ModuleDependency[] {
+  const modules: ModuleDependency[] = [];
+  const moduleFiles = glob.sync(`${rootDir}/**/*.module.ts`);
+
+  for (const file of moduleFiles) {
+    const source = ts.createSourceFile(
+      file,
+      fs.readFileSync(file, "utf-8"),
+      ts.ScriptTarget.Latest
+    );
+    const imports: string[] = [];
+
+    ts.forEachChild(source, (node) => {
+      if (ts.isImportDeclaration(node)) {
+        const moduleSpecifier = (node.moduleSpecifier as ts.StringLiteral).text;
+        if (moduleSpecifier.startsWith("../") || moduleSpecifier.startsWith("./")) {
+          const resolvedModule = path.resolve(path.dirname(file), moduleSpecifier);
+          imports.push(resolvedModule);
+        }
+      }
+    });
+
+    modules.push({ source: file, imports });
+  }
+
+  return modules;
+}
+```
+
+The output revealed that billing had exactly two inbound dependencies and zero bidirectional ones, making it the cleanest extraction target. We started there.
 
 ```yaml
 # docker-compose for local development
@@ -33,10 +86,112 @@ services:
     depends_on: [postgres]
 ```
 
+## Data Migration Strategy
+
+The hardest part of any microservices migration is splitting the database. Our monolith had 47 tables in a single PostgreSQL instance, with foreign keys crossing domain boundaries everywhere. Splitting cold turkey would have meant downtime, which was not an option for a healthcare platform processing active patient data.
+
+We used a phased approach. First, we introduced a schema-level separation within the same database, prefixing tables with their owning service. Then we set up logical replication to stream changes from the shared tables to the new service-specific databases. Finally, we cut over one service at a time.
+
+```typescript
+// Data sync worker that ran during the migration window
+// Replicated billing data from the shared DB to the billing service DB
+import { Pool } from "pg";
+
+const sourcePool = new Pool({ connectionString: process.env.MONOLITH_DB_URL });
+const targetPool = new Pool({ connectionString: process.env.BILLING_DB_URL });
+
+async function syncBillingData(lastSyncTimestamp: Date): Promise<Date> {
+  const { rows } = await sourcePool.query(
+    `SELECT * FROM billing_invoices
+     WHERE updated_at > $1
+     ORDER BY updated_at ASC
+     LIMIT 1000`,
+    [lastSyncTimestamp]
+  );
+
+  if (rows.length === 0) return lastSyncTimestamp;
+
+  const values = rows.map((row) => [
+    row.id, row.patient_id, row.amount_cents,
+    row.status, row.created_at, row.updated_at,
+  ]);
+
+  await targetPool.query(
+    `INSERT INTO invoices (id, patient_id, amount_cents, status, created_at, updated_at)
+     VALUES ${values.map((_, i) =>
+       `($${i * 6 + 1}, $${i * 6 + 2}, $${i * 6 + 3}, $${i * 6 + 4}, $${i * 6 + 5}, $${i * 6 + 6})`
+     ).join(", ")}
+     ON CONFLICT (id) DO UPDATE SET
+       amount_cents = EXCLUDED.amount_cents,
+       status = EXCLUDED.status,
+       updated_at = EXCLUDED.updated_at`,
+    values.flat()
+  );
+
+  return rows[rows.length - 1].updated_at;
+}
+```
+
+The sync worker ran continuously during a two-week migration window. We verified data consistency by running nightly checksums comparing row counts and hash sums between the source and target databases. The final cutover for billing took twelve minutes of read-only mode, during which we ran the sync one last time and flipped the DNS to point at the new service.
+
+## Deployment Pipeline Changes
+
+In the monolith, we had a single GitHub Actions workflow that ran lint, tests, build, and deploy in sequence. The entire pipeline took fourteen minutes. After the migration, each service had its own workflow triggered only by changes in its directory. The billing service pipeline ran in three minutes because it had a smaller test suite and a smaller Docker image.
+
+We adopted a path-based trigger pattern in GitHub Actions:
+
+```yaml
+# .github/workflows/billing-service.yml
+name: Billing Service CI/CD
+on:
+  push:
+    branches: [main]
+    paths:
+      - "services/billing/**"
+      - "shared/types/**"
+  pull_request:
+    paths:
+      - "services/billing/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cd services/billing && npm ci && npm test
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          docker build -t billing-service:${{ github.sha }} ./services/billing
+          docker push $ECR_REGISTRY/billing-service:${{ github.sha }}
+          kubectl set image deployment/billing-service \
+            app=$ECR_REGISTRY/billing-service:${{ github.sha }}
+```
+
+One change that saved us significant headaches was introducing a shared types package. Rather than duplicating TypeScript interfaces across services, we maintained a `shared/types` directory that was published as a private npm package. Any change to shared types triggered CI for all consuming services.
+
 ## What We Got Wrong
 
 We extracted too many services too fast. The billing service was pulled out before its API contract was stable, leading to three months of constant breaking changes across teams. My advice: extract one service at a time, let it stabilize for at least a full sprint cycle, and only then move on to the next. We also underestimated the operational overhead of monitoring twelve services instead of one.
 
+Observability was an afterthought. In a monolith, you grep a single log file. With microservices, a single user request might touch four services. We did not invest in distributed tracing until two months into the migration, which meant debugging production issues was essentially guesswork. By the time we integrated OpenTelemetry with Jaeger, we had already wasted dozens of engineering hours on incidents that would have been trivial to diagnose with proper trace context.
+
+We also underestimated the cost of data consistency. In the monolith, a database transaction guaranteed that creating an appointment and updating the billing record happened atomically. In the microservices world, we needed saga patterns and compensating transactions. The scheduling service would emit an "appointment.created" event, the billing service would create the invoice, and if billing failed, the scheduling service had to handle the rollback. Getting this right took an additional six weeks.
+
+## Lessons Learned
+
+**Start with a modular monolith.** If I could do it over, I would have invested in strong module boundaries inside the monolith first. Clear interfaces between modules, separate database schemas, and independent test suites. That way, extraction becomes a mechanical process rather than an archaeological dig.
+
+**Measure before you migrate.** We should have established baseline metrics for deploy frequency, lead time for changes, and incident recovery time before starting. Without a baseline, it was hard to prove the migration was delivering value to stakeholders during the painful middle phase.
+
+**Invest in developer experience early.** Running twelve services locally with Docker Compose consumed 8 GB of RAM and took ninety seconds to start. We eventually built a CLI tool that let developers run only the services they were actively working on, with the rest stubbed by lightweight mock servers.
+
 ## When to Stay Monolithic
 
 After going through this migration, I now advise most early-stage startups to stay monolithic until they hit a clear scaling or team-coordination bottleneck. A well-structured modular monolith with clear internal boundaries gives you eighty percent of the organizational benefits without the distributed systems tax.
+
+The signals that you are ready for microservices are organizational, not technical. If two teams cannot ship independently because they are blocked by each other's deployment schedules, or if a single service has a dramatically different scaling profile from the rest of the application, then a targeted extraction makes sense. But if you are a team of five engineers and your deploy pipeline takes ten minutes, you do not need microservices. You need better module boundaries.

@@ -48,11 +48,11 @@ export function getProjectCategories(): {
     {} as Record<string, number>
   );
 
-  return (Object.keys(categoryLabels) as ProjectCategory[]).map(
-    (category) => ({
+  return (Object.keys(categoryLabels) as ProjectCategory[])
+    .filter((category) => categoryCounts[category] > 0)
+    .map((category) => ({
       value: category,
       label: categoryLabels[category],
-      count: categoryCounts[category] || 0,
-    })
-  );
+      count: categoryCounts[category],
+    }));
 }

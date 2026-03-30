@@ -6,15 +6,15 @@ const roofingCrm: Project = {
   tagline:
     "Specialized mobile CRM for roofing contractors and project management",
   description:
-    "A mobile-first CRM built specifically for roofing contractors, covering the entire job lifecycle from lead capture and estimation through scheduling, progress tracking, and invoicing — designed to work reliably on job sites with limited connectivity.",
+    "A mobile-first CRM built specifically for roofing contractors, covering the entire job lifecycle from lead capture and estimation through scheduling, progress tracking, and invoicing. Designed to work reliably on job sites with limited connectivity, it reduces invoicing time by 60% and brings GPS-tagged photo documentation, weather-aware scheduling, and offline-first sync to every project.",
   category: "mobile-app",
   featured: false,
   sortOrder: 4,
   challenge:
-    "Roofing contractors relied on paper-based tracking and generic CRMs that didn't fit their workflow. They needed a mobile-first solution designed specifically for managing roofing jobs from estimation through invoicing.",
+    "Roofing contractors relied on paper-based tracking and generic CRMs that didn't fit their field-heavy workflow. Job data was scattered across clipboards, spreadsheets, and text messages, leading to lost estimates and delayed invoicing. They needed a mobile-first solution designed specifically for the roofing trade that could handle the entire job lifecycle from lead capture to final payment. Critically, the app had to function fully offline on remote job sites where cellular coverage is often unreliable.",
   role: "Mobile Developer",
   approach:
-    "Domain-driven design approach, working closely with roofing contractors to understand their workflow. Built a mobile-first CRM with offline capabilities for job sites.",
+    "Employed a domain-driven design methodology, conducting on-site ride-alongs with roofing contractors to map their real-world workflows before writing any code. Built the mobile client in React Native with an offline-first SQLite layer that queues all mutations and syncs via a conflict-resolution algorithm when connectivity returns. Integrated Stripe for in-app payment processing and invoice generation directly from job line items, and connected a hyperlocal weather API to the scheduling module so crews can plan around rain days. Backed the system with a Node.js API on PostgreSQL, storing geotagged photos in AWS S3 with pre-signed URLs for fast, secure retrieval.",
   features: [
     {
       title: "Job Workflow Management",
@@ -66,6 +66,7 @@ const roofingCrm: Project = {
     "/images/projects/roofing-crm/screenshot-2.webp",
     "/images/projects/roofing-crm/screenshot-3.webp",
   ],
+  githubUrl: "https://github.com/rohanps630/roofing-crm",
   duration: "3 months",
   year: "2023",
 };

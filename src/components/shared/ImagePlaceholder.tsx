@@ -5,6 +5,7 @@ interface ImagePlaceholderProps {
   category?: string;
   aspectRatio?: "video" | "square" | "wide";
   className?: string;
+  alt?: string;
 }
 
 const categoryGradients: Record<string, string> = {
@@ -20,6 +21,7 @@ export function ImagePlaceholder({
   category,
   aspectRatio = "video",
   className,
+  alt,
 }: ImagePlaceholderProps) {
   const gradient = categoryGradients[category || "default"] || categoryGradients.default;
 
@@ -35,6 +37,7 @@ export function ImagePlaceholder({
         },
         className
       )}
+      {...(alt ? { role: "img", "aria-label": alt } : { "aria-hidden": true as const })}
     >
       <div className="absolute inset-0 flex items-center justify-center p-6">
         <p className="text-center font-heading text-lg font-semibold text-foreground/30">

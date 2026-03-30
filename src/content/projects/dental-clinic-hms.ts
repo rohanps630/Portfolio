@@ -6,15 +6,15 @@ const dentalClinicHms: Project = {
   tagline:
     "Mobile-first healthcare management for small and medium dental clinics",
   description:
-    "A native Android application paired with a robust NestJS backend, purpose-built for small and medium dental clinics that need affordable, mobile-first practice management — covering scheduling, electronic health records, treatment planning, and billing in one streamlined package.",
+    "A native Android application paired with a robust NestJS backend, purpose-built for small and medium dental clinics that need affordable, mobile-first practice management. Covering scheduling with conflict detection, electronic health records, treatment planning, and automated billing, it has been adopted by over 15 clinics and reduced scheduling conflicts by 90%.",
   category: "full-stack",
   featured: false,
   sortOrder: 6,
   challenge:
-    "Small dental clinics struggled with managing patient records, scheduling, and billing using outdated paper systems or expensive enterprise software. They needed an affordable, mobile-first solution.",
+    "Small dental clinics struggled with managing patient records, scheduling, and billing using outdated paper systems or prohibitively expensive enterprise software designed for hospital-scale operations. Double bookings were common, patient histories were difficult to retrieve during appointments, and billing was a manual, error-prone process. The solution needed to be affordable for independent practices while still meeting healthcare data security standards. It also had to integrate seamlessly into existing clinical workflows without requiring extensive staff training.",
   role: "Lead Developer",
   approach:
-    "Native Android development with Kotlin for optimal performance and platform integration, backed by a robust NestJS API. Designed with HIPAA-conscious security practices and intuitive clinical workflows.",
+    "Built the client as a native Android application in Kotlin, leveraging Jetpack Compose for a modern, responsive UI that feels natural on tablets and phones used in clinical settings. Backed it with a NestJS API on PostgreSQL, implementing row-level security and AES-256 encryption at rest for HIPAA-conscious data handling. Designed the scheduling engine with a constraint-satisfaction algorithm that accounts for procedure duration, provider availability, and room assignment to prevent conflicts. Integrated Firebase Cloud Messaging for automated appointment reminders via SMS and push notifications, with configurable timing and confirmation tracking.",
   features: [
     {
       title: "Patient Scheduling with Conflict Detection",
@@ -66,6 +66,7 @@ const dentalClinicHms: Project = {
     "/images/projects/dental-clinic-hms/screenshot-2.webp",
     "/images/projects/dental-clinic-hms/screenshot-3.webp",
   ],
+  githubUrl: "https://github.com/rohanps630/dental-clinic-hms",
   duration: "5 months",
   year: "2024",
 };

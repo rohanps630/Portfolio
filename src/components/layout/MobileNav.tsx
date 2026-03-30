@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -13,10 +13,51 @@ import { cn } from "@/lib/utils";
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const menuRef = useRef<HTMLDivElement>(null);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        toggleButtonRef.current?.focus();
+        return;
+      }
+
+      if (e.key !== "Tab") return;
+
+      const focusableElements = menuRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusableElements || focusableElements.length === 0) return;
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (open && menuRef.current) {
+      const firstLink = menuRef.current.querySelector<HTMLElement>("a[href]");
+      if (firstLink) {
+        requestAnimationFrame(() => firstLink.focus());
+      }
+    }
+  }, [open]);
 
   return (
     <div className="md:hidden">
       <button
+        ref={toggleButtonRef}
         onClick={() => setOpen(!open)}
         className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
         aria-label={open ? "Close menu" : "Open menu"}
@@ -39,11 +80,13 @@ export function MobileNav() {
 
             {/* Menu panel */}
             <motion.div
+              ref={menuRef}
               initial={{ opacity: 0, x: "100%" }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="fixed top-16 right-0 bottom-0 w-72 bg-background border-l border-border z-50 flex flex-col p-6"
+              onKeyDown={handleKeyDown}
             >
               <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
                 {siteConfig.nav.map((item) => (

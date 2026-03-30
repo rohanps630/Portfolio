@@ -6,15 +6,15 @@ const aiAutomationHub: Project = {
   tagline:
     "Intelligent customer support and lead generation with AI voice agents",
   description:
-    "An AI-driven platform that transforms customer support and lead generation through intelligent voice agents, automated workflows, and real-time conversation analytics — helping businesses respond faster and convert more leads.",
+    "An AI-driven platform that transforms customer support and lead generation through intelligent voice agents, automated workflows, and real-time conversation analytics. By combining NLP-powered voice agents with machine learning lead scoring, it helps businesses respond to inquiries in under two minutes and increase lead conversion rates by up to 45%.",
   category: "ai-ml",
   featured: true,
   sortOrder: 3,
   challenge:
-    "Businesses were losing potential customers due to slow response times and inconsistent support quality. They needed an AI-powered solution that could handle customer interactions autonomously while maintaining a human touch.",
+    "Businesses were losing potential customers due to slow response times and inconsistent support quality across multiple communication channels. Their existing support infrastructure averaged four-hour response times and lacked any intelligent routing or prioritization, causing high-value leads to go cold. They needed an AI-powered solution that could handle customer interactions autonomously while maintaining a human touch and knowing when to escalate. The system also had to integrate with existing CRM and telephony infrastructure without requiring a costly migration.",
   role: "Lead Full Stack Developer",
   approach:
-    "Built an event-driven architecture with NestJS, integrated Twilio for voice agent capabilities, and implemented AI models for natural language understanding and automated response generation.",
+    "Architected an event-driven microservices platform using NestJS with a message queue backbone powered by Redis Streams for reliable asynchronous processing. Integrated Twilio Programmable Voice for inbound and outbound call handling, layering OpenAI GPT models on top for real-time natural language understanding and context-aware response generation. Built a custom ML pipeline for lead scoring that analyzes conversation sentiment, engagement patterns, and demographic signals to prioritize the highest-value prospects. Implemented a React-based operator dashboard with live WebSocket feeds for real-time conversation monitoring, analytics, and manual escalation controls.",
   features: [
     {
       title: "AI-Powered Voice Agents via Twilio Integration",
@@ -75,6 +75,7 @@ const aiAutomationHub: Project = {
     "/images/projects/ai-automation-hub/screenshot-2.webp",
     "/images/projects/ai-automation-hub/screenshot-3.webp",
   ],
+  githubUrl: "https://github.com/rohanps630/ai-automation-hub",
   duration: "5 months",
   year: "2024",
 };

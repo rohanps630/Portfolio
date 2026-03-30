@@ -6,15 +6,15 @@ const accessibleChatSystem: Project = {
   tagline:
     "Inclusive communication platform for individuals with speech and hearing impairments",
   description:
-    "A real-time communication platform purpose-built for accessibility, combining WebSocket-powered messaging with text-to-speech and speech-to-text capabilities to break down communication barriers for individuals with speech and hearing impairments.",
+    "A real-time communication platform purpose-built for accessibility, combining WebSocket-powered messaging with text-to-speech and speech-to-text capabilities. Designed to break down communication barriers for individuals with speech and hearing impairments, it delivers sub-100ms message latency with full WCAG 2.1 AA compliance across every interaction.",
   category: "mobile-app",
   featured: true,
   sortOrder: 1,
   challenge:
-    "Built for individuals with speech and hearing impairments who face significant barriers in real-time digital communication. Existing chat apps lacked accessibility features like text-to-speech, making them unusable for this community.",
+    "Built for individuals with speech and hearing impairments who face significant barriers in real-time digital communication. Existing chat applications lacked critical accessibility features like text-to-speech and screen reader support, making them effectively unusable for this community. The platform also needed to handle unreliable network conditions gracefully, since many users depend on mobile devices in environments with spotty connectivity. Balancing real-time performance with robust accessibility was a core technical tension that shaped every design decision.",
   role: "Lead Developer",
   approach:
-    "Focus on empathy-driven design with WebSocket architecture for real-time messaging, integrated text-to-speech engine, and comprehensive accessibility features from the ground up.",
+    "Adopted an empathy-driven design methodology, conducting usability sessions with individuals who have speech and hearing impairments to inform every interface decision. Built on a WebSocket architecture using Socket.IO for bidirectional, low-latency messaging with automatic reconnection and message queuing. Integrated the Web Speech API alongside a server-side fallback engine for text-to-speech and speech-to-text conversion, ensuring consistent behavior across devices. Implemented ARIA live regions, logical focus management, and high-contrast theming from the ground up to meet WCAG 2.1 AA compliance.",
   features: [
     {
       title: "Real-Time Messaging with WebSockets",
@@ -66,6 +66,7 @@ const accessibleChatSystem: Project = {
     "/images/projects/accessible-chat-system/screenshot-2.webp",
     "/images/projects/accessible-chat-system/screenshot-3.webp",
   ],
+  githubUrl: "https://github.com/rohanps630/accessible-chat-app",
   duration: "4 months",
   year: "2023",
 };

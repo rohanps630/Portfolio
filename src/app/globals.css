@@ -66,6 +66,9 @@
   --color-border: #e2e2ea;
   --color-card: #ffffff;
   --color-card-hover: #f8f8fc;
+  --color-success: #16a34a;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
 }
 
 /* Base styles */
@@ -158,6 +161,11 @@ body {
   --tw-prose-quotes: var(--color-muted-foreground);
   --tw-prose-quote-borders: var(--color-accent);
   --tw-prose-hr: var(--color-border);
+}
+
+[data-theme="light"] .prose {
+  --tw-prose-pre-bg: #f1f1f5;
+  --tw-prose-pre-code: #0a0a12;
 }
 
 /* Tech stack infinite scroll */
