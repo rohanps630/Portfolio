@@ -1,0 +1,42 @@
+---
+title: "From Monolith to Microservices: Lessons from a Healthcare Platform Migration"
+excerpt: "Practical lessons learned migrating a large healthcare monolith to microservices, including what we got wrong, what worked, and when you should avoid microservices entirely."
+date: "2025-10-20"
+category: "architecture"
+tags: ["microservices", "architecture", "nodejs", "docker"]
+coverImage: "/images/blog/monolith-microservices.jpg"
+published: true
+---
+
+## The Monolith That Worked (Until It Didn't)
+
+Our healthcare platform started as a single NestJS application with a PostgreSQL database. For the first eighteen months it served us well. Deployments were simple, debugging was straightforward, and the team of four developers could hold the entire system in their heads. The problems started when we onboarded two new enterprise clients with conflicting SLA requirements and the team grew to twelve engineers stepping on each other's toes in a single repository.
+
+## Identifying Service Boundaries
+
+The biggest mistake teams make is slicing by technical layer instead of business domain. We initially considered splitting into a "data layer service" and a "business logic service," which would have been a distributed monolith with extra network hops. Instead, we mapped bounded contexts from our domain model: patient management, appointment scheduling, billing, and clinical notes each became candidates for independent services.
+
+```yaml
+# docker-compose for local development
+services:
+  patient-service:
+    build: ./services/patient
+    ports: ["3001:3000"]
+    depends_on: [postgres, redis]
+  scheduling-service:
+    build: ./services/scheduling
+    ports: ["3002:3000"]
+    depends_on: [postgres, redis]
+  billing-service:
+    build: ./services/billing
+    ports: ["3003:3000"]
+    depends_on: [postgres]
+```
+
+## What We Got Wrong
+
+We extracted too many services too fast. The billing service was pulled out before its API contract was stable, leading to three months of constant breaking changes across teams. My advice: extract one service at a time, let it stabilize for at least a full sprint cycle, and only then move on to the next. We also underestimated the operational overhead of monitoring twelve services instead of one.
+
+## When to Stay Monolithic
+
+After going through this migration, I now advise most early-stage startups to stay monolithic until they hit a clear scaling or team-coordination bottleneck. A well-structured modular monolith with clear internal boundaries gives you eighty percent of the organizational benefits without the distributed systems tax.

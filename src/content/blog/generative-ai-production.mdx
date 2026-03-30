@@ -1,0 +1,38 @@
+---
+title: "A Developer's Guide to Generative AI Integration in Production Apps"
+excerpt: "Practical patterns for integrating LLMs into production applications, covering prompt engineering, cost management, error handling, and user experience design."
+date: "2025-04-15"
+category: "ai"
+tags: ["ai", "llm", "openai", "production"]
+coverImage: "/images/blog/generative-ai-production.jpg"
+published: true
+---
+
+## Beyond the Demo
+
+Every developer has seen impressive AI demos, but shipping generative AI in production is a different challenge entirely. After integrating LLMs into three production applications over the past year, I have encountered a consistent set of problems that demos never surface: unpredictable latency, hallucinated data, cost overruns, and users who don't understand what the AI can and cannot do.
+
+## Designing the Prompt Layer
+
+The single most impactful architectural decision is treating prompts as versioned, testable artifacts rather than inline strings. We maintain a prompt registry where each prompt has a name, version number, template with typed variables, and a suite of test cases. Deployments can roll back to a previous prompt version without changing application code.
+
+```typescript
+const prompts = {
+  "summarize-notes": {
+    version: 3,
+    model: "gpt-4o",
+    maxTokens: 500,
+    template: `Summarize the following clinical notes in 3 bullet points.
+Focus on: diagnosis, treatment plan, and follow-up actions.
+Notes: {{notes}}`,
+  },
+};
+```
+
+## Managing Cost at Scale
+
+Token costs add up quickly when you have thousands of users. We implemented a tiered approach: simple classification tasks use a smaller, cheaper model, while complex generation tasks use GPT-4. A caching layer intercepts semantically similar requests using embedding-based similarity search, reducing redundant API calls by about thirty-five percent.
+
+## Error Handling and Fallbacks
+
+LLM APIs fail in ways that traditional APIs don't. Timeouts are longer, rate limits are stricter, and responses can be technically valid JSON but semantically nonsensical. We wrap every LLM call in a circuit breaker pattern with exponential backoff, and every feature that uses AI has a graceful degradation path that works without it.

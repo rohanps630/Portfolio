@@ -1,0 +1,34 @@
+---
+title: "How I Improved App Performance by 40% with React Rendering Optimization"
+excerpt: "A case study on diagnosing and fixing React rendering performance issues in a production dashboard application, with measurable before-and-after results."
+date: "2025-05-10"
+category: "react"
+tags: ["react", "performance", "optimization", "profiling"]
+coverImage: "/images/blog/react-performance.jpg"
+published: true
+---
+
+## The Performance Problem
+
+A client's analytics dashboard had become painfully slow. Users reported noticeable lag when switching between views, and the interactive charts took several seconds to respond to filter changes. The React DevTools Profiler revealed that a single filter change was triggering re-renders across 847 components, most of which had no reason to update.
+
+## Diagnosing the Root Causes
+
+The three biggest culprits were inline object creation in props, a context provider wrapping the entire app with frequently changing values, and large list components rendering without virtualization. Each problem compounded the others: the context change triggered a tree-wide re-render, and every list item re-created its inline style objects on each render.
+
+```tsx
+// Before: new object reference every render
+<ChartCard style={{ padding: 16, margin: 8 }} data={data} />
+
+// After: stable reference
+const chartCardStyle = { padding: 16, margin: 8 } as const;
+<ChartCard style={chartCardStyle} data={data} />
+```
+
+## The Fixes That Mattered
+
+I split the monolithic context into three focused providers: one for user preferences that rarely change, one for the active filter state, and one for the data cache. Components subscribe only to the context they need, so a filter change no longer re-renders the sidebar or the header. For the data tables, I replaced the naive map with `react-window`, cutting DOM nodes from 2,400 to roughly 40 visible rows at any time.
+
+## Measuring the Impact
+
+After the optimizations, the Lighthouse performance score went from 54 to 89. Interaction to Next Paint dropped from 380 milliseconds to 120 milliseconds. The filter-to-chart-update cycle, which was the user's primary complaint, went from 1.8 seconds to under 400 milliseconds. The total time investment was about three days of focused profiling and refactoring.

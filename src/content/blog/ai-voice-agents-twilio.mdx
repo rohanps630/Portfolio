@@ -1,0 +1,41 @@
+---
+title: "Integrating AI Voice Agents with Twilio: A Technical Deep Dive"
+excerpt: "How I built an AI-powered voice agent using Twilio, OpenAI's Whisper for transcription, and GPT-4 for conversational responses, with sub-second latency."
+date: "2025-09-12"
+category: "ai"
+tags: ["ai", "twilio", "voice", "openai"]
+coverImage: "/images/blog/ai-voice-agents.jpg"
+published: true
+---
+
+## The Problem With Traditional IVR
+
+Interactive Voice Response systems have barely evolved in two decades. Users navigate rigid phone trees, pressing numbers to reach a department that may or may not handle their problem. A client in the insurance industry wanted to replace their entire IVR flow with a conversational AI agent that could understand natural language, look up policy details, and route calls intelligently.
+
+## Architecture Overview
+
+The pipeline has four stages: Twilio captures the caller's audio and streams it via WebSocket, Whisper transcribes the audio to text, GPT-4 generates a contextual response, and a text-to-speech engine sends audio back through Twilio. The critical challenge is latency. A pause longer than 800 milliseconds feels unnatural in conversation.
+
+```typescript
+twilioWs.on("message", async (audioChunk: Buffer) => {
+  transcriptionBuffer.push(audioChunk);
+
+  if (detectSilence(audioChunk, SILENCE_THRESHOLD_MS)) {
+    const transcript = await whisper.transcribe(
+      Buffer.concat(transcriptionBuffer)
+    );
+    const reply = await gpt4.chat(transcript, conversationHistory);
+    const audio = await tts.synthesize(reply);
+    twilioWs.send(audio);
+    transcriptionBuffer = [];
+  }
+});
+```
+
+## Achieving Sub-Second Latency
+
+The naive approach of waiting for the user to finish speaking, transcribing the entire utterance, generating a full response, and synthesizing the complete audio took about 2.4 seconds end to end. We brought this under 700 milliseconds by streaming at every stage. Whisper processes audio in chunks, GPT-4 streams tokens, and the TTS engine begins synthesizing as soon as the first sentence is complete.
+
+## Handling Edge Cases
+
+Voice interfaces surface problems that text chat never does. Background noise, accented speech, and users who talk over the agent all required custom handling. We added a confidence threshold on transcription results and a graceful fallback that says "I didn't catch that, could you repeat?" when the score drops below 0.7.

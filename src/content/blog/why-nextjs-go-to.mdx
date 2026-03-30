@@ -1,0 +1,40 @@
+---
+title: "Why Next.js is My Go-To for Client Projects (and When I Don't Use It)"
+excerpt: "After building over a dozen production apps with Next.js, here's my honest take on when it shines, when it's overkill, and the alternatives I reach for instead."
+date: "2025-08-05"
+category: "react"
+tags: ["nextjs", "react", "frameworks", "architecture"]
+coverImage: "/images/blog/nextjs-goto.jpg"
+published: true
+---
+
+## The Default Choice
+
+When a client comes to me with a new web project, Next.js is my starting point about eighty percent of the time. The combination of server-side rendering, API routes, file-based routing, and the deployment story with Vercel makes it the fastest path from idea to production for most web applications. The App Router in particular has matured into a genuinely powerful model for building data-driven pages.
+
+## Where Next.js Shines
+
+The sweet spot is content-heavy applications that also need dynamic features. Marketing sites with a blog, SaaS dashboards with public-facing pages, e-commerce storefronts. Server Components let me fetch data at the component level without client-side waterfalls, and the built-in image optimization alone has saved clients thousands of dollars in bandwidth costs.
+
+```tsx
+// Server Component - zero client JS for this data fetch
+async function PricingTable() {
+  const plans = await db.plans.findMany({ where: { active: true } });
+
+  return (
+    <div className="grid grid-cols-3 gap-6">
+      {plans.map((plan) => (
+        <PricingCard key={plan.id} plan={plan} />
+      ))}
+    </div>
+  );
+}
+```
+
+## When I Reach for Something Else
+
+For highly interactive single-page applications where every view is behind authentication, a plain Vite plus React setup is simpler and avoids the SSR complexity. For static documentation sites, Astro gives better performance out of the box. And for projects where the client's team is more comfortable with Vue, I'll use Nuxt without hesitation.
+
+## The Honest Tradeoffs
+
+Next.js is not without friction. The App Router's caching behavior can be surprising if you don't invest time understanding it. The boundary between server and client components requires discipline. And vendor lock-in to Vercel, while not absolute, is a real consideration for clients who want to self-host.

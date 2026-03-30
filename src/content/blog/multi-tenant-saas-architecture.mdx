@@ -1,0 +1,38 @@
+---
+title: "The Architecture Behind a Multi-Tenant SaaS Platform"
+excerpt: "A walkthrough of the technical decisions behind building a multi-tenant SaaS platform, from database isolation strategies to tenant-aware middleware."
+date: "2025-06-22"
+category: "architecture"
+tags: ["saas", "multi-tenant", "architecture", "postgresql"]
+coverImage: "/images/blog/multi-tenant-saas.jpg"
+published: true
+---
+
+## Choosing a Tenancy Model
+
+When I started building a project management SaaS for a client, the first major decision was the tenancy model. The three common approaches are separate databases per tenant, shared database with separate schemas, and shared database with a tenant ID column. Each comes with different tradeoffs in isolation, cost, and operational complexity.
+
+We chose the shared database with row-level security approach. Each table includes a `tenant_id` column, and PostgreSQL's row-level security policies ensure that queries can only access rows belonging to the authenticated tenant. This gives us the cost efficiency of a single database while maintaining strong data isolation.
+
+## Tenant-Aware Middleware
+
+Every request passes through middleware that extracts the tenant context from the JWT token and sets it on the database connection. This pattern ensures that even if application code forgets to filter by tenant, the database layer enforces isolation.
+
+```typescript
+async function tenantMiddleware(req: Request, res: Response, next: Next) {
+  const token = extractBearerToken(req);
+  const { tenantId } = verifyJWT(token);
+
+  await db.query("SET app.current_tenant = $1", [tenantId]);
+  req.tenantId = tenantId;
+  next();
+}
+```
+
+## Handling Tenant-Specific Customization
+
+Enterprise clients inevitably want custom fields, workflows, and branding. Rather than branching application code per tenant, we built a configuration-driven system where each tenant has a JSON schema defining their custom fields. The UI renders dynamically based on this schema, and custom field data is stored in a JSONB column.
+
+## Lessons in Billing and Metering
+
+Usage-based billing required instrumenting every API call with tenant-scoped counters in Redis. We aggregate these counters into daily snapshots stored in PostgreSQL, which feed into the billing system. The key lesson was to decouple metering from billing: record everything, and let the billing logic decide what to charge for.

@@ -1,0 +1,47 @@
+---
+title: "Building Accessible Applications: Going Beyond WCAG Compliance"
+excerpt: "Why treating accessibility as a checkbox exercise fails your users, and practical strategies for building genuinely inclusive applications from the ground up."
+date: "2025-02-10"
+category: "accessibility"
+tags: ["accessibility", "a11y", "react", "ux"]
+coverImage: "/images/blog/accessible-apps.jpg"
+published: true
+---
+
+## The Compliance Trap
+
+Most teams approach accessibility by running an automated scanner before launch and fixing the errors it flags. This catches maybe thirty percent of real accessibility issues. Automated tools can detect missing alt text and color contrast failures, but they cannot tell you that your custom dropdown is impossible to navigate with a keyboard or that your loading states leave screen reader users in silence.
+
+## Accessibility as Architecture
+
+The most effective approach I have found is making accessibility a first-class architectural concern rather than a last-mile fix. Every component in our design system is built with ARIA attributes, keyboard navigation, and focus management from the start. When accessibility is baked into the primitives, the applications built on top of them inherit it automatically.
+
+```tsx
+function Dialog({ isOpen, onClose, title, children }: DialogProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      dialogRef.current?.focus();
+      document.body.style.overflow = "hidden";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  return (
+    <div role="dialog" aria-modal="true" aria-labelledby="dialog-title"
+         ref={dialogRef} tabIndex={-1} onKeyDown={handleEscClose}>
+      <h2 id="dialog-title">{title}</h2>
+      {children}
+    </div>
+  );
+}
+```
+
+## Testing With Real Users
+
+Automated testing plus manual keyboard testing still misses the lived experience of people with disabilities. We run quarterly usability sessions with screen reader users, and the insights are humbling. A button that our team thought was perfectly accessible turned out to announce as a meaningless label because the icon-only design had a generic aria-label.
+
+## Beyond Visual Disabilities
+
+Accessibility extends far beyond screen readers. Motor impairments affect hover interactions and small click targets. Cognitive disabilities impact information density and navigation complexity. Vestibular disorders make animations uncomfortable. Building for the full spectrum of human ability makes your application better for everyone.

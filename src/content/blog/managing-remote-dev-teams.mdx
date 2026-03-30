@@ -1,0 +1,33 @@
+---
+title: "Managing Remote Development Teams: Processes That Actually Work"
+excerpt: "Lessons from leading distributed engineering teams across multiple time zones, covering async communication, code review culture, and maintaining team cohesion."
+date: "2025-03-01"
+category: "career"
+tags: ["leadership", "remote-work", "engineering-management", "process"]
+coverImage: "/images/blog/remote-teams.jpg"
+published: true
+---
+
+## The Async-First Mindset
+
+After leading remote development teams for three years, the single biggest lesson is that async communication isn't just a concession to time zones. It produces better decisions. When engineers write their thoughts instead of speaking off the cuff in a meeting, proposals are more structured, context is preserved for future reference, and introverted team members contribute equally.
+
+## What Actually Replaced Meetings
+
+We reduced recurring meetings to two per week: a Monday planning session and a Friday demo. Everything else became async. Technical discussions happen in GitHub PR comments. Architecture decisions are proposed as written RFCs with a 48-hour comment window. Status updates are automated through CI/CD notifications and a daily bot that collects blockers.
+
+## Code Review as Culture
+
+In a remote team, pull request reviews are the primary touchpoint between engineers. We established three principles: reviews must happen within four business hours, every review must include at least one positive comment, and nitpicks are labeled as such so authors know what's blocking versus what's optional.
+
+```markdown
+## PR Review Guidelines
+
+- **Blocking**: Security issues, bugs, missing tests
+- **Suggestion**: Better approach exists but current works
+- **Nitpick**: Style preference, not worth blocking (prefix with "nit:")
+```
+
+## Maintaining Human Connection
+
+The hardest part of remote work is preventing isolation. We allocate budget for quarterly in-person offsites focused on relationship building rather than work output. Between offsites, optional virtual coffee chats are randomly paired each week. These small rituals have a measurable impact on retention and collaboration quality.

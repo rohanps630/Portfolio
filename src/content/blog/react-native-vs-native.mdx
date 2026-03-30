@@ -1,0 +1,37 @@
+---
+title: "Building Cross-Platform Apps: React Native vs. Native Development in 2026"
+excerpt: "An honest comparison of React Native and native development based on shipping production apps with both approaches, covering performance, developer experience, and total cost."
+date: "2025-07-18"
+category: "mobile"
+tags: ["react-native", "mobile", "ios", "android", "kotlin"]
+coverImage: "/images/blog/rn-vs-native.jpg"
+published: true
+---
+
+## The State of Cross-Platform in 2026
+
+The cross-platform landscape has matured significantly. React Native's New Architecture with Fabric and TurboModules has closed much of the performance gap that native developers used to cite as a dealbreaker. Having shipped production apps in both React Native and native Kotlin/Swift over the past four years, I can say the decision is no longer about capability but about tradeoffs.
+
+## When React Native Wins
+
+For startups and small teams shipping to both iOS and Android, React Native delivers roughly seventy percent code sharing between platforms. The iteration speed with hot reloading, combined with the ability to share business logic with a web app, makes it the pragmatic choice when time-to-market matters more than squeezing the last five percent of performance.
+
+```tsx
+// Shared hook between React Native and React web
+function usePatientRecords(patientId: string) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["patient", patientId],
+    queryFn: () => api.getPatientRecords(patientId),
+  });
+
+  return { records: data?.records ?? [], isLoading };
+}
+```
+
+## When to Go Native
+
+Certain categories of apps still benefit from native development. Anything with heavy use of platform-specific APIs like ARKit, complex camera pipelines, or real-time audio processing will be simpler to build and maintain in Swift or Kotlin. Games and apps with custom rendering engines are also poor candidates for React Native.
+
+## The Hidden Cost Factor
+
+What many teams overlook is the long-term maintenance cost. A React Native app requires one team with JavaScript expertise. A native approach requires either two specialized teams or developers fluent in both Swift and Kotlin. For a startup burning runway, that difference can be the deciding factor.
