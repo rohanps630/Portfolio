@@ -4,13 +4,14 @@ import { verifySession } from "@/lib/auth";
 import sql from "@/lib/db";
 
 const serviceSchema = z.object({
-  title: z.string().min(1),
   slug: z.string().min(1),
-  tagline: z.string().default(""),
+  title: z.string().min(1),
   description: z.string().default(""),
-  icon: z.string().default(""),
+  price: z.string().default(""),
+  timeline: z.string().default(""),
   features: z.array(z.string()).default([]),
-  price_label: z.string().default(""),
+  highlighted: z.boolean().default(false),
+  cta_text: z.string().default(""),
   sort_order: z.number().int().default(0),
   visible: z.boolean().default(true),
 });
@@ -36,8 +37,8 @@ export async function POST(request: NextRequest) {
     const data = serviceSchema.parse(body);
 
     const [created] = await sql`
-      INSERT INTO services (title, slug, tagline, description, icon, features, price_label, sort_order, visible)
-      VALUES (${data.title}, ${data.slug}, ${data.tagline}, ${data.description}, ${data.icon}, ${sql.json(data.features)}, ${data.price_label}, ${data.sort_order}, ${data.visible})
+      INSERT INTO services (slug, title, description, price, timeline, features, highlighted, cta_text, sort_order, visible)
+      VALUES (${data.slug}, ${data.title}, ${data.description}, ${data.price}, ${data.timeline}, ${sql.json(data.features)}, ${data.highlighted}, ${data.cta_text}, ${data.sort_order}, ${data.visible})
       RETURNING *
     `;
 

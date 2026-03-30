@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -21,6 +22,8 @@ import {
   BarChart3,
   Code2,
   ListOrdered,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 const contentItems = [
@@ -62,13 +65,34 @@ function NavLink({
       onClick={onClick}
       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
         isActive
-          ? "bg-[#6366f1]/15 text-[#818cf8]"
-          : "text-[#8888a0] hover:text-[#f0f0f5] hover:bg-[#1e1e3a]"
+          ? "bg-accent-muted text-accent"
+          : "text-muted-foreground hover:text-foreground hover:bg-border"
       }`}
     >
       <Icon size={18} />
       {item.label}
     </Link>
+  );
+}
+
+function SidebarThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  const isDark = !mounted || theme === "dark";
+
+  return (
+    <button
+      onClick={() => mounted && setTheme(isDark ? "light" : "dark")}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-border transition-colors w-full cursor-pointer"
+      aria-label="Toggle theme"
+      suppressHydrationWarning
+    >
+      {isDark ? <Sun size={18} /> : <Moon size={18} />}
+      <span suppressHydrationWarning>{isDark ? "Light Mode" : "Dark Mode"}</span>
+    </button>
   );
 }
 
@@ -84,15 +108,15 @@ export function AdminSidebar() {
 
   const sidebarContent = (
     <>
-      <div className="p-6 border-b border-[#1e1e3a]">
-        <h1 className="text-lg font-heading font-bold text-[#f0f0f5]">
+      <div className="p-6 border-b border-border">
+        <h1 className="text-lg font-heading font-bold text-foreground">
           Admin Panel
         </h1>
-        <p className="text-xs text-[#8888a0] mt-1">Content Management</p>
+        <p className="text-xs text-muted-foreground mt-1">Content Management</p>
       </div>
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        <p className="px-3 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-[#8888a0]/60">
+        <p className="px-3 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
           Content
         </p>
         {contentItems.map((item) => (
@@ -104,9 +128,9 @@ export function AdminSidebar() {
           />
         ))}
 
-        <div className="my-3 border-t border-[#1e1e3a]" />
+        <div className="my-3 border-t border-border" />
 
-        <p className="px-3 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-[#8888a0]/60">
+        <p className="px-3 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
           Configuration
         </p>
         {configItems.map((item) => (
@@ -119,17 +143,18 @@ export function AdminSidebar() {
         ))}
       </nav>
 
-      <div className="p-4 border-t border-[#1e1e3a] space-y-1">
+      <div className="p-4 border-t border-border space-y-1">
+        <SidebarThemeToggle />
         <Link
           href="/"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#8888a0] hover:text-[#f0f0f5] hover:bg-[#1e1e3a] transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-border transition-colors"
         >
           <ArrowLeft size={18} />
           Back to Site
         </Link>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[#8888a0] hover:text-[#ef4444] hover:bg-[#1e1e3a] transition-colors w-full cursor-pointer"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-error hover:bg-border transition-colors w-full cursor-pointer"
         >
           <LogOut size={18} />
           Logout
@@ -141,15 +166,15 @@ export function AdminSidebar() {
   return (
     <>
       {/* Mobile header bar */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-[#111128] border-b border-[#1e1e3a] flex items-center px-4 gap-3">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-card border-b border-border flex items-center px-4 gap-3">
         <button
           onClick={() => setOpen(!open)}
-          className="p-2 rounded-lg text-[#8888a0] hover:text-[#f0f0f5] hover:bg-[#1e1e3a] transition-colors cursor-pointer"
+          className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-border transition-colors cursor-pointer"
           aria-label={open ? "Close menu" : "Open menu"}
         >
           {open ? <X size={20} /> : <Menu size={20} />}
         </button>
-        <span className="text-sm font-heading font-bold text-[#f0f0f5]">
+        <span className="text-sm font-heading font-bold text-foreground">
           Admin Panel
         </span>
       </div>
@@ -164,7 +189,7 @@ export function AdminSidebar() {
 
       {/* Mobile sidebar (slide-out) */}
       <aside
-        className={`lg:hidden fixed left-0 top-0 h-screen w-64 bg-[#111128] border-r border-[#1e1e3a] flex flex-col z-50 transition-transform duration-300 ${
+        className={`lg:hidden fixed left-0 top-0 h-screen w-64 bg-card border-r border-border flex flex-col z-50 transition-transform duration-300 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -172,7 +197,7 @@ export function AdminSidebar() {
       </aside>
 
       {/* Desktop sidebar (always visible) */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-[#111128] border-r border-[#1e1e3a] flex-col z-50">
+      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-card border-r border-border flex-col z-50">
         {sidebarContent}
       </aside>
     </>

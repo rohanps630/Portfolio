@@ -35,13 +35,13 @@ export function DeleteButton({ endpoint, label = "Delete" }: DeleteButtonProps) 
         <button
           onClick={handleDelete}
           disabled={deleting}
-          className="px-2.5 py-1 text-xs bg-[#ef4444] text-white rounded-md hover:bg-[#dc2626] transition-colors disabled:opacity-50"
+          className="px-2.5 py-1 text-xs bg-error text-white rounded-md hover:bg-error/80 transition-colors disabled:opacity-50"
         >
           {deleting ? "..." : "Confirm"}
         </button>
         <button
           onClick={() => setConfirming(false)}
-          className="px-2.5 py-1 text-xs text-[#8888a0] hover:text-[#f0f0f5] transition-colors"
+          className="px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
           Cancel
         </button>
@@ -52,7 +52,7 @@ export function DeleteButton({ endpoint, label = "Delete" }: DeleteButtonProps) 
   return (
     <button
       onClick={() => setConfirming(true)}
-      className="p-1.5 text-[#8888a0] hover:text-[#ef4444] transition-colors rounded-md hover:bg-[#ef4444]/10"
+      className="p-1.5 text-muted-foreground hover:text-error transition-colors rounded-md hover:bg-error/10"
       title={label}
     >
       <Trash2 size={15} />

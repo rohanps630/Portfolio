@@ -101,13 +101,13 @@ export function BlogForm({ initialData }: { initialData?: BlogData }) {
   };
 
   const inputClass =
-    "w-full px-3 py-2 bg-[#0a0a12] border border-[#1e1e3a] rounded-lg text-[#f0f0f5] text-sm placeholder-[#8888a0]/50 focus:outline-none focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] transition-colors";
-  const labelClass = "block text-sm font-medium text-[#8888a0] mb-1.5";
+    "w-full px-3 py-2 bg-background border border-border rounded-lg text-foreground text-sm placeholder-muted-foreground/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors";
+  const labelClass = "block text-sm font-medium text-muted-foreground mb-1.5";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
       {error && (
-        <div className="px-4 py-3 text-sm text-[#ef4444] bg-[#ef4444]/10 rounded-lg border border-[#ef4444]/20">
+        <div className="px-4 py-3 text-sm text-error bg-error/10 rounded-lg border border-error/20">
           {error}
         </div>
       )}
@@ -174,12 +174,12 @@ export function BlogForm({ initialData }: { initialData?: BlogData }) {
           />
         </div>
         <div className="flex items-end pb-1">
-          <label className="flex items-center gap-2 text-sm text-[#8888a0] cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
             <input
               type="checkbox"
               checked={data.published}
               onChange={(e) => updateField("published", e.target.checked)}
-              className="w-4 h-4 rounded border-[#1e1e3a] bg-[#0a0a12] text-[#6366f1] focus:ring-[#6366f1]"
+              className="w-4 h-4 rounded border-border bg-background text-accent focus:ring-accent"
             />
             Published
           </label>
@@ -220,11 +220,11 @@ export function BlogForm({ initialData }: { initialData?: BlogData }) {
         />
       </div>
 
-      <div className="flex items-center gap-3 pt-4 border-t border-[#1e1e3a]">
+      <div className="flex items-center gap-3 pt-4 border-t border-border">
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-2.5 bg-[#6366f1] hover:bg-[#818cf8] text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+          className="px-6 py-2.5 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
         >
           {saving
             ? "Saving..."
@@ -235,7 +235,7 @@ export function BlogForm({ initialData }: { initialData?: BlogData }) {
         <button
           type="button"
           onClick={() => router.push("/admin/blog")}
-          className="px-6 py-2.5 text-sm text-[#8888a0] hover:text-[#f0f0f5] transition-colors"
+          className="px-6 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           Cancel
         </button>

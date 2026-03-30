@@ -5,7 +5,6 @@ import type { FieldDef } from "@/components/admin/InlineEditableList";
 const fields: FieldDef[] = [
   { key: "question", label: "Question", placeholder: "Frequently asked question" },
   { key: "answer", label: "Answer", type: "textarea", placeholder: "The answer..." },
-  { key: "category", label: "Category", placeholder: "general, pricing, process, etc." },
   { key: "sort_order", label: "Sort Order", type: "number", defaultValue: 0 },
   { key: "visible", label: "Visible", type: "checkbox", defaultValue: true },
 ];

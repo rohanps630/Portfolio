@@ -4,13 +4,14 @@ import { verifySession } from "@/lib/auth";
 import sql from "@/lib/db";
 
 const serviceUpdateSchema = z.object({
-  title: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),
-  tagline: z.string().optional(),
+  title: z.string().min(1).optional(),
   description: z.string().optional(),
-  icon: z.string().optional(),
+  price: z.string().optional(),
+  timeline: z.string().optional(),
   features: z.array(z.string()).optional(),
-  price_label: z.string().optional(),
+  highlighted: z.boolean().optional(),
+  cta_text: z.string().optional(),
   sort_order: z.number().int().optional(),
   visible: z.boolean().optional(),
 });
@@ -58,15 +59,17 @@ export async function PUT(
 
     const [updated] = await sql`
       UPDATE services SET
-        title = ${merged.title as string},
         slug = ${merged.slug as string},
-        tagline = ${merged.tagline as string},
+        title = ${merged.title as string},
         description = ${merged.description as string},
-        icon = ${merged.icon as string},
+        price = ${merged.price as string},
+        timeline = ${merged.timeline as string},
         features = ${sql.json(merged.features as string[])},
-        price_label = ${merged.price_label as string},
+        highlighted = ${merged.highlighted as boolean},
+        cta_text = ${merged.cta_text as string},
         sort_order = ${merged.sort_order as number},
-        visible = ${merged.visible as boolean}
+        visible = ${merged.visible as boolean},
+        updated_at = now()
       WHERE id = ${id}
       RETURNING *
     `;

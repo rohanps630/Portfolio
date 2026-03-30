@@ -7,9 +7,7 @@ const testimonialSchema = z.object({
   name: z.string().min(1),
   role: z.string().default(""),
   company: z.string().default(""),
-  content: z.string().min(1),
-  avatar: z.string().default(""),
-  rating: z.number().int().min(1).max(5).default(5),
+  quote: z.string().min(1),
   sort_order: z.number().int().default(0),
   visible: z.boolean().default(true),
 });
@@ -35,8 +33,8 @@ export async function POST(request: NextRequest) {
     const data = testimonialSchema.parse(body);
 
     const [created] = await sql`
-      INSERT INTO testimonials (name, role, company, content, avatar, rating, sort_order, visible)
-      VALUES (${data.name}, ${data.role}, ${data.company}, ${data.content}, ${data.avatar}, ${data.rating}, ${data.sort_order}, ${data.visible})
+      INSERT INTO testimonials (name, role, company, quote, sort_order, visible)
+      VALUES (${data.name}, ${data.role}, ${data.company}, ${data.quote}, ${data.sort_order}, ${data.visible})
       RETURNING *
     `;
 

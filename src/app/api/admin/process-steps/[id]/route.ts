@@ -4,10 +4,11 @@ import { verifySession } from "@/lib/auth";
 import sql from "@/lib/db";
 
 const processStepUpdateSchema = z.object({
+  step_number: z.number().int().optional(),
   title: z.string().min(1).optional(),
   description: z.string().optional(),
-  icon: z.string().optional(),
   sort_order: z.number().int().optional(),
+  visible: z.boolean().optional(),
 });
 
 export async function GET(
@@ -53,10 +54,12 @@ export async function PUT(
 
     const [updated] = await sql`
       UPDATE process_steps SET
+        step_number = ${merged.step_number as number},
         title = ${merged.title as string},
         description = ${merged.description as string},
-        icon = ${merged.icon as string},
-        sort_order = ${merged.sort_order as number}
+        sort_order = ${merged.sort_order as number},
+        visible = ${merged.visible as boolean},
+        updated_at = now()
       WHERE id = ${id}
       RETURNING *
     `;

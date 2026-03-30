@@ -6,7 +6,6 @@ import sql from "@/lib/db";
 const faqUpdateSchema = z.object({
   question: z.string().min(1).optional(),
   answer: z.string().min(1).optional(),
-  category: z.string().optional(),
   sort_order: z.number().int().optional(),
   visible: z.boolean().optional(),
 });

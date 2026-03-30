@@ -177,20 +177,20 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
   };
 
   const inputClass =
-    "w-full px-3 py-2 bg-[#0a0a12] border border-[#1e1e3a] rounded-lg text-[#f0f0f5] text-sm placeholder-[#8888a0]/50 focus:outline-none focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] transition-colors";
-  const labelClass = "block text-sm font-medium text-[#8888a0] mb-1.5";
+    "w-full px-3 py-2 bg-background border border-border rounded-lg text-foreground text-sm placeholder-muted-foreground/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors";
+  const labelClass = "block text-sm font-medium text-muted-foreground mb-1.5";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl">
       {error && (
-        <div className="px-4 py-3 text-sm text-[#ef4444] bg-[#ef4444]/10 rounded-lg border border-[#ef4444]/20">
+        <div className="px-4 py-3 text-sm text-error bg-error/10 rounded-lg border border-error/20">
           {error}
         </div>
       )}
 
       {/* Basic Info */}
       <section className="space-y-4">
-        <h2 className="text-lg font-heading font-semibold text-[#f0f0f5]">
+        <h2 className="text-lg font-heading font-semibold text-foreground">
           Basic Information
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -264,12 +264,12 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
             />
           </div>
           <div className="flex items-end pb-1">
-            <label className="flex items-center gap-2 text-sm text-[#8888a0] cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
               <input
                 type="checkbox"
                 checked={data.featured}
                 onChange={(e) => updateField("featured", e.target.checked)}
-                className="w-4 h-4 rounded border-[#1e1e3a] bg-[#0a0a12] text-[#6366f1] focus:ring-[#6366f1]"
+                className="w-4 h-4 rounded border-border bg-background text-accent focus:ring-accent"
               />
               Featured project
             </label>
@@ -279,7 +279,7 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
 
       {/* Project Details */}
       <section className="space-y-4">
-        <h2 className="text-lg font-heading font-semibold text-[#f0f0f5]">
+        <h2 className="text-lg font-heading font-semibold text-foreground">
           Project Details
         </h2>
         <div>
@@ -335,7 +335,7 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
 
       {/* Tech Stack */}
       <section className="space-y-4">
-        <h2 className="text-lg font-heading font-semibold text-[#f0f0f5]">
+        <h2 className="text-lg font-heading font-semibold text-foreground">
           Tech Stack
         </h2>
         <div>
@@ -355,13 +355,13 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
       {/* Features */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-heading font-semibold text-[#f0f0f5]">
+          <h2 className="text-lg font-heading font-semibold text-foreground">
             Features
           </h2>
           <button
             type="button"
             onClick={addFeature}
-            className="inline-flex items-center gap-1 text-sm text-[#6366f1] hover:text-[#818cf8] transition-colors"
+            className="inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover transition-colors"
           >
             <Plus size={14} />
             Add Feature
@@ -370,7 +370,7 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
         {data.features.map((feat, idx) => (
           <div
             key={idx}
-            className="flex gap-3 items-start bg-[#0a0a12] border border-[#1e1e3a] rounded-lg p-3"
+            className="flex gap-3 items-start bg-background border border-border rounded-lg p-3"
           >
             <div className="flex-1 space-y-2">
               <input
@@ -393,7 +393,7 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
             <button
               type="button"
               onClick={() => removeFeature(idx)}
-              className="p-1 text-[#8888a0] hover:text-[#ef4444] transition-colors"
+              className="p-1 text-muted-foreground hover:text-error transition-colors"
             >
               <X size={16} />
             </button>
@@ -404,13 +404,13 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
       {/* Impact */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-heading font-semibold text-[#f0f0f5]">
+          <h2 className="text-lg font-heading font-semibold text-foreground">
             Impact Metrics
           </h2>
           <button
             type="button"
             onClick={addImpact}
-            className="inline-flex items-center gap-1 text-sm text-[#6366f1] hover:text-[#818cf8] transition-colors"
+            className="inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover transition-colors"
           >
             <Plus size={14} />
             Add Metric
@@ -419,7 +419,7 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
         {data.impact.map((item, idx) => (
           <div
             key={idx}
-            className="flex gap-3 items-start bg-[#0a0a12] border border-[#1e1e3a] rounded-lg p-3"
+            className="flex gap-3 items-start bg-background border border-border rounded-lg p-3"
           >
             <div className="flex-1 space-y-2">
               <div className="grid grid-cols-2 gap-2">
@@ -451,7 +451,7 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
             <button
               type="button"
               onClick={() => removeImpact(idx)}
-              className="p-1 text-[#8888a0] hover:text-[#ef4444] transition-colors"
+              className="p-1 text-muted-foreground hover:text-error transition-colors"
             >
               <X size={16} />
             </button>
@@ -461,7 +461,7 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
 
       {/* URLs */}
       <section className="space-y-4">
-        <h2 className="text-lg font-heading font-semibold text-[#f0f0f5]">
+        <h2 className="text-lg font-heading font-semibold text-foreground">
           Links
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -489,11 +489,11 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
       </section>
 
       {/* Submit */}
-      <div className="flex items-center gap-3 pt-4 border-t border-[#1e1e3a]">
+      <div className="flex items-center gap-3 pt-4 border-t border-border">
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-2.5 bg-[#6366f1] hover:bg-[#818cf8] text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+          className="px-6 py-2.5 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
         >
           {saving
             ? "Saving..."
@@ -504,7 +504,7 @@ export function ProjectForm({ initialData }: { initialData?: ProjectData }) {
         <button
           type="button"
           onClick={() => router.push("/admin/projects")}
-          className="px-6 py-2.5 text-sm text-[#8888a0] hover:text-[#f0f0f5] transition-colors"
+          className="px-6 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           Cancel
         </button>

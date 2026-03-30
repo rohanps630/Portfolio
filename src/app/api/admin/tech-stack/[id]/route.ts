@@ -5,9 +5,6 @@ import sql from "@/lib/db";
 
 const techStackUpdateSchema = z.object({
   name: z.string().min(1).optional(),
-  category: z.string().optional(),
-  icon: z.string().optional(),
-  proficiency: z.number().int().min(0).max(100).optional(),
   sort_order: z.number().int().optional(),
   visible: z.boolean().optional(),
 });
@@ -56,11 +53,9 @@ export async function PUT(
     const [updated] = await sql`
       UPDATE tech_stack SET
         name = ${merged.name as string},
-        category = ${merged.category as string},
-        icon = ${merged.icon as string},
-        proficiency = ${merged.proficiency as number},
         sort_order = ${merged.sort_order as number},
-        visible = ${merged.visible as boolean}
+        visible = ${merged.visible as boolean},
+        updated_at = now()
       WHERE id = ${id}
       RETURNING *
     `;

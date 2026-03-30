@@ -160,7 +160,7 @@ export function InlineEditableList({
   };
 
   const renderForm = () => (
-    <div className="bg-[#0a0a12] border border-[#1e1e3a] rounded-lg p-4 space-y-4">
+    <div className="bg-background border border-border rounded-lg p-4 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {fields.map((field) => (
           <div
@@ -175,13 +175,13 @@ export function InlineEditableList({
                   type="checkbox"
                   checked={!!formData[field.key]}
                   onChange={(e) => updateField(field.key, e.target.checked)}
-                  className="rounded border-[#1e1e3a]"
+                  className="rounded border-border"
                 />
-                <span className="text-sm text-[#f0f0f5]">{field.label}</span>
+                <span className="text-sm text-foreground">{field.label}</span>
               </label>
             ) : (
               <>
-                <label className="block text-xs font-medium text-[#8888a0] mb-1">
+                <label className="block text-xs font-medium text-muted-foreground mb-1">
                   {field.label}
                 </label>
                 {field.type === "textarea" || field.jsonArray ? (
@@ -190,7 +190,7 @@ export function InlineEditableList({
                     onChange={(e) => updateField(field.key, e.target.value)}
                     placeholder={field.jsonArray ? "One per line" : field.placeholder}
                     rows={3}
-                    className="w-full px-3 py-2 bg-[#111128] border border-[#1e1e3a] rounded-lg text-sm text-[#f0f0f5] placeholder-[#8888a0]/50 focus:outline-none focus:border-[#6366f1] transition-colors"
+                    className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
                   />
                 ) : (
                   <input
@@ -203,7 +203,7 @@ export function InlineEditableList({
                       )
                     }
                     placeholder={field.placeholder}
-                    className="w-full px-3 py-2 bg-[#111128] border border-[#1e1e3a] rounded-lg text-sm text-[#f0f0f5] placeholder-[#8888a0]/50 focus:outline-none focus:border-[#6366f1] transition-colors"
+                    className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
                   />
                 )}
               </>
@@ -215,14 +215,14 @@ export function InlineEditableList({
         <button
           onClick={showAdd ? handleAdd : handleUpdate}
           disabled={saving}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#6366f1] hover:bg-[#818cf8] text-white text-sm rounded-lg transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent hover:bg-accent-hover text-white text-sm rounded-lg transition-colors disabled:opacity-50"
         >
           {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
           {showAdd ? "Add" : "Save"}
         </button>
         <button
           onClick={cancel}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[#8888a0] hover:text-[#f0f0f5] text-sm rounded-lg transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-muted-foreground hover:text-foreground text-sm rounded-lg transition-colors"
         >
           <X size={14} />
           Cancel
@@ -234,10 +234,10 @@ export function InlineEditableList({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-heading font-bold text-[#f0f0f5]">{title}</h1>
+        <h1 className="text-2xl font-heading font-bold text-foreground">{title}</h1>
         <button
           onClick={openAdd}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#6366f1] hover:bg-[#818cf8] text-white text-sm font-medium rounded-lg transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors"
         >
           <Plus size={16} />
           Add New
@@ -246,25 +246,25 @@ export function InlineEditableList({
 
       {showAdd && renderForm()}
 
-      <div className="bg-[#111128] border border-[#1e1e3a] rounded-xl overflow-hidden">
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
         {items.length === 0 ? (
-          <p className="px-5 py-8 text-center text-[#8888a0] text-sm">
+          <p className="px-5 py-8 text-center text-muted-foreground text-sm">
             No items yet. Click &quot;Add New&quot; to create one.
           </p>
         ) : (
-          <div className="divide-y divide-[#1e1e3a]">
+          <div className="divide-y divide-border">
             {items.map((item) => (
               <div key={item.id}>
                 {editingId === item.id ? (
                   <div className="p-4">{renderForm()}</div>
                 ) : (
-                  <div className="flex items-center justify-between px-5 py-3 hover:bg-[#1e1e3a]/50 transition-colors">
+                  <div className="flex items-center justify-between px-5 py-3 hover:bg-border/50 transition-colors">
                     <div>
-                      <p className="text-sm font-medium text-[#f0f0f5]">
+                      <p className="text-sm font-medium text-foreground">
                         {item[displayField]}
                       </p>
                       {secondaryField && item[secondaryField] && (
-                        <p className="text-xs text-[#8888a0] mt-0.5">
+                        <p className="text-xs text-muted-foreground mt-0.5">
                           {typeof item[secondaryField] === "string" && item[secondaryField].length > 100
                             ? item[secondaryField].substring(0, 100) + "..."
                             : item[secondaryField]}
@@ -273,11 +273,11 @@ export function InlineEditableList({
                     </div>
                     <div className="flex items-center gap-1 shrink-0 ml-4">
                       {item.sort_order !== undefined && (
-                        <span className="text-xs text-[#8888a0] mr-2">#{item.sort_order}</span>
+                        <span className="text-xs text-muted-foreground mr-2">#{item.sort_order}</span>
                       )}
                       <button
                         onClick={() => openEdit(item)}
-                        className="p-1.5 text-[#8888a0] hover:text-[#6366f1] transition-colors rounded-md hover:bg-[#6366f1]/10"
+                        className="p-1.5 text-muted-foreground hover:text-accent transition-colors rounded-md hover:bg-accent/10"
                         title="Edit"
                       >
                         <Pencil size={15} />

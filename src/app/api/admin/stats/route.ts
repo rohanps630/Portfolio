@@ -6,8 +6,8 @@ import sql from "@/lib/db";
 const statSchema = z.object({
   label: z.string().min(1),
   value: z.string().min(1),
-  suffix: z.string().default(""),
   sort_order: z.number().int().default(0),
+  visible: z.boolean().default(true),
 });
 
 export async function GET() {
@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
     const data = statSchema.parse(body);
 
     const [created] = await sql`
-      INSERT INTO stats (label, value, suffix, sort_order)
-      VALUES (${data.label}, ${data.value}, ${data.suffix}, ${data.sort_order})
+      INSERT INTO stats (label, value, sort_order, visible)
+      VALUES (${data.label}, ${data.value}, ${data.sort_order}, ${data.visible})
       RETURNING *
     `;
 

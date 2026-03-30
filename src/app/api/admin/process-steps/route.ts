@@ -4,10 +4,11 @@ import { verifySession } from "@/lib/auth";
 import sql from "@/lib/db";
 
 const processStepSchema = z.object({
+  step_number: z.number().int().default(0),
   title: z.string().min(1),
   description: z.string().default(""),
-  icon: z.string().default(""),
   sort_order: z.number().int().default(0),
+  visible: z.boolean().default(true),
 });
 
 export async function GET() {
@@ -31,8 +32,8 @@ export async function POST(request: NextRequest) {
     const data = processStepSchema.parse(body);
 
     const [created] = await sql`
-      INSERT INTO process_steps (title, description, icon, sort_order)
-      VALUES (${data.title}, ${data.description}, ${data.icon}, ${data.sort_order})
+      INSERT INTO process_steps (step_number, title, description, sort_order, visible)
+      VALUES (${data.step_number}, ${data.title}, ${data.description}, ${data.sort_order}, ${data.visible})
       RETURNING *
     `;
 

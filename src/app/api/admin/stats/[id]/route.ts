@@ -6,8 +6,8 @@ import sql from "@/lib/db";
 const statUpdateSchema = z.object({
   label: z.string().min(1).optional(),
   value: z.string().min(1).optional(),
-  suffix: z.string().optional(),
   sort_order: z.number().int().optional(),
+  visible: z.boolean().optional(),
 });
 
 export async function GET(
@@ -55,8 +55,9 @@ export async function PUT(
       UPDATE stats SET
         label = ${merged.label as string},
         value = ${merged.value as string},
-        suffix = ${merged.suffix as string},
-        sort_order = ${merged.sort_order as number}
+        sort_order = ${merged.sort_order as number},
+        visible = ${merged.visible as boolean},
+        updated_at = now()
       WHERE id = ${id}
       RETURNING *
     `;

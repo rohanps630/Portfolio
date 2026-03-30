@@ -6,9 +6,7 @@ const fields: FieldDef[] = [
   { key: "name", label: "Name", placeholder: "Client name" },
   { key: "role", label: "Role", placeholder: "CEO, CTO, etc." },
   { key: "company", label: "Company", placeholder: "Company name" },
-  { key: "content", label: "Testimonial", type: "textarea", placeholder: "What they said..." },
-  { key: "avatar", label: "Avatar URL", placeholder: "/images/avatar.jpg" },
-  { key: "rating", label: "Rating (1-5)", type: "number", defaultValue: 5 },
+  { key: "quote", label: "What they said", type: "textarea", placeholder: "What they said..." },
   { key: "sort_order", label: "Sort Order", type: "number", defaultValue: 0 },
   { key: "visible", label: "Visible", type: "checkbox", defaultValue: true },
 ];
@@ -22,7 +20,7 @@ export default async function AdminTestimonialsPage() {
       apiPath="/api/admin/testimonials"
       fields={fields}
       displayField="name"
-      secondaryField="content"
+      secondaryField="quote"
       items={testimonials}
     />
   );

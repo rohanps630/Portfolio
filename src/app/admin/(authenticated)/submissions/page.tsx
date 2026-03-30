@@ -20,7 +20,7 @@ export default async function AdminSubmissionsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-heading font-bold text-[#f0f0f5]">
+      <h1 className="text-2xl font-heading font-bold text-foreground">
         Submissions
       </h1>
       <SubmissionsList submissions={submissions} />

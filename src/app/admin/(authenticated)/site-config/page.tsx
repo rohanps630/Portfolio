@@ -58,7 +58,7 @@ export default function SiteConfigPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="animate-spin text-[#6366f1]" size={24} />
+        <Loader2 className="animate-spin text-accent" size={24} />
       </div>
     );
   }
@@ -66,11 +66,11 @@ export default function SiteConfigPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-heading font-bold text-[#f0f0f5]">Site Configuration</h1>
+        <h1 className="text-2xl font-heading font-bold text-foreground">Site Configuration</h1>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#6366f1] hover:bg-[#818cf8] text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
         >
           {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           Save Changes
@@ -81,26 +81,26 @@ export default function SiteConfigPage() {
         <div
           className={`px-4 py-3 rounded-lg text-sm ${
             message.includes("success")
-              ? "bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20"
-              : "bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/20"
+              ? "bg-success/10 text-success border border-success/20"
+              : "bg-error/10 text-error border border-error/20"
           }`}
         >
           {message}
         </div>
       )}
 
-      <div className="bg-[#111128] border border-[#1e1e3a] rounded-xl p-6">
+      <div className="bg-card border border-border rounded-xl p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {CONFIG_KEYS.map(({ key, label, placeholder, multiline }) => (
             <div key={key} className={multiline ? "md:col-span-2" : ""}>
-              <label className="block text-sm font-medium text-[#8888a0] mb-1.5">{label}</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-1.5">{label}</label>
               {multiline ? (
                 <textarea
                   value={config[key] || ""}
                   onChange={(e) => setConfig((prev) => ({ ...prev, [key]: e.target.value }))}
                   placeholder={placeholder}
                   rows={3}
-                  className="w-full px-3 py-2 bg-[#0a0a12] border border-[#1e1e3a] rounded-lg text-sm text-[#f0f0f5] placeholder-[#8888a0]/50 focus:outline-none focus:border-[#6366f1] transition-colors"
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
                 />
               ) : (
                 <input
@@ -108,7 +108,7 @@ export default function SiteConfigPage() {
                   value={config[key] || ""}
                   onChange={(e) => setConfig((prev) => ({ ...prev, [key]: e.target.value }))}
                   placeholder={placeholder}
-                  className="w-full px-3 py-2 bg-[#0a0a12] border border-[#1e1e3a] rounded-lg text-sm text-[#f0f0f5] placeholder-[#8888a0]/50 focus:outline-none focus:border-[#6366f1] transition-colors"
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-accent transition-colors"
                 />
               )}
             </div>

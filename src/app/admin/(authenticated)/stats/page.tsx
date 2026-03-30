@@ -4,9 +4,9 @@ import type { FieldDef } from "@/components/admin/InlineEditableList";
 
 const fields: FieldDef[] = [
   { key: "label", label: "Label", placeholder: "e.g. Projects Completed" },
-  { key: "value", label: "Value", placeholder: "e.g. 50" },
-  { key: "suffix", label: "Suffix", placeholder: "e.g. +" },
+  { key: "value", label: "Value", placeholder: "e.g. 50+" },
   { key: "sort_order", label: "Sort Order", type: "number", defaultValue: 0 },
+  { key: "visible", label: "Visible", type: "checkbox", defaultValue: true },
 ];
 
 export default async function AdminStatsPage() {

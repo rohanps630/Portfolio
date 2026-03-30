@@ -5,10 +5,12 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 
 interface PageSection {
   id: number;
-  page: string;
-  section: string;
+  key: string;
+  label: string;
   visible: boolean;
 }
+
+const PAGE_KEYS = ["home", "about", "projects", "blog", "services", "contact"];
 
 export default function AdminPagesPage() {
   const [sections, setSections] = useState<PageSection[]>([]);
@@ -48,50 +50,58 @@ export default function AdminPagesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="animate-spin text-[#6366f1]" size={24} />
+        <Loader2 className="animate-spin text-accent" size={24} />
       </div>
     );
   }
 
-  // Group sections by page
-  const grouped: Record<string, PageSection[]> = {};
+  // Group sections into Pages and Sections categories
+  const pages: PageSection[] = [];
+  const sectionItems: PageSection[] = [];
+
   for (const section of sections) {
-    const page = section.page || "General";
-    if (!grouped[page]) grouped[page] = [];
-    grouped[page].push(section);
+    if (PAGE_KEYS.includes(section.key)) {
+      pages.push(section);
+    } else {
+      sectionItems.push(section);
+    }
   }
+
+  const groups: { label: string; items: PageSection[] }[] = [];
+  if (pages.length > 0) groups.push({ label: "Pages", items: pages });
+  if (sectionItems.length > 0) groups.push({ label: "Sections", items: sectionItems });
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-heading font-bold text-[#f0f0f5]">Page Sections</h1>
-      <p className="text-sm text-[#8888a0]">Toggle visibility of page sections across the site.</p>
+      <h1 className="text-2xl font-heading font-bold text-foreground">Page Sections</h1>
+      <p className="text-sm text-muted-foreground">Toggle visibility of page sections across the site.</p>
 
-      {Object.entries(grouped).map(([page, pageSections]) => (
-        <div key={page} className="bg-[#111128] border border-[#1e1e3a] rounded-xl overflow-hidden">
-          <div className="px-5 py-3 border-b border-[#1e1e3a]">
-            <h2 className="text-sm font-heading font-semibold text-[#f0f0f5] uppercase tracking-wider">
-              {page}
+      {groups.map((group) => (
+        <div key={group.label} className="bg-card border border-border rounded-xl overflow-hidden">
+          <div className="px-5 py-3 border-b border-border">
+            <h2 className="text-sm font-heading font-semibold text-foreground uppercase tracking-wider">
+              {group.label}
             </h2>
           </div>
-          <div className="divide-y divide-[#1e1e3a]">
-            {pageSections.map((section) => (
+          <div className="divide-y divide-border">
+            {group.items.map((section) => (
               <div
                 key={section.id}
-                className="flex items-center justify-between px-5 py-3 hover:bg-[#1e1e3a]/50 transition-colors"
+                className="flex items-center justify-between px-5 py-3 hover:bg-border/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   {section.visible ? (
-                    <Eye size={16} className="text-[#22c55e]" />
+                    <Eye size={16} className="text-success" />
                   ) : (
-                    <EyeOff size={16} className="text-[#8888a0]/50" />
+                    <EyeOff size={16} className="text-muted-foreground/50" />
                   )}
-                  <span className="text-sm text-[#f0f0f5]">{section.section}</span>
+                  <span className="text-sm text-foreground">{section.label}</span>
                 </div>
                 <button
                   onClick={() => handleToggle(section)}
                   disabled={toggling === section.id}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                    section.visible ? "bg-[#6366f1]" : "bg-[#1e1e3a]"
+                    section.visible ? "bg-accent" : "bg-border"
                   }`}
                 >
                   <span
@@ -107,7 +117,7 @@ export default function AdminPagesPage() {
       ))}
 
       {sections.length === 0 && (
-        <div className="bg-[#111128] border border-[#1e1e3a] rounded-xl px-5 py-8 text-center text-[#8888a0] text-sm">
+        <div className="bg-card border border-border rounded-xl px-5 py-8 text-center text-muted-foreground text-sm">
           No page sections found.
         </div>
       )}

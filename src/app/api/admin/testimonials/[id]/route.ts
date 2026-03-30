@@ -7,9 +7,7 @@ const testimonialUpdateSchema = z.object({
   name: z.string().min(1).optional(),
   role: z.string().optional(),
   company: z.string().optional(),
-  content: z.string().min(1).optional(),
-  avatar: z.string().optional(),
-  rating: z.number().int().min(1).max(5).optional(),
+  quote: z.string().min(1).optional(),
   sort_order: z.number().int().optional(),
   visible: z.boolean().optional(),
 });
@@ -60,11 +58,10 @@ export async function PUT(
         name = ${merged.name as string},
         role = ${merged.role as string},
         company = ${merged.company as string},
-        content = ${merged.content as string},
-        avatar = ${merged.avatar as string},
-        rating = ${merged.rating as number},
+        quote = ${merged.quote as string},
         sort_order = ${merged.sort_order as number},
-        visible = ${merged.visible as boolean}
+        visible = ${merged.visible as boolean},
+        updated_at = now()
       WHERE id = ${id}
       RETURNING *
     `;

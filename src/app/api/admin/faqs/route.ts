@@ -6,7 +6,6 @@ import sql from "@/lib/db";
 const faqSchema = z.object({
   question: z.string().min(1),
   answer: z.string().min(1),
-  category: z.string().default(""),
   sort_order: z.number().int().default(0),
   visible: z.boolean().default(true),
 });
@@ -32,8 +31,8 @@ export async function POST(request: NextRequest) {
     const data = faqSchema.parse(body);
 
     const [created] = await sql`
-      INSERT INTO faqs (question, answer, category, sort_order, visible)
-      VALUES (${data.question}, ${data.answer}, ${data.category}, ${data.sort_order}, ${data.visible})
+      INSERT INTO faqs (question, answer, sort_order, visible)
+      VALUES (${data.question}, ${data.answer}, ${data.sort_order}, ${data.visible})
       RETURNING *
     `;
 

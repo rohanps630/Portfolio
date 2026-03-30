@@ -35,16 +35,13 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div
-      data-theme="dark"
-      className="min-h-screen flex items-center justify-center bg-[#0a0a12] px-4"
-    >
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-heading font-bold text-[#f0f0f5]">
+          <h1 className="text-2xl font-heading font-bold text-foreground">
             Admin Login
           </h1>
-          <p className="text-sm text-[#8888a0] mt-2">
+          <p className="text-sm text-muted-foreground mt-2">
             Enter your password to continue
           </p>
         </div>
@@ -53,7 +50,7 @@ export default function AdminLoginPage() {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-[#8888a0] mb-1.5"
+              className="block text-sm font-medium text-muted-foreground mb-1.5"
             >
               Password
             </label>
@@ -64,12 +61,12 @@ export default function AdminLoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter admin password"
               required
-              className="w-full px-4 py-2.5 bg-[#111128] border border-[#1e1e3a] rounded-lg text-[#f0f0f5] placeholder-[#8888a0]/50 focus:outline-none focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1] transition-colors"
+              className="w-full px-4 py-2.5 bg-card border border-border rounded-lg text-foreground placeholder-muted-foreground/50 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-[#ef4444] bg-[#ef4444]/10 px-3 py-2 rounded-lg">
+            <p className="text-sm text-error bg-error/10 px-3 py-2 rounded-lg">
               {error}
             </p>
           )}
@@ -77,7 +74,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-[#6366f1] hover:bg-[#818cf8] text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-2.5 bg-accent hover:bg-accent-hover text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>

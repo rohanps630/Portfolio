@@ -5,9 +5,6 @@ import sql from "@/lib/db";
 
 const techStackSchema = z.object({
   name: z.string().min(1),
-  category: z.string().default(""),
-  icon: z.string().default(""),
-  proficiency: z.number().int().min(0).max(100).default(0),
   sort_order: z.number().int().default(0),
   visible: z.boolean().default(true),
 });
@@ -33,8 +30,8 @@ export async function POST(request: NextRequest) {
     const data = techStackSchema.parse(body);
 
     const [created] = await sql`
-      INSERT INTO tech_stack (name, category, icon, proficiency, sort_order, visible)
-      VALUES (${data.name}, ${data.category}, ${data.icon}, ${data.proficiency}, ${data.sort_order}, ${data.visible})
+      INSERT INTO tech_stack (name, sort_order, visible)
+      VALUES (${data.name}, ${data.sort_order}, ${data.visible})
       RETURNING *
     `;
 
