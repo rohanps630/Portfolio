@@ -6,7 +6,7 @@ export const siteConfig = {
   tagline: "I build products that scale.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://rohansuresh.dev",
   contact: {
-    email: "rohanpsuresh@gmail.com",
+    email: "rohan@codenforge.com",
     phone: "+91 8921355003",
     location: "Kottayam, Kerala, India",
     whatsapp: "https://wa.me/918921355003",

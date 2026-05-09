@@ -44,9 +44,9 @@ export default async function Home() {
         <ServicesPreview />
       </section>
 
-      <section className="py-20 md:py-28">
+      {/* <section className="py-20 md:py-28">
         <TestimonialSection testimonials={testimonials} />
-      </section>
+      </section> */}
 
       <section className="py-20 md:py-28">
         <BlogPreview posts={blogPosts.slice(0, 3)} />
