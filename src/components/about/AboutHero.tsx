@@ -7,11 +7,14 @@ export function AboutHero() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
       <FadeIn direction="left">
         <div className="relative mx-auto w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-accent/30 via-accent/10 to-transparent" />
-          <div className="absolute inset-2 rounded-full border border-border bg-card flex items-center justify-center">
-            <span className="text-muted-foreground text-sm font-medium">
-              Professional Photo
-            </span>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-accent/10 to-transparent blur-2xl" />
+          <div className="absolute inset-2 rounded-full overflow-hidden border border-border/50 ring-1 ring-inset ring-accent/10 bg-transparent">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/profile.png"
+              alt="Rohan P. Suresh"
+              className="absolute inset-0 w-full h-full object-cover object-top scale-110 translate-y-2"
+            />
           </div>
         </div>
       </FadeIn>
