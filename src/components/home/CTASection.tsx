@@ -17,12 +17,12 @@ export function CTASection() {
 
           <div className="relative z-10">
             <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
-              Have a Project in Mind?
+              Let&apos;s Build Something
             </h2>
 
             <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto">
-              I&apos;m currently available for freelance work. Let&apos;s
-              discuss how I can help bring your vision to life.
+              Open to senior full-stack and AI-engineering roles, as well as
+              selective client projects. Reach out and let&apos;s chat.
             </p>
 
             <div className="mt-8">

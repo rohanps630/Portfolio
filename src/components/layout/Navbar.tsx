@@ -65,7 +65,7 @@ export function Navbar() {
           <ThemeToggle />
           <Link href="/contact" className="hidden md:block">
             <motion.div whileTap={{ scale: 0.97 }}>
-              <Button size="sm">Let&apos;s Talk</Button>
+              <Button size="sm">Contact</Button>
             </motion.div>
           </Link>
           <MobileNav />

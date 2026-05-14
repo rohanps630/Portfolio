@@ -108,7 +108,7 @@ export function MobileNav() {
 
               <div className="mt-6">
                 <Link href="/contact" onClick={() => setOpen(false)}>
-                  <Button className="w-full">Let&apos;s Talk</Button>
+                  <Button className="w-full">Contact</Button>
                 </Link>
               </div>
 

@@ -56,15 +56,22 @@ export function HeroSection({ tagline, stats }: HeroSectionProps) {
         {/* Left column */}
         <FadeIn direction="up" delay={0}>
           <div className="max-w-xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground mb-5">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              Open to senior roles &amp; client work
+            </div>
             <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
               <TextScramble text={tagline} />
             </h1>
 
             <FadeIn direction="up" delay={0.15}>
               <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-                Full-stack developer specializing in React, React Native, Node.js
-                &amp; AI integration. I help startups and businesses turn ideas
-                into reliable, scalable software.
+                Full-stack engineer working across web, mobile, and AI-integrated
+                systems. React, React Native, Node.js, Go, Python, and modern LLM
+                tooling — shipped to production.
               </p>
             </FadeIn>
 
@@ -80,7 +87,7 @@ export function HeroSection({ tagline, stats }: HeroSectionProps) {
                 <MagneticButton>
                   <Link href="/contact">
                     <Button variant="secondary" size="lg">
-                      Let&apos;s Talk
+                      Get in Touch
                     </Button>
                   </Link>
                 </MagneticButton>

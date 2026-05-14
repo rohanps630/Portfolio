@@ -12,7 +12,7 @@ const aiAutomationHub: Project = {
   sortOrder: 3,
   challenge:
     "Businesses were losing potential customers due to slow response times and inconsistent support quality across multiple communication channels. Their existing support infrastructure averaged four-hour response times and lacked any intelligent routing or prioritization, causing high-value leads to go cold. They needed an AI-powered solution that could handle customer interactions autonomously while maintaining a human touch and knowing when to escalate. The system also had to integrate with existing CRM and telephony infrastructure without requiring a costly migration.",
-  role: "Lead Full Stack Developer",
+  role: "Primary Full Stack Developer",
   approach:
     "Architected an event-driven microservices platform using NestJS with a message queue backbone powered by Redis Streams for reliable asynchronous processing. Integrated Twilio Programmable Voice for inbound and outbound call handling, layering OpenAI GPT models on top for real-time natural language understanding and context-aware response generation. Built a custom ML pipeline for lead scoring that analyzes conversation sentiment, engagement patterns, and demographic signals to prioritize the highest-value prospects. Implemented a React-based operator dashboard with live WebSocket feeds for real-time conversation monitoring, analytics, and manual escalation controls.",
   features: [
@@ -75,7 +75,6 @@ const aiAutomationHub: Project = {
     "/images/projects/ai-automation-hub/screenshot-2.webp",
     "/images/projects/ai-automation-hub/screenshot-3.webp",
   ],
-  githubUrl: "https://github.com/rohanps630/ai-automation-hub",
   duration: "5 months",
   year: "2024",
 };

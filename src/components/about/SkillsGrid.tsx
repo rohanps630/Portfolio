@@ -32,6 +32,7 @@ const categories: SkillCategory[] = [
     skills: [
       "Python",
       "Node.js",
+      "Go",
       "NestJS",
       "Express.js",
       "Django",
@@ -42,7 +43,15 @@ const categories: SkillCategory[] = [
   {
     icon: <Database className="h-6 w-6 text-accent" />,
     title: "Data & Infrastructure",
-    skills: ["MongoDB", "PostgreSQL", "Docker", "Nginx", "CI/CD", "AWS"],
+    skills: [
+      "MongoDB",
+      "PostgreSQL",
+      "Docker",
+      "Nginx",
+      "GitHub Actions",
+      "Bitbucket Pipelines",
+      "AWS",
+    ],
   },
   {
     icon: <Brain className="h-6 w-6 text-accent" />,
@@ -50,8 +59,10 @@ const categories: SkillCategory[] = [
     skills: [
       "Google ADK",
       "Generative AI",
-      "LLM APIs",
+      "Gemini",
+      "ChatGPT",
       "Vector Databases",
+      "LangChain",
     ],
   },
 ];

@@ -25,17 +25,21 @@ export function AboutHero() {
             About Me
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            I help startups and businesses turn ideas into reliable, scalable
-            software — from first prototype to production. With over 4.5 years
-            of experience building web and mobile applications, I&apos;ve led
-            development teams, shipped products used by thousands, and worked
-            with clients across industries from healthcare to education to AI.
+            Full-stack engineer with 4.75 years building web, mobile, and
+            AI-integrated systems — real-time chat, AI voice agents, healthcare
+            platforms, and developer tooling. I&apos;ve shipped products to
+            production across React, React Native, Node.js, Go, Python, and
+            the modern LLM stack.
+          </p>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Currently a Software Engineer at Innovation Incubator Advisory,
+            working on AI-powered products and microservice architectures.
+            Open to senior full-stack and AI-engineering roles, as well as
+            selective client projects.
           </p>
           <p className="text-lg text-muted-foreground leading-relaxed">
             My approach is rooted in clear communication, clean architecture,
-            and a commitment to delivering software that works — not just at
-            launch, but for the long haul. I treat every project as a
-            partnership, not just a transaction.
+            and delivering software that holds up beyond launch.
           </p>
         </div>
       </FadeIn>

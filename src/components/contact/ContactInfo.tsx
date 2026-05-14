@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, Phone, MapPin, Clock, Calendar } from "lucide-react";
+import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { siteConfig } from "@/content/site";
 import { FadeIn } from "@/components/animations/FadeIn";
 
@@ -12,18 +12,19 @@ const contactItems = [
     href: `mailto:${siteConfig.contact.email}`,
   },
   {
-    icon: Phone,
-    label: "WhatsApp",
-    value: "Chat on WhatsApp",
-    href: siteConfig.contact.whatsapp,
-  },
-  {
     icon: MapPin,
     label: "Location",
     value: siteConfig.contact.location,
     href: undefined,
   },
 ];
+
+const secondaryContact = {
+  icon: Phone,
+  label: "WhatsApp (for quick chats)",
+  value: "Message on WhatsApp",
+  href: siteConfig.contact.whatsapp,
+};
 
 export function ContactInfo() {
   return (
@@ -92,6 +93,26 @@ export function ContactInfo() {
               </a>
             </div>
           </div>
+
+          {/* Secondary: WhatsApp for quick chats */}
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-border bg-muted">
+              <secondaryContact.icon className="h-4 w-4 text-accent" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">
+                {secondaryContact.label}
+              </p>
+              <a
+                href={secondaryContact.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-foreground hover:text-accent transition-colors"
+              >
+                {secondaryContact.value}
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Response time */}
@@ -100,25 +121,6 @@ export function ContactInfo() {
           <p className="text-sm text-muted-foreground">
             I respond to all inquiries within 24 hours.
           </p>
-        </div>
-
-        {/* Schedule a Call */}
-        <div className="rounded-xl border border-border bg-card p-6 space-y-3">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-accent" />
-            <h3 className="text-sm font-semibold text-foreground">
-              Schedule a Call
-            </h3>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Prefer a live conversation? Book a time that works for you.
-          </p>
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-all duration-200 hover:bg-muted hover:border-accent/50"
-          >
-            Book a Call
-          </a>
         </div>
       </div>
     </FadeIn>

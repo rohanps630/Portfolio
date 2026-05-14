@@ -12,7 +12,7 @@ const dentalClinicHms: Project = {
   sortOrder: 6,
   challenge:
     "Small dental clinics struggled with managing patient records, scheduling, and billing using outdated paper systems or prohibitively expensive enterprise software designed for hospital-scale operations. Double bookings were common, patient histories were difficult to retrieve during appointments, and billing was a manual, error-prone process. The solution needed to be affordable for independent practices while still meeting healthcare data security standards. It also had to integrate seamlessly into existing clinical workflows without requiring extensive staff training.",
-  role: "Lead Developer",
+  role: "Primary Developer",
   approach:
     "Built the client as a native Android application in Kotlin, leveraging Jetpack Compose for a modern, responsive UI that feels natural on tablets and phones used in clinical settings. Backed it with a NestJS API on PostgreSQL, implementing row-level security and AES-256 encryption at rest for HIPAA-conscious data handling. Designed the scheduling engine with a constraint-satisfaction algorithm that accounts for procedure duration, provider availability, and room assignment to prevent conflicts. Integrated Firebase Cloud Messaging for automated appointment reminders via SMS and push notifications, with configurable timing and confirmation tracking.",
   features: [
@@ -59,14 +59,13 @@ const dentalClinicHms: Project = {
       description: "Decreased patient wait times by 25%",
     },
   ],
-  techStack: ["Kotlin", "NestJS", "PostgreSQL", "Firebase", "Android SDK"],
+  techStack: ["React", "Go", "PostgreSQL", "Kotlin", "Android SDK"],
   coverImage: "/images/projects/dental-clinic-hms/cover.webp",
   screenshots: [
     "/images/projects/dental-clinic-hms/screenshot-1.webp",
     "/images/projects/dental-clinic-hms/screenshot-2.webp",
     "/images/projects/dental-clinic-hms/screenshot-3.webp",
   ],
-  githubUrl: "https://github.com/rohanps630/dental-clinic-hms",
   duration: "5 months",
   year: "2024",
 };

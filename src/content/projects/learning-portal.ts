@@ -73,7 +73,6 @@ const learningPortal: Project = {
     "/images/projects/learning-portal/screenshot-2.webp",
     "/images/projects/learning-portal/screenshot-3.webp",
   ],
-  githubUrl: "https://github.com/rohanps630/learning-portal",
   duration: "6 months",
   year: "2022",
 };

@@ -12,8 +12,8 @@ interface AnimatedCounterProps {
 
 function parseValue(value: string) {
   const match = value.match(/^([\d.]+)(.*)$/);
-  if (!match) return { number: 0, suffix: value };
-  return { number: parseFloat(match[1]), suffix: match[2] };
+  if (!match) return { numberStr: "0", suffix: value };
+  return { numberStr: match[1], suffix: match[2] };
 }
 
 /** A single digit that "rolls" from 0 to its target via translateY. */
@@ -75,7 +75,7 @@ export function AnimatedCounter({
   label,
   className,
 }: AnimatedCounterProps) {
-  const { number, suffix } = parseValue(value);
+  const { numberStr, suffix } = parseValue(value);
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const prefersReducedMotion = useReducedMotion();
@@ -91,10 +91,9 @@ export function AnimatedCounter({
     );
   }
 
-  // Split the numeric portion into individual characters (digits and dots)
-  const isDecimal = number % 1 !== 0;
-  const displayNumber = isDecimal ? number.toFixed(1) : Math.round(number).toString();
-  const chars = displayNumber.split("");
+  // Split the numeric portion into individual characters (digits and dots),
+  // preserving the precision the caller provided (e.g. "4.75" stays as "4.75").
+  const chars = numberStr.split("");
 
   return (
     <div ref={ref} className={cn("text-center", className)}>

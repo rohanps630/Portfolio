@@ -66,7 +66,6 @@ const roofingCrm: Project = {
     "/images/projects/roofing-crm/screenshot-2.webp",
     "/images/projects/roofing-crm/screenshot-3.webp",
   ],
-  githubUrl: "https://github.com/rohanps630/roofing-crm",
   duration: "3 months",
   year: "2023",
 };

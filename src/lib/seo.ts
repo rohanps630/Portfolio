@@ -105,28 +105,6 @@ export function buildArticleJsonLd({
   };
 }
 
-export function buildServiceJsonLd() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    name: `${siteConfig.name} — Full Stack Development Services`,
-    description: siteConfig.description,
-    url: `${siteConfig.url}/services`,
-    provider: {
-      "@type": "Person",
-      name: siteConfig.name,
-      url: siteConfig.url,
-    },
-    areaServed: ["US", "GB", "AE", "DE", "IN"],
-    serviceType: [
-      "Web Application Development",
-      "Mobile App Development",
-      "Full Stack Development",
-      "MVP Development",
-    ],
-  };
-}
-
 export function buildBreadcrumbJsonLd(
   items: { name: string; href: string }[]
 ) {

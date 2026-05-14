@@ -6,7 +6,7 @@ import { ContactInfo } from "@/components/contact/ContactInfo";
 export const metadata = createMetadata({
   title: "Contact",
   description:
-    "Get in touch to discuss your next project. Whether you need an MVP, a full product build, or ongoing development support, I'd love to hear from you.",
+    "Get in touch — whether you're hiring, have a project to scope, or just want to say hi. I respond within 24 hours.",
   path: "/contact",
 });
 
@@ -16,8 +16,8 @@ export default function ContactPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           label="Contact"
-          title="Let's Work Together"
-          subtitle="Have a project in mind? Fill out the form below and I'll get back to you within 24 hours."
+          title="Get in Touch"
+          subtitle="Whether you're hiring, have a project to scope, or just want to say hi — drop a note below and I'll reply within 24 hours."
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16">

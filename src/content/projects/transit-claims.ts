@@ -54,9 +54,9 @@ const transitClaims: Project = {
       description: "Decreased communication errors by 70%",
     },
     {
-      label: "Digitization",
-      value: "100%",
-      description: "Digitized 100% of claim documentation",
+      label: "Paper Replaced",
+      value: "End-to-end",
+      description: "Replaced paper-based claim documentation with a digital lifecycle",
     },
   ],
   techStack: ["React Native", "Node.js", "Express", "MongoDB", "AWS S3"],
@@ -66,7 +66,6 @@ const transitClaims: Project = {
     "/images/projects/transit-claims/screenshot-2.webp",
     "/images/projects/transit-claims/screenshot-3.webp",
   ],
-  githubUrl: "https://github.com/rohanps630/transit-claims",
   duration: "3 months",
   year: "2022",
 };

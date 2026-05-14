@@ -43,14 +43,16 @@ export default function AboutPage() {
           <SkillsGrid />
         </section>
 
-        {/* Resume Download */}
+        {/* Resume */}
         <section className="py-12 text-center">
           <Link
             href="/resume/rohan-suresh-resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg bg-accent px-8 py-4 text-base font-medium text-white shadow-lg shadow-accent/20 transition-all duration-200 hover:bg-accent-hover hover:shadow-accent/30"
           >
             <Download className="h-5 w-5" />
-            Download Resume
+            View Resume
           </Link>
         </section>
 

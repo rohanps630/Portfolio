@@ -17,8 +17,8 @@ export function Footer() {
             <div className="md:col-span-2">
               <Logo />
               <p className="mt-4 text-sm text-muted-foreground max-w-sm">
-                Helping startups and businesses turn ideas into reliable, scalable
-                software — from first prototype to production.
+                Full-stack engineer building web, mobile, and AI-integrated
+                products. Open to senior roles and selective client work.
               </p>
               <SocialLinks className="mt-5" />
             </div>

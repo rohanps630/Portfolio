@@ -8,7 +8,6 @@ import {
   contactFormSchema,
   type ContactFormData,
   projectTypeLabels,
-  budgetLabels,
   timelineLabels,
 } from "@/types/contact";
 import { Input } from "@/components/ui/Input";
@@ -31,7 +30,7 @@ export function ContactForm() {
     defaultValues: {
       name: "",
       email: "",
-      projectType: "mvp",
+      projectType: "full-time",
       budget: "not-sure",
       timeline: "flexible",
       message: "",
@@ -69,11 +68,6 @@ export function ContactForm() {
   const projectTypeOptions = Object.entries(projectTypeLabels).map(
     ([value, label]) => ({ value, label })
   );
-
-  const budgetOptions = Object.entries(budgetLabels).map(([value, label]) => ({
-    value,
-    label,
-  }));
 
   const timelineOptions = Object.entries(timelineLabels).map(
     ([value, label]) => ({ value, label })
@@ -116,20 +110,13 @@ export function ContactForm() {
         </FadeIn>
 
         <FadeIn delay={0.1}>
-          <div className={`grid grid-cols-1 sm:grid-cols-3 gap-6${errors.projectType || errors.budget || errors.timeline ? ' animate-shake' : ''}`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6${errors.projectType || errors.timeline ? ' animate-shake' : ''}`}>
             <Select
-              label="Project Type"
+              label="What's this about?"
               options={projectTypeOptions}
               required
               error={errors.projectType?.message}
               {...register("projectType")}
-            />
-            <Select
-              label="Budget"
-              options={budgetOptions}
-              required
-              error={errors.budget?.message}
-              {...register("budget")}
             />
             <Select
               label="Timeline"
@@ -145,7 +132,7 @@ export function ContactForm() {
           <div className={errors.message ? 'animate-shake' : ''}>
             <Textarea
               label="Message"
-              placeholder="Tell me about your project — what problem are you solving, and how can I help?"
+              placeholder="A few sentences about what you have in mind — a role, a project, an idea, or just hello."
               required
               error={errors.message?.message}
               {...register("message")}
