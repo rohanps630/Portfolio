@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { siteConfig } from "@/content/site";
+import { createMetadata } from "@/lib/seo";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeaturedProjects } from "@/components/home/FeaturedProjects";
 import { TechStackBar } from "@/components/home/TechStackBar";
@@ -9,10 +9,12 @@ import { getAllPosts } from "@/lib/mdx";
 import { getFeaturedProjects } from "@/lib/projects";
 import { getTechStack, getStats } from "@/lib/data";
 
-export const metadata: Metadata = {
+export const metadata = createMetadata({
   title: siteConfig.title,
   description: siteConfig.description,
-};
+  path: "/",
+  absoluteTitle: true,
+});
 
 export default async function Home() {
   const [blogPosts, featuredProjects, techStack, stats] = await Promise.all([

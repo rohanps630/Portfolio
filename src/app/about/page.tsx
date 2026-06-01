@@ -8,9 +8,9 @@ import { SkillsGrid } from "@/components/about/SkillsGrid";
 import { Certifications } from "@/components/about/Certifications";
 
 export const metadata = createMetadata({
-  title: "About",
+  title: "About — Full Stack & AI Engineer",
   description:
-    "Learn about my journey as a Full Stack Developer with 4.5+ years of experience building web and mobile applications for startups and businesses worldwide.",
+    "Rohan P. Suresh — full-stack engineer with 4.75+ years building web, mobile, and AI-integrated systems with React, Node.js, Go, Python & LLMs.",
   path: "/about",
 });
 

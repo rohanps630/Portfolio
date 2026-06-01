@@ -1,9 +1,18 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
 import { siteConfig } from "@/content/site";
-import { buildPersonJsonLd } from "@/lib/seo";
+import { buildPersonJsonLd, buildWebSiteJsonLd } from "@/lib/seo";
 import { PublicShell } from "@/components/layout/PublicShell";
 import "@/app/globals.css";
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a12" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -12,7 +21,18 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  applicationName: siteConfig.name,
+  alternates: {
+    canonical: siteConfig.url,
+  },
   keywords: [
+    "Rohan P. Suresh",
+    "Rohan Suresh",
+    "Rohan P Suresh",
+    "Rohan Suresh developer",
+    "Rohan Suresh portfolio",
+    "Rohan Suresh engineer",
+    "Rohan Suresh Kerala",
     "full stack engineer",
     "AI integration engineer",
     "React engineer",
@@ -25,6 +45,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.name,
+  publisher: siteConfig.name,
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -86,6 +107,12 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(buildPersonJsonLd()),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(buildWebSiteJsonLd()),
           }}
         />
       </head>

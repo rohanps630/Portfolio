@@ -7,9 +7,9 @@ import { BlogGrid } from "@/components/blog/BlogGrid";
 import type { BlogCategory } from "@/types/blog";
 
 export const metadata = createMetadata({
-  title: "Blog",
+  title: "Blog — Architecture, React, AI & DevOps",
   description:
-    "Thoughts on software architecture, React, mobile development, AI integration, and lessons from building production applications.",
+    "Writing by Rohan P. Suresh on software architecture, React, React Native, AI integration, and lessons from shipping production apps.",
   path: "/blog",
 });
 
@@ -32,9 +32,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     <main className="pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
+          as="h1"
           label="Blog"
-          title="Thoughts & Insights"
-          subtitle="Writing about software architecture, development practices, and lessons learned from building production applications."
+          title="Writing by Rohan P. Suresh"
+          subtitle="Thoughts on software architecture, development practices, and lessons learned from building production applications."
         />
 
         <Suspense fallback={null}>

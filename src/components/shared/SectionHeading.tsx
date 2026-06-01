@@ -10,6 +10,7 @@ interface SectionHeadingProps {
   subtitle?: string;
   align?: "left" | "center";
   className?: string;
+  as?: "h1" | "h2";
 }
 
 export function SectionHeading({
@@ -18,7 +19,9 @@ export function SectionHeading({
   subtitle,
   align = "center",
   className,
+  as = "h2",
 }: SectionHeadingProps) {
+  const HeadingTag = as;
   return (
     <div
       className={cn(
@@ -43,9 +46,9 @@ export function SectionHeading({
         </FadeIn>
       )}
       <FadeIn delay={0.1}>
-        <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
+        <HeadingTag className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight">
           {title}
-        </h2>
+        </HeadingTag>
       </FadeIn>
       {subtitle && (
         <FadeIn delay={0.2}>

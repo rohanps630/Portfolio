@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPostBySlug, getPostSlugs, getAllPosts } from "@/lib/mdx";
-import { createMetadata, buildArticleJsonLd } from "@/lib/seo";
+import { createMetadata, buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { siteConfig } from "@/content/site";
 import { BlogHeader } from "@/components/blog/BlogHeader";
 import { BlogContent } from "@/components/blog/BlogContent";
@@ -84,11 +84,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     image: post.coverImage || undefined,
   });
 
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", href: "/" },
+    { name: "Blog", href: "/blog" },
+    { name: post.title, href: `/blog/${slug}` },
+  ]);
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <main className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

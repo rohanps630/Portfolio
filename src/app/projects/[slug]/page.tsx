@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ExternalLink, Code2 } from "lucide-react";
 import { getProjectBySlug, getProjects } from "@/lib/projects";
-import { createMetadata } from "@/lib/seo";
+import { createMetadata, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { ProjectHero } from "@/components/projects/ProjectHero";
 import { ProjectChallenge } from "@/components/projects/ProjectChallenge";
@@ -65,7 +65,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     { name: project.title, href: `/projects/${project.slug}` },
   ];
 
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbs);
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
     <main className="pt-24 pb-0">
       {/* Breadcrumbs */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
@@ -128,5 +135,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         nextProject={nextProject}
       />
     </main>
+    </>
   );
 }

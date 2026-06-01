@@ -8,6 +8,7 @@ interface CreateMetadataOptions {
   image?: string;
   type?: "website" | "article";
   publishedTime?: string;
+  absoluteTitle?: boolean;
 }
 
 export function createMetadata({
@@ -17,12 +18,13 @@ export function createMetadata({
   image,
   type = "website",
   publishedTime,
+  absoluteTitle = false,
 }: CreateMetadataOptions = {}): Metadata {
   const url = `${siteConfig.url}${path}`;
   const ogImage = image || `${siteConfig.url}/images/og-default.jpg`;
 
   return {
-    title,
+    title: absoluteTitle && title ? { absolute: title } : title,
     description,
     alternates: {
       canonical: url,
@@ -60,8 +62,15 @@ export function buildPersonJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": `${siteConfig.url}/#person`,
     name: siteConfig.name,
-    jobTitle: "Full Stack Developer",
+    givenName: "Rohan",
+    familyName: "Suresh",
+    additionalName: "P.",
+    alternateName: ["Rohan Suresh", "Rohan P Suresh", "Rohan P. Suresh"],
+    jobTitle: "Full Stack & AI Integration Engineer",
+    description: siteConfig.description,
+    image: `${siteConfig.url}/images/profile.png`,
     url: siteConfig.url,
     email: siteConfig.contact.email,
     telephone: siteConfig.contact.phone,
@@ -71,7 +80,37 @@ export function buildPersonJsonLd() {
       addressRegion: "Kerala",
       addressCountry: "IN",
     },
+    worksFor: {
+      "@type": "Organization",
+      name: "Innovation Incubator Advisory",
+    },
+    knowsAbout: [
+      "Full Stack Development",
+      "React",
+      "React Native",
+      "Next.js",
+      "Node.js",
+      "TypeScript",
+      "Go",
+      "Python",
+      "AI Integration",
+      "LLM Engineering",
+      "Software Architecture",
+    ],
     sameAs: [siteConfig.social.github, siteConfig.social.linkedin],
+  };
+}
+
+export function buildWebSiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteConfig.url}/#website`,
+    url: siteConfig.url,
+    name: siteConfig.name,
+    description: siteConfig.description,
+    publisher: { "@id": `${siteConfig.url}/#person` },
+    inLanguage: "en-US",
   };
 }
 

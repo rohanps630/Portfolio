@@ -64,6 +64,9 @@ export function HeroSection({ tagline, stats }: HeroSectionProps) {
               Open to senior roles &amp; client work
             </div>
             <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+              <span className="block text-lg md:text-xl font-medium text-accent mb-3 tracking-normal">
+                Hi, I&apos;m Rohan P. Suresh
+              </span>
               <TextScramble text={tagline} />
             </h1>
 
