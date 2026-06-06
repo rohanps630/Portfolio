@@ -108,8 +108,11 @@ export function buildWebSiteJsonLd() {
     "@id": `${siteConfig.url}/#website`,
     url: siteConfig.url,
     name: siteConfig.name,
+    alternateName: ["Rohan Suresh", "Rohan P Suresh"],
     description: siteConfig.description,
     publisher: { "@id": `${siteConfig.url}/#person` },
+    author: { "@id": `${siteConfig.url}/#person` },
+    copyrightHolder: { "@id": `${siteConfig.url}/#person` },
     inLanguage: "en-US",
   };
 }
