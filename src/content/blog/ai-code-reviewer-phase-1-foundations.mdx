@@ -1,0 +1,228 @@
+---
+title: "Shipping the Boring Half: AI Code Reviewer, Phase 1 Foundations"
+excerpt: "What 'production-grade scaffolding' actually looks like for an AI app in 2026 — monorepo, project references, env-gated observability, and a streaming endpoint with a placeholder agent — before any retrieval or tool use lands."
+date: "2026-05-15"
+category: "ai"
+tags: ["ai", "agents", "nextjs", "typescript", "monorepo", "anthropic"]
+coverImage: "/images/blog/ai-code-reviewer-phase-1.jpg"
+published: true
+---
+
+The companion post — [Building an AI Code Reviewer That Actually Reads Your Code](/blog/building-ai-code-reviewer) — describes the full system: retrieval, agent loop, evals, model routing. This post is narrower and closer to the metal. It's about what I actually shipped in the first four days: the foundations layer that has to exist before any of the interesting AI work is even possible.
+
+Every AI project has this layer. Most blog posts skip it. I think that's a mistake — the boring half is where production-readiness either gets baked in or gets bolted on later at three times the cost.
+
+## What "Phase 1" means here
+
+The project — [ai-code-reviewer](https://github.com/rohanps630/ai-code-reviewer) — is a six-phase build. Phase 1 ships the dumbest possible end-to-end version:
+
+1. Paste a diff into a web form.
+2. The browser POSTs it to `/api/reviews`.
+3. The server streams a structured review back — token by token.
+4. The review row persists to Postgres.
+
+No retrieval. No agent loop. No real LLM calls. The streamed review is a hand-coded placeholder that yields a realistic-looking sequence of `ReviewChunk` events. That's deliberate. The point of Phase 1 isn't to be smart; it's to have every wire in place so Phase 2 can plug in real retrieval without re-architecting anything.
+
+Ship criteria for Phase 1:
+
+- Web app deployed to Vercel.
+- `/api/reviews` accepts a diff and streams a structured response.
+- Reviews persist to Postgres.
+- Sentry + Langfuse wired (even if no traces fire yet).
+- CI green: lint, typecheck, tests, build, secret scan.
+
+A list of "no big deal" items that nonetheless took a full pass to get right.
+
+## The stack, decided once
+
+The first commit before any code was a stack decision and an ADR documenting it. The constraint was simple: everything had to be production-credible — no experiments, no bets on libraries that might churn in six months. The shape:
+
+- **App layer**: Next.js 15 App Router, React 19, TypeScript 5 strict, Tailwind 4, shadcn/ui, Vercel AI SDK.
+- **Data**: Postgres via Supabase with pgvector, Drizzle ORM.
+- **AI**: Anthropic Claude primary, OpenAI fallback, Voyage `voyage-code-3` embeddings, Cohere `rerank-3`.
+- **Python** (Phase 2+): 3.12, uv, Ruff, Pydantic v2, tree-sitter.
+- **Tooling**: Biome over ESLint+Prettier, Vitest, Lefthook, Turborepo, pnpm.
+- **Ops**: Vercel + Modal, Langfuse, Sentry.
+
+Every choice is in [ADR-001](https://github.com/rohanps630/ai-code-reviewer/blob/main/docs/adr/001-stack-choices.md) with a one-line rejection of the obvious alternative. The point of writing that down: the next time I'm tempted to swap something out mid-build, I have to write a new ADR explaining why. Friction is the feature.
+
+## The monorepo, and why "trivial" cross-package imports weren't
+
+The repo is four workspaces:
+
+```
+ai-code-reviewer/
+├── apps/
+│   ├── web/              # Next.js 15
+│   └── indexer/          # Python — Phase 2+
+└── packages/
+    ├── agent/            # Hand-written loop, tools, prompts, retrieval
+    ├── db/               # Drizzle schemas + client
+    └── shared/           # Env loader + cross-cutting types
+```
+
+`packages/agent/` is marked as hand-written and protected — no AI coding tool is allowed to touch the loop, prompts, or retrieval without explicit human direction. That's the whole point of the project; we're learning primitives, not auto-generating them.
+
+The thing I underestimated: TypeScript monorepos with cross-package source imports are surprisingly hard to get right in 2026. The first wire-up tried the simple path — `package.json` `exports` pointing directly at `./src/*.ts`, with bundler-level transpilation. Two failure modes hit immediately:
+
+1. **rootDir conflict**. `packages/db/src/client.ts` wanted to import `serverEnv` from `@acr/shared/env`. `tsc` rejected it because the imported file sat outside `@acr/db`'s declared `rootDir`. The workaround was reading `process.env.DATABASE_URL` directly in the DB client — duplicating env logic that already lived in `@acr/shared`.
+
+2. **Webpack can't resolve NodeNext `.js` specifiers to `.ts` source**. The packages use the correct ESM-style `import x from "./y.js"` form. Next.js 16's webpack doesn't know to remap that to the actual `.ts` file unless you give it an `extensionAlias` override. So `next.config.ts` ended up carrying a workaround.
+
+Both got fixed properly mid-Phase-1 by converting to [TypeScript project references](https://github.com/rohanps630/ai-code-reviewer/blob/main/docs/adr/002-typescript-project-references.md) — `composite: true`, real `tsc --build` emit, `exports` pointing to compiled `dist/`. The webpack override disappeared. The `process.env` duplication disappeared. The whole thing got more boring, which is the goal.
+
+A new ADR captures the decision so the next monorepo doesn't relearn this.
+
+## Streaming without coupling to the AI SDK's wire protocol
+
+The `/api/reviews` route is small but does five things:
+
+1. Validate the POST body with Zod. 400 on bad input with the flattened Zod issues — no opaque "invalid request."
+2. Insert a `reviews` row with status `pending`.
+3. Call the placeholder generator that yields a sequence of `ReviewChunk` objects.
+4. Stream the chunks back to the client as **NDJSON** — one JSON object per line.
+5. Update the row to `streaming`, then `completed` with the final structured output and zeroed token/cost.
+
+The interesting choice was point 4. The brief said "use Vercel AI SDK 5's data stream protocol," but by the time I got there, the AI SDK had churned to v6 and the protocol had shifted. NDJSON is dumber and decoupled — the server emits one JSON object per line, the client reads with `getReader()` + `TextDecoder`, splits on `\n`, parses each line. It works with any HTTP client, including `curl`, and it doesn't depend on whichever wire format the AI SDK ships next quarter.
+
+The full route, abridged:
+
+```typescript
+export async function POST(req: Request) {
+  const parsed = BodySchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
+    return Response.json(
+      { error: "Invalid request body", issues: parsed.error.flatten() },
+      { status: 400 },
+    );
+  }
+
+  const { diff, model } = parsed.data;
+  const [{ id: reviewId }] = await db
+    .insert(reviews)
+    .values({ diff, model, status: "pending" })
+    .returning({ id: reviews.id });
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder();
+      const emit = (chunk: ReviewChunk) =>
+        controller.enqueue(encoder.encode(`${JSON.stringify(chunk)}\n`));
+
+      let final: ReviewOutput | null = null;
+      try {
+        await db.update(reviews).set({ status: "streaming" }).where(eq(reviews.id, reviewId));
+
+        for await (const chunk of await pickSource(parsed.data)) {
+          if (chunk.type === "final") final = chunk.output;
+          emit(chunk);
+        }
+
+        await db
+          .update(reviews)
+          .set({ status: "completed", output: final })
+          .where(eq(reviews.id, reviewId));
+      } catch (err) {
+        await db.update(reviews).set({ status: "failed" }).where(eq(reviews.id, reviewId));
+        emit({ type: "status", message: `Error: ${stringifyError(err)}` });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: { "Content-Type": "application/x-ndjson; charset=utf-8" },
+  });
+}
+```
+
+The `pickSource` helper tries to call the real `runReview` from `@acr/agent`, catches its `Not implemented` throw, and falls back to the placeholder generator. The day the real agent loop lands (Phase 3), that fallback path disappears and the same route streams real findings. The contract — `ReviewChunk` — is already frozen.
+
+## Observability before there's anything to observe
+
+Both Sentry and Langfuse are wired in Phase 1 even though no LLM calls happen. The thinking: the day the first real LLM call ships is the worst possible day to discover your tracing isn't set up. Better to wire it now against a placeholder and trust that real spans will flow through the same pipes later.
+
+Sentry split per runtime (Next.js 15+ convention):
+- `instrumentation.ts` registers the server config based on `NEXT_RUNTIME`.
+- `instrumentation-client.ts` handles browser init.
+- `global-error.tsx` so React render errors get captured.
+- All three init paths gate on the relevant DSN env var being present — missing secrets don't crash boot, they just silently disable the SDK.
+
+Langfuse is a lazy `getLangfuse()` singleton that returns `null` when the keys aren't set. The `/api/reviews` route wraps each streamed run in a `trace` + `span` and flushes on stream end — success or failure. No spans actually contain LLM payloads yet, but the call sites are there, and the Phase 2 work is just attaching real data to existing spans.
+
+## Validation at every boundary
+
+There's exactly one validation library in this project: Zod (TypeScript) and Pydantic v2 (Python). Every external input passes through one of them before reaching domain logic:
+
+- HTTP request bodies.
+- Environment variables, parsed once at startup and exposed as `clientEnv` / `serverEnv`.
+- LLM tool-call arguments (Phase 3).
+- LLM structured outputs we're going to act on (Phase 3).
+- GitHub webhook payloads (Phase 3).
+
+The env loader had its own subplot. Next.js 16's page-data collection workers don't reliably inherit `.env*` files from the parent process. The first version of `@acr/shared/env` parsed strictly at module load, which caused `next build` to crash with a confusing Zod error inside a worker that had no env vars at all. The fix is small but worth writing down: skip strict validation when `NODE_ENV !== "production"` or `NEXT_PHASE === "phase-production-build"`. Production runtimes still parse and fail loud; build-time workers and dev get a passthrough. The strict-loud-or-permissive choice is explicit and documented in the file.
+
+## An interactive CLI, because remembering scripts is dumb
+
+By the end of Phase 1 the repo had a dozen pnpm scripts (`dev`, `build`, `build:packages`, `test`, `lint`, `lint:fix`, `format`, `typecheck`, `db:migrate`, `db:studio`, …) plus a half-dozen `uv` commands in the Python subdirectory. Nobody remembers all those.
+
+A small interactive CLI at `scripts/cli.mjs` (zero deps, Node 22 stdlib only) wraps everything behind a numbered menu:
+
+```
+◆ AI Code Reviewer
+────────────────────────────────────────────────────────────
+   1. Development  →
+   2. Build  →
+   3. Test  →
+   4. Quality  →
+   5. Database  →
+   6. Indexer (Python)  →
+   7. Git  →
+   8. About
+────────────────────────────────────────────────────────────
+   0. Exit
+
+› Select [0-8]:
+```
+
+`pnpm cli` opens it. Numbered nav, nested submenus, confirmation prompts on destructive actions (`clean`, `migrate`, `push`), live-streamed output for long-running tasks (dev server, Drizzle Studio), and a Ctrl-C handler that kills the child but keeps the menu loop alive. The action tree is a single object literal — adding a new command is one entry.
+
+It's overkill for a one-developer project. I built it anyway because I'm also using this repo to demonstrate engineering taste, and "every routine task is one menu item away" reads better than "remember `pnpm --filter @acr/web build` from memory."
+
+## One source of truth for every AI coding tool
+
+The project is partly an experiment in working with multiple AI coding tools simultaneously — Claude Code, Codex CLI, Cursor, and Kiro all touched code during Phase 1. Each tool has its own discovery convention: `CLAUDE.md`, `AGENTS.md` (native for Codex), `.cursorrules`, `.kiro/steering/*.md`. The naive approach is to put per-tool guidance in each, which guarantees drift.
+
+The pattern this project landed on:
+
+- **`AGENTS.md`** at the repo root is the canonical source of truth for every agent. It has the stack, folder structure, naming, commit format, "never do" rules, and the discovery table itself.
+- **`CLAUDE.md`** is one line: `@AGENTS.md`.
+- **`.cursorrules`** is a paragraph pointing at AGENTS.md and listing the protected paths.
+- **`.kiro/steering/*.md`** are ~12-line shims with Kiro's required frontmatter and `#[[file:...]]` imports that pull AGENTS.md into the steering context.
+
+Adding a new agent later is two steps: drop its discovery file (pointing at AGENTS.md), add a row to the table in `AGENTS.md` § 9. Nobody maintains two copies of the same rule.
+
+## What I'd do differently next time
+
+A few things I'd front-load on the next project:
+
+- **TypeScript project references on day one**, not as a "Phase 2 prep" cleanup. The retrofit was small but the friction of the workarounds — webpack `extensionAlias`, `transpilePackages`, the duplicate `process.env` reads — added up. The composite + emit setup is more boring out of the gate.
+- **A real Supabase instance before the first commit.** Phase 1 ran with placeholder env values, which papered over a couple of issues that surfaced only on the first real connection (TLS, IPv6 resolution on macOS). Cheaper to surface them at the start.
+- **Decide the streaming wire format on the server side first.** Trying to inherit it from "whatever the AI SDK does this week" is a lot of churn for no benefit when the agent emits a known schema. NDJSON is fine. Pick that on day one.
+
+## What's next
+
+Phase 2 — *RAG done right*. The roadmap is in [docs/roadmap.md](https://github.com/rohanps630/ai-code-reviewer/blob/main/docs/roadmap.md). Concretely:
+
+1. Schema for `repos`, `documents`, `chunks` tables with pgvector HNSW indexes.
+2. Python chunking pipeline in `apps/indexer/` — tree-sitter, AST-aware splits.
+3. Voyage `voyage-code-3` embeddings adapter, batched, with retry/backoff.
+4. Contextual prefix generation per chunk (Anthropic's pattern).
+5. Hybrid retrieval in `packages/agent/src/retrieval/` — BM25 + vector + reciprocal rank fusion.
+6. Cohere `rerank-3` over the top 30.
+7. Replace the placeholder review with a real retrieval-augmented Claude call. Still no agent loop yet — that's Phase 3.
+
+If Phase 1 was about making sure the wires would carry signal, Phase 2 is about generating signal worth carrying.
+
+The repo is [github.com/rohanps630/ai-code-reviewer](https://github.com/rohanps630/ai-code-reviewer). All ADRs, the architecture doc, and the full session log are in there.
