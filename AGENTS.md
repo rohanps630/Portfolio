@@ -129,3 +129,10 @@ non-derivable *why* and *why-not* that no tool can recover from the code.
 - All color/spacing/type goes through the semantic tokens in `globals.css` `@theme`; raw hex/arbitrary values in components are a review rejection. New semantics = new token, not an inline value.
 - A11y floor on every component at birth: 4.5:1 contrast, visible focus, 44px touch targets, no hover-only affordances, labels never placeholder-only, SVG icons (no emoji), reserve space for async content (CLS), every animation gated on `prefers-reduced-motion`.
 - Animation: 150–300ms standard, transform/opacity only, motion must convey meaning (docs/design/04-motion-system.md is binding).
+
+**Going deeper (on demand, not preloaded):** these are distilled summaries. When a task warrants the
+full rule sets, read them from the Cortex library at `~/Work/Cognition/cortex/skills/`:
+`web/react-best-practices/rules/*.md` (70 per-rule files: waterfalls, bundle, RSC, re-renders),
+`web/composition-patterns/rules/*.md`, `ui/ui-ux-guidelines/references/` (priority checklists,
+style catalog, color palettes, font pairings), `ui/design-system/references/` (token architecture).
+Adapt to this stack when applying — never paste verbatim, and the blueprint docs win on conflict.
