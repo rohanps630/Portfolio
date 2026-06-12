@@ -1,8 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { Suspense } from "react";
 import { getSystemBySlug, getSystems } from "@/lib/systems";
+import { getArchitectureBySlug } from "@/content/architectures";
 import { createMetadata } from "@/lib/seo";
+import { Explorer } from "@/components/explorer/Explorer";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { MetricFact } from "@/components/ui/MetricFact";
 import { DecisionRecordBlock } from "@/components/ui/DecisionRecord";
@@ -38,6 +41,7 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function ProjectPage({ params }: PageProps) {
   const { slug } = await params;
   const system = await getSystemBySlug(slug);
+  const architecture = getArchitectureBySlug(slug);
 
   if (!system) {
     notFound();
@@ -156,7 +160,27 @@ export default async function ProjectPage({ params }: PageProps) {
               <div className="prose prose-lg dark:prose-invert mb-8">
                 <p>{system.solutionOverview}</p>
               </div>
+
+              {/* Interactive Architecture Explorer */}
+              {architecture && (
+                <div className="mb-12">
+                  <div className="mb-4 flex justify-between items-end">
+                    <h3 className="text-xl font-heading font-semibold">Interactive Architecture</h3>
+                    <Link 
+                      href={`/explorer/${system.slug}`}
+                      className="text-sm font-medium text-accent hover:text-accent-hover transition-colors"
+                      target="_blank"
+                    >
+                      Open full screen ↗
+                    </Link>
+                  </div>
+                  <Suspense fallback={<div className="h-[600px] bg-muted/20 rounded-xl animate-pulse flex items-center justify-center">Loading Explorer...</div>}>
+                    <Explorer model={architecture} embedded={true} />
+                  </Suspense>
+                </div>
+              )}
               
+              {/* Static Diagrams Fallback or Supplemental */}
               {system.staticDiagrams && system.staticDiagrams.length > 0 && (
                 <div className="space-y-8">
                   {system.staticDiagrams.map((diag, i) => (
