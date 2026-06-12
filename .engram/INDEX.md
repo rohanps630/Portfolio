@@ -90,3 +90,20 @@ _aka: years of experience, tech stack chips, LangChain_
 - Why:   resume says 5 (the 4.75 decimal read as insecurity); the flagship project's whole pitch is "no LangChain glue" — listing LangChain as a skill made the site argue against itself
 - Not:   rejected 4.75 stat and LangChain/ChatGPT chips (removed 2026-06-12); LangChain may appear only inside rejected-alternatives prose in decision records
 - Decided: 2026-06-12
+
+## Components — Contact page query prefill requires Suspense
+_aka: useSearchParams, static bailout, contact prefill_
+
+- What:  `ContactForm` must be wrapped in a `<Suspense>` boundary where imported on the `/contact` page
+- Where: src/app/contact/page.tsx
+- Why:   using `useSearchParams` directly triggers a Next.js static generation bailout (degrading the entire route to client-side rendering at runtime or breaking compilation) if not wrapped in `<Suspense>`
+- Decided: 2026-06-12
+
+## Tooling — Pagefind search index is gitignored
+_aka: public/pagefind, search build artifacts_
+
+- What:  `public/pagefind/` directory is added to `.gitignore`
+- Where: .gitignore
+- Why:   the search index is generated dynamically in `postbuild` during the CI/CD deployment flow; checking it into git causes constant noise and merge conflicts
+- Decided: 2026-06-12
+
