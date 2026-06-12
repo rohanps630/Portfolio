@@ -1,12 +1,12 @@
 import { siteConfig } from "@/content/site";
 import { createMetadata } from "@/lib/seo";
 import { HeroSection } from "@/components/home/HeroSection";
-import { FeaturedProjects } from "@/components/home/FeaturedProjects";
+import { FeaturedSystems } from "@/components/home/FeaturedSystems";
 import { TechStackBar } from "@/components/home/TechStackBar";
 import { BlogPreview } from "@/components/home/BlogPreview";
 import { CTASection } from "@/components/home/CTASection";
 import { getAllPosts } from "@/lib/mdx";
-import { getFeaturedProjects } from "@/lib/projects";
+import { getFeaturedSystems } from "@/lib/systems";
 import { getTechStack, getStats } from "@/lib/data";
 
 export const metadata = createMetadata({
@@ -17,9 +17,9 @@ export const metadata = createMetadata({
 });
 
 export default async function Home() {
-  const [blogPosts, featuredProjects, techStack, stats] = await Promise.all([
+  const [blogPosts, featuredSystems, techStack, stats] = await Promise.all([
     getAllPosts(),
-    getFeaturedProjects(),
+    getFeaturedSystems(),
     getTechStack(),
     getStats(),
   ]);
@@ -27,11 +27,11 @@ export default async function Home() {
   return (
     <>
       <section className="py-8 md:py-12">
-        <HeroSection tagline={siteConfig.tagline} stats={stats} />
+        <HeroSection stats={stats} />
       </section>
 
       <section className="py-20 md:py-28">
-        <FeaturedProjects projects={featuredProjects.slice(0, 3)} />
+        <FeaturedSystems systems={featuredSystems.slice(0, 3)} />
       </section>
 
       <section className="py-20 md:py-28">

@@ -2,7 +2,7 @@ import { Mail } from "lucide-react";
 import { siteConfig } from "@/content/site";
 import { cn } from "@/lib/utils";
 
-function GithubIcon({ size = 20 }: { size?: number }) {
+export function GithubIcon({ size = 20 }: { size?: number }) {
   return (
     <svg
       width={size}

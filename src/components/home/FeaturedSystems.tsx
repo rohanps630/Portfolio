@@ -3,30 +3,27 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { SectionHeading } from "@/components/shared/SectionHeading";
-import { ProjectCard } from "@/components/projects/ProjectCard";
+import { SystemCard } from "@/components/ui/SystemCard";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { Button } from "@/components/ui/Button";
 import { SectionContainer } from "@/components/layout/SectionContainer";
-import type { Project } from "@/types/project";
+import type { System } from "@/lib/schemas/system";
 
-interface FeaturedProjectsProps {
-  projects: Project[];
+interface FeaturedSystemsProps {
+  systems: System[];
 }
 
-export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
+export function FeaturedSystems({ systems }: FeaturedSystemsProps) {
   return (
     <SectionContainer>
       <FadeIn>
-        <SectionHeading
-          label="Selected Work"
-          title="Projects I'm Proud Of"
-        />
+        <SectionHeading label="Selected Work" title="Systems I'm Proud Of" />
       </FadeIn>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-        {projects.map((project, index) => (
-          <FadeIn key={project.slug} delay={index * 0.15}>
-            <ProjectCard project={project} />
+        {systems.map((system, index) => (
+          <FadeIn key={system.slug} delay={index * 0.15}>
+            <SystemCard system={system} />
           </FadeIn>
         ))}
       </div>
@@ -35,7 +32,7 @@ export function FeaturedProjects({ projects }: FeaturedProjectsProps) {
         <div className="mt-12 text-center">
           <Link href="/projects">
             <Button variant="secondary" size="md">
-              View All Projects
+              View All Systems
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>

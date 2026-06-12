@@ -5,7 +5,7 @@ import matter from "gray-matter";
 import { siteConfig } from "../src/content/site";
 import { siteSchema } from "../src/lib/schemas/site";
 import { noteSchema } from "../src/lib/schemas/note";
-import { getProjects } from "../src/lib/projects";
+import { getSystems } from "../src/lib/systems";
 
 async function main() {
   let hasError = false;
@@ -14,9 +14,6 @@ async function main() {
     console.error(`❌ ${msg}`);
     hasError = true;
   };
-  // Missing media is a designed state (slots render fallbacks) until real
-  // assets land — warn, don't fail. Fake/empty placeholder files are banned,
-  // so an existing-but-empty file is also a warning to replace, never to keep.
   const warn = (msg: string) => {
     console.warn(`⚠️  ${msg}`);
     warnCount += 1;
@@ -36,18 +33,34 @@ async function main() {
     error(`Site config validation failed: ${siteResult.error.message}`);
   }
 
-  console.log("Validating projects...");
-  const projects = await getProjects();
-  const projectSlugs = new Set<string>();
+  console.log("Validating systems...");
+  const systems = await getSystems();
+  const systemSlugs = new Set<string>();
   
-  for (const project of projects) {
-    if (projectSlugs.has(project.slug)) {
-      error(`Duplicate project slug found: ${project.slug}`);
+  for (const system of systems) {
+    if (systemSlugs.has(system.slug)) {
+      error(`Duplicate system slug found: ${system.slug}`);
     }
-    projectSlugs.add(project.slug);
+    systemSlugs.add(system.slug);
 
-    if (project.coverImage) {
-      checkImage(project.coverImage, `Project: ${project.slug}`);
+    if (system.coverImage) {
+      checkImage(system.coverImage, `System: ${system.slug}`);
+    }
+
+    // Referential checks
+    const decisionIds = new Set<string>();
+    for (const d of system.decisions) {
+      if (decisionIds.has(d.id)) {
+        error(`Duplicate decision ID found: ${d.id} in system ${system.slug}`);
+      }
+      decisionIds.add(d.id);
+    }
+
+    // Evidence rule
+    if (system.tier <= 2) {
+      if (system.evidence.length === 0 && system.screenshots.length === 0) {
+        warn(`Tier ${system.tier} system ${system.slug} has no evidence or screenshots (required in Phase 2)`);
+      }
     }
   }
 
