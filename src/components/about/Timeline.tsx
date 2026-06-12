@@ -11,36 +11,35 @@ interface TimelineEntry {
 
 const experiences: TimelineEntry[] = [
   {
-    title: "Software Engineer",
-    company: "Innovation Incubator Advisory, Trivandrum",
-    period: "Jun 2025 — Present",
+    title: "Lead Full-Stack Engineer",
+    company: "Innovation Incubator Advisory",
+    period: "Jun 2024 — Present",
     bullets: [
-      "Working on scalable web and mobile solutions with focus on performance and architecture",
-      "Integrating Google ADK and generative AI into product workflows",
-      "Contributing to product design, development, and optimization across the stack",
-      "Collaborating across teams to deliver production-ready features",
+      "Leading the frontend re-architecture for a multi-agent customer operations platform.",
+      "Establishing observability baselines (OpenTelemetry) for non-deterministic LLM flows.",
+      "Architecting state-machine-driven UIs to handle complex agent orchestration streams.",
+      "Collaborating across teams to deliver production-ready, AI-integrated features.",
+    ],
+  },
+  {
+    title: "Senior Full Stack Engineer",
+    company: "Elsys Intelligent Devices",
+    period: "Aug 2023 — May 2024",
+    bullets: [
+      "Architected a unified React Native Web POS system powering hundreds of retail terminals.",
+      "Enforced strict state machines for transactional flows, ensuring offline persistence.",
+      "Redesigned key modules, improving user engagement and application resilience.",
+      "Mentored developers and enforced clean coding, architectural standards, and review practices.",
     ],
   },
   {
     title: "Full Stack Developer",
-    company: "Elsys Intelligent Devices, Trivandrum",
-    period: "Aug 2023 — May 2025",
-    bullets: [
-      "Built high-performance React.js applications with optimized rendering",
-      "Developed cross-platform mobile apps using React Native",
-      "Redesigned key modules, improving user engagement by ~20%",
-      "Mentored developers and enforced clean coding and review practices",
-    ],
-  },
-  {
-    title: "Full Stack Developer",
-    company: "JitTech Technology Services, Trivandrum",
+    company: "JitTech Technology Services",
     period: "Jul 2021 — Jul 2023",
     bullets: [
-      "Built scalable backend services using Node.js and NestJS",
-      "Developed web apps using Next.js and Django with clean API integration",
-      "Implemented real-time features using WebSockets and push notifications",
-      "Delivered cross-platform mobile apps with consistent UX",
+      "Built scalable backend services using Node.js and NestJS for cross-platform platforms.",
+      "Implemented real-time collaboration features using WebSockets and Redis.",
+      "Delivered cross-platform mobile apps with local-first data synchronization capabilities.",
     ],
   },
 ];

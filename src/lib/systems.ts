@@ -7,6 +7,8 @@ import aiAutomationHub from "@/content/systems/ai-automation-hub";
 import roofingCrm from "@/content/systems/roofing-crm";
 import transitClaims from "@/content/systems/transit-claims";
 import dentalClinicHms from "@/content/systems/dental-clinic-hms";
+import multiAgentOps from "@/content/systems/multi-agent-ops";
+import telecomPos from "@/content/systems/telecom-pos";
 
 const systems: System[] = [
   aiCodeReviewer,
@@ -16,6 +18,8 @@ const systems: System[] = [
   roofingCrm,
   transitClaims,
   dentalClinicHms,
+  multiAgentOps,
+  telecomPos,
 ].sort((a, b) => a.sortOrder - b.sortOrder);
 
 export async function getSystems(): Promise<System[]> {

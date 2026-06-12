@@ -4,7 +4,7 @@ export const dentalClinicHms: System = {
   "slug": "dental-clinic-hms",
   "title": "Dental Clinic Management System",
   "thesis": "Mobile-first healthcare management for small and medium dental clinics",
-  "tier": 2,
+  "tier": 3,
   "domain": "platforms",
   "context": "production",
   "status": {

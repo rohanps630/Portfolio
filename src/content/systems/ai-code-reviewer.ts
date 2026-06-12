@@ -31,80 +31,84 @@ export const aiCodeReviewer: System = {
     {
       "id": "decision-1",
       "title": "Hand-Written Agent Runtime with Tool Use",
-      "decision": "A model-agnostic runtime — no framework — driving a typed, streaming ReAct loop over a Zod-typed tool registry: search_code, read_file, find_references, and sandboxed run_tests. Explicit termination via a validated submit_review stop tool, an iteration cap, an in-loop cost ceiling, timeouts, and cancellation.",
+      "decision": "A model-agnostic runtime — no framework — driving a typed, streaming ReAct loop over a Zod-typed tool registry.",
       "alternatives": [
         {
-          "option": "Standard approach",
-          "whyNot": "Did not meet requirements"
+          "option": "LangChain or LlamaIndex",
+          "whyNot": "Abstracts the LLM calls too heavily, obscuring prompt formatting and making it difficult to debug token usage or enforce strict streaming iteration constraints."
         }
       ],
-      "rationale": "Derived from feature set.",
-      "cost": "Maintenance overhead of custom implementation."
+      "rationale": "By writing a raw ReAct loop with Zod-typed tool execution, we get absolute control over the generation lifecycle, accurate token counting, and the ability to cleanly enforce our strict $0.50 per-run cost ceiling.",
+      "cost": "Requires maintaining our own provider SDK wrappers and manual retry logic, adding roughly ~600 lines of boilerplate to the core."
     },
     {
       "id": "decision-2",
       "title": "Hybrid Code-Aware Retrieval",
-      "decision": "Tree-sitter AST chunking preserves function and class boundaries. BM25 + Voyage voyage-code-3 embeddings are fused with Reciprocal Rank Fusion, then re-scored by Cohere rerank-v3.5 — composed as inspectable steps you can swap, with contextual chunk prefixing for semantic recall on short snippets.",
+      "decision": "Tree-sitter AST chunking combined with BM25, Voyage embeddings, Reciprocal Rank Fusion, and Cohere cross-encoder reranking.",
       "alternatives": [
         {
-          "option": "Standard approach",
-          "whyNot": "Did not meet requirements"
+          "option": "Pure Vector Search (Embeddings only)",
+          "whyNot": "Semantic search fails on exact symbol matches (e.g., finding the specific usage of an obscure variable name) which are critical for code review context."
+        },
+        {
+          "option": "Static Analysis only",
+          "whyNot": "Cannot grasp intent or answer semantic queries like 'where do we handle payment retry logic?'"
         }
       ],
-      "rationale": "Derived from feature set.",
-      "cost": "Maintenance overhead of custom implementation."
+      "rationale": "Combining BM25 (lexical) with Voyage embeddings (semantic) via Reciprocal Rank Fusion, followed by a Cohere cross-encoder reranking, yields the best of both worlds, ensuring both exact symbols and semantic intent are retrieved.",
+      "cost": "Significantly increases indexing time and requires running three distinct models/algorithms per query, adding ~800ms of latency to the context gathering phase."
     },
     {
       "id": "decision-3",
       "title": "Evals with a Versioned Golden Dataset",
-      "decision": "A versioned golden dataset (v1: 30 synthetic seeded examples across bug, security, performance, and logic categories — real public-PR curation in progress), scored by a versioned LLM-as-judge plus deterministic checks. The baseline run is committed to the repo, below-bar verdict and 67% false-positive rate included, and eval CI posts regression deltas on pull requests.",
+      "decision": "A versioned golden dataset scored by a versioned LLM-as-judge plus deterministic checks, running automatically in CI.",
       "alternatives": [
         {
-          "option": "Standard approach",
-          "whyNot": "Did not meet requirements"
+          "option": "Prompt-based vibe checks (Eyeballing)",
+          "whyNot": "Breaks down completely at scale; impossible to know if a prompt tweak improved logic but regressed syntax checks."
         }
       ],
-      "rationale": "Derived from feature set.",
-      "cost": "Maintenance overhead of custom implementation."
+      "rationale": "A versioned dataset gives us a deterministic baseline. If an agent refactor drops the judge score below the baseline 0.635, we don't merge. It treats prompt engineering as software engineering.",
+      "cost": "Writing and maintaining the golden dataset requires significant human time (curating the PR, defining the expected findings, maintaining the judge criteria)."
     },
     {
       "id": "decision-4",
       "title": "Production-Grade Observability",
-      "decision": "Full request-level tracing in Langfuse via agent lifecycle hooks — tool calls, token counts, cache metadata, model latencies. Sentry for error tracking, and every run persisted as a replayable event stream with a step-by-step replay UI.",
+      "decision": "Full request-level tracing in Langfuse via agent lifecycle hooks, persisting every run as a replayable event stream.",
       "alternatives": [
         {
-          "option": "Standard approach",
-          "whyNot": "Did not meet requirements"
+          "option": "Console logging or basic APM",
+          "whyNot": "Does not capture the rich, nested tree of LLM traces, token usage, tool invocations, and retrieval latencies."
         }
       ],
-      "rationale": "Derived from feature set.",
-      "cost": "Maintenance overhead of custom implementation."
+      "rationale": "Langfuse provides full request-level tracing. We persist every run as a replayable event stream, meaning when the agent hallucinates, we can step through the exact prompt, retrieved context, and tool outputs that led to the failure.",
+      "cost": "Adds a dependency on a dedicated LLM observability stack and slightly increases memory footprint per run to buffer traces."
     },
     {
       "id": "decision-5",
       "title": "Cost & Latency Optimizations",
-      "decision": "Prompt caching on the system prompt and indexed documents, Redis exact-match plus pgvector semantic caching on near-duplicate diffs, and tier-based model routing (haiku/sonnet/opus per provider) backed by a pricing table that feeds a hard $0.50 in-loop spend cap. Measured average cost lands with the upcoming frontier-model eval runs.",
+      "decision": "Prompt caching, exact-match semantic caching, and tier-based model routing backed by a pricing table.",
       "alternatives": [
         {
-          "option": "Standard approach",
-          "whyNot": "Did not meet requirements"
+          "option": "Always route to the smartest model (e.g., Claude 3.5 Sonnet)",
+          "whyNot": "Costs scale linearly and violate our $0.50 per PR budget very quickly on large diffs."
         }
       ],
-      "rationale": "Derived from feature set.",
-      "cost": "Maintenance overhead of custom implementation."
+      "rationale": "We use a tiered routing system. Simple file parsing and formatting use Haiku, saving the expensive Sonnet calls strictly for the final synthesized review. We also heavily leverage Anthropic's prompt caching on the system prompt.",
+      "cost": "Requires complex state management to track token counts across multiple model sessions and manually calculate cumulative costs mid-loop."
     },
     {
       "id": "decision-6",
       "title": "Prompt-Injection Defense",
-      "decision": "All retrieved code is treated as untrusted: file contents and search results are wrapped in untrusted-content tags, diff text is sanitized against delimiter forgery, and the system prompt pins explicit injection-resistance rules — covered by a dedicated test suite. The agent executes untrusted code only inside an E2B sandbox.",
+      "decision": "All retrieved code is treated as untrusted, wrapped in XML tags, sanitized against delimiter forgery, and executed in an E2B sandbox.",
       "alternatives": [
         {
-          "option": "Standard approach",
-          "whyNot": "Did not meet requirements"
+          "option": "Ignore the risk (assume internal PRs are safe)",
+          "whyNot": "A compromised dependency or malicious pull request could instruct the agent to leak secrets or execute arbitrary code."
         }
       ],
-      "rationale": "Derived from feature set.",
-      "cost": "Maintenance overhead of custom implementation."
+      "rationale": "We treat all retrieved code as untrusted, wrapping it in specific XML tags, sanitizing diffs against delimiter forgery, and running all arbitrary code executions in an isolated E2B sandbox.",
+      "cost": "Adds noticeable parsing latency to sanitize strings, and running an E2B sandbox introduces a hard cold-start penalty for code execution."
     }
   ],
   "techStack": [

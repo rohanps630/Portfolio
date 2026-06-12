@@ -4,7 +4,7 @@ export const aiAutomationHub: System = {
   "slug": "ai-automation-hub",
   "title": "AI-Powered Automation Hub",
   "thesis": "Intelligent customer support and lead generation with AI voice agents",
-  "tier": 2,
+  "tier": 3,
   "domain": "ai-systems",
   "context": "production",
   "status": {

@@ -1,5 +1,6 @@
 import { resumeData } from "@/content/resume";
 import { createMetadata } from "@/lib/seo";
+import { PrintButton } from "@/components/ui/PrintButton";
 
 export const metadata = createMetadata({
   title: "Resume — Rohan P. Suresh",
@@ -94,12 +95,7 @@ export default function ResumePage() {
 
         {/* Print only button */}
         <div className="mt-12 text-center print:hidden">
-          <button
-            onClick={() => window.print()}
-            className="px-6 py-2 bg-foreground text-background rounded-full font-medium hover:bg-foreground/90 transition-colors"
-          >
-            Print Resume
-          </button>
+          <PrintButton />
         </div>
       </div>
     </main>

@@ -65,37 +65,11 @@ export const roofingCrm: System = {
       ],
       "rationale": "Derived from feature set.",
       "cost": "Maintenance overhead of custom implementation."
-    },
-    {
-      "id": "decision-4",
-      "title": "Weather Integration for Scheduling",
-      "decision": "Hyperlocal weather forecasts built into the scheduling view so crews can plan around rain days and optimize their weekly calendar.",
-      "alternatives": [
-        {
-          "option": "Standard approach",
-          "whyNot": "Did not meet requirements"
-        }
-      ],
-      "rationale": "Derived from feature set.",
-      "cost": "Maintenance overhead of custom implementation."
-    },
-    {
-      "id": "decision-5",
-      "title": "Offline-Capable for Job Site Use",
-      "decision": "Full read-write functionality without an internet connection, with automatic background sync when connectivity returns — critical for remote job sites.",
-      "alternatives": [
-        {
-          "option": "Standard approach",
-          "whyNot": "Did not meet requirements"
-        }
-      ],
-      "rationale": "Derived from feature set.",
-      "cost": "Maintenance overhead of custom implementation."
     }
   ],
   "techStack": [
     {
-      "name": "React Native"
+      "name": "React"
     },
     {
       "name": "Node.js"
@@ -104,19 +78,10 @@ export const roofingCrm: System = {
       "name": "PostgreSQL"
     },
     {
-      "name": "AWS S3"
-    },
-    {
-      "name": "Stripe"
+      "name": "Three.js"
     }
   ],
   "outcomes": [
-    {
-      "value": "50+",
-      "label": "Contractors Served",
-      "description": "Streamlined operations for 50+ contractors",
-      "provenance": "measured"
-    },
     {
       "value": "-60%",
       "label": "Invoicing Time",

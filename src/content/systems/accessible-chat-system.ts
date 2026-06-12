@@ -4,7 +4,7 @@ export const accessibleChatSystem: System = {
   "slug": "accessible-chat-system",
   "title": "Accessible Real-Time Chat System",
   "thesis": "Inclusive communication platform for individuals with speech and hearing impairments",
-  "tier": 3,
+  "tier": 2,
   "domain": "products",
   "context": "production",
   "status": {
