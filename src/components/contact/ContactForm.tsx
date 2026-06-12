@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { trackEvent } from "@/lib/analytics";
 import {
   contactFormSchema,
   type ContactFormData,
@@ -20,10 +22,13 @@ import { FormSuccess } from "@/components/contact/FormSuccess";
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
   const {
     register,
     handleSubmit,
+    control,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
@@ -37,6 +42,13 @@ export function ContactForm() {
       website: "",
     },
   });
+
+  useEffect(() => {
+    const typeQuery = searchParams.get("type");
+    if (typeQuery && Object.keys(projectTypeLabels).includes(typeQuery)) {
+      setValue("projectType", typeQuery as ContactFormData["projectType"]);
+    }
+  }, [searchParams, setValue]);
 
   const onSubmit = async (data: ContactFormData) => {
     setServerError(null);
@@ -56,6 +68,7 @@ export function ContactForm() {
       }
 
       setSubmitted(true);
+      trackEvent("contact_submit", { type: data.projectType });
     } catch {
       setServerError("Something went wrong. Please try again.");
     }
@@ -64,10 +77,6 @@ export function ContactForm() {
   if (submitted) {
     return <FormSuccess />;
   }
-
-  const projectTypeOptions = Object.entries(projectTypeLabels).map(
-    ([value, label]) => ({ value, label })
-  );
 
   const timelineOptions = Object.entries(timelineLabels).map(
     ([value, label]) => ({ value, label })
@@ -110,14 +119,70 @@ export function ContactForm() {
         </FadeIn>
 
         <FadeIn delay={0.1}>
-          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6${errors.projectType || errors.timeline ? ' animate-shake' : ''}`}>
-            <Select
-              label="What's this about?"
-              options={projectTypeOptions}
-              required
-              error={errors.projectType?.message}
-              {...register("projectType")}
-            />
+          <div className="space-y-4">
+            <label className="block text-sm font-medium text-foreground">
+              What's this about?
+            </label>
+            <div 
+              role="radiogroup" 
+              aria-labelledby="projectTypeGroup"
+              className={`grid grid-cols-1 sm:grid-cols-3 gap-3 ${errors.projectType ? 'animate-shake' : ''}`}
+            >
+              <Controller
+                name="projectType"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    {Object.entries(projectTypeLabels).map(([value, label]) => (
+                      <label
+                        key={value}
+                        className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none transition-colors ${
+                          field.value === value
+                            ? "border-primary bg-primary/10 ring-1 ring-primary"
+                            : "border-border bg-card hover:bg-muted/50"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          value={value}
+                          checked={field.value === value}
+                          onChange={(e) => field.onChange(e.target.value)}
+                          className="sr-only"
+                        />
+                        <span className="flex flex-1">
+                          <span className="flex flex-col">
+                            <span className="block text-sm font-medium text-foreground">
+                              {label}
+                            </span>
+                          </span>
+                        </span>
+                        {field.value === value && (
+                          <svg
+                            className="h-5 w-5 text-primary"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        )}
+                      </label>
+                    ))}
+                  </>
+                )}
+              />
+            </div>
+            {errors.projectType && (
+              <p className="mt-1 text-sm text-error">{errors.projectType.message}</p>
+            )}
+          </div>
+        </FadeIn>
+
+        <FadeIn delay={0.2}>
+          <div className={errors.timeline ? 'animate-shake' : ''}>
             <Select
               label="Timeline"
               options={timelineOptions}
@@ -128,7 +193,7 @@ export function ContactForm() {
           </div>
         </FadeIn>
 
-        <FadeIn delay={0.2}>
+        <FadeIn delay={0.3}>
           <div className={errors.message ? 'animate-shake' : ''}>
             <Textarea
               label="Message"
@@ -146,17 +211,22 @@ export function ContactForm() {
           </p>
         )}
 
-        <FadeIn delay={0.3}>
-          <Button type="submit" size="lg" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Sending...
-              </>
-            ) : (
-              "Send Message"
-            )}
-          </Button>
+        <FadeIn delay={0.4}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <Button type="submit" size="lg" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                "Send Message"
+              )}
+            </Button>
+            <p className="text-sm text-muted-foreground max-w-sm">
+              Based in IST. I reply to all non-automated inquiries within 24 hours. Open to remote roles.
+            </p>
+          </div>
         </FadeIn>
       </form>
     </FadeIn>

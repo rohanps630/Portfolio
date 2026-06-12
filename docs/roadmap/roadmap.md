@@ -64,3 +64,21 @@ An implementation AI agent executes phases in order; within a phase, tasks list 
 - Phases 0–2 deliver ~70% of the positioning value (right evidence, right copy, fast site) — if energy stalls, stopping after Phase 2 still leaves a coherent, superior portfolio.
 - The explorer (3) lands only after the case studies exist because it links *into* decisions; building it first would create the orphaned gimmick this blueprint exists to avoid.
 - Search/graph (4) before polish (5): connective tissue compounds the value of everything already shipped; polish doesn't.
+
+---
+
+## 2026-06-12 Postmortem
+
+The portfolio rebuild has reached Phase 5 and the launch milestone. The site successfully transitioned from a standard template into a rigorous, verifiable engineering lab.
+
+**What Worked (The Wins):**
+- **Zero-DB SSG Architecture**: Fully leveraging Next.js static generation paired with MDX and local TypeScript records created a lightning-fast site with no external runtime dependencies.
+- **The Architecture Explorer**: The custom, dependency-free explorer successfully visualizes complex flows (like the AI Code Reviewer) directly in the browser while maintaining high performance. It effectively differentiates the portfolio from standard case studies.
+- **Connective Tissue & Pagefind**: Building the graph between notes and systems (`RelatedSystem`, `RelatedNotes`) and implementing the client-side Pagefind index made the site highly navigable and cohesive.
+
+**Cuts & Misses (The Honest Assessment):**
+- **Content Bottleneck**: Authoring the sheer volume of rigorous case studies (especially the tier-conditional content and full architectural decision records) remains the primary bottleneck. As predicted, the framework exists, but the content pipeline requires ongoing effort.
+- **The Explorer Scope**: While the explorer functions beautifully, abstracting enterprise models (multi-agent ops, telecom POS) into the UI without violating NDA/confidentiality requires significantly more sanitization effort than initially scoped.
+- **OG Image Perfection**: The dynamic `@vercel/og` generation is functional and performs well, but refining the exact brand motifs within the constrained flexbox environment of Satori took more iteration than expected.
+
+The lab is live. Now the real work begins: maintaining it with new systems and notes as the field evolves.

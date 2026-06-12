@@ -1,4 +1,5 @@
 import { createMetadata } from "@/lib/seo";
+import { Suspense } from "react";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { ContactInfo } from "@/components/contact/ContactInfo";
@@ -29,7 +30,9 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="lg:col-span-3 lg:order-1">
-            <ContactForm />
+            <Suspense fallback={<div className="h-64 flex items-center justify-center text-muted-foreground">Loading form...</div>}>
+              <ContactForm />
+            </Suspense>
           </div>
         </div>
       </div>

@@ -39,3 +39,7 @@ data/
 
 # Word documents
 *.docx
+
+# Pagefind build output
+public/pagefind/
+

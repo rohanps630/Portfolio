@@ -76,3 +76,18 @@ Decision records, Tier-2 architecture sections, archive rows: collapsed by defau
 2. `prefers-reduced-motion` audit passes on every route (manual matrix + axe).
 3. Removing `three`, `@react-three/fiber`, `@react-three/drei`, `lenis` cuts ≥ 400KB from the home-page JS budget (verify via bundle analysis).
 4. Every remaining animation can be justified in one sentence naming the information it conveys; the justification list lives in this doc's appendix at implementation time.
+
+## Appendix A: Information Justification
+
+*This appendix catalogs all current animations in the codebase and the information they convey. If an animation cannot be justified here, it must be removed.*
+
+| Component/Animation | Information Conveyed (Why it exists) |
+|---------------------|--------------------------------------|
+| **Page Route Change (Fade-through)** | Explains that context has shifted entirely to a new document without jarring the eye. |
+| **Section `FadeIn` (Case Studies/Notes)** | Directs attention to new reading blocks in a staggered sequence to prioritize the reading path. |
+| **Command Palette (Scale/Opacity entrance)** | Signals a modal interruption that sits 'above' the current page context. |
+| **Explorer Edge Pulse (Flow step)** | Demonstrates the direction of data/control flow between two systems or components. |
+| **Explorer Node Highlight** | Focuses attention on the active subject of the current flow step or selected entity. |
+| **Explorer Context/Container Tab Switch** | Provides continuity, proving that the zoomed-in view is still the same underlying system. |
+| **Decision Record Expand/Collapse** | Discloses secondary information without losing the reader's current place on the page. |
+| **Button/Card Hover States (CSS)** | Proves the element is interactive and ready to receive input. |

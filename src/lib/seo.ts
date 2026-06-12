@@ -11,6 +11,15 @@ interface CreateMetadataOptions {
   absoluteTitle?: boolean;
 }
 
+export function generateOgImageUrl(title: string, subtitle?: string, type: "default" | "system" | "note" | "explorer" = "default", extra?: string) {
+  const params = new URLSearchParams();
+  params.set("title", title);
+  if (subtitle) params.set("subtitle", subtitle);
+  if (type !== "default") params.set("type", type);
+  if (extra) params.set("extra", extra);
+  return `${siteConfig.url}/api/og?${params.toString()}`;
+}
+
 export function createMetadata({
   title,
   description,

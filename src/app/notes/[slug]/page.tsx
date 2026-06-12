@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getNoteBySlug, getPostSlugs, getAllNotes } from "@/lib/mdx";
-import { createMetadata, buildArticleJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { createMetadata, buildArticleJsonLd, buildBreadcrumbJsonLd, generateOgImageUrl } from "@/lib/seo";
 import { siteConfig } from "@/content/site";
 import { NoteHeader } from "@/components/notes/NoteHeader";
 import { NoteContent } from "@/components/notes/NoteContent";
@@ -32,9 +32,9 @@ export async function generateMetadata({
       title: note.title,
       description: note.excerpt,
       path: `/notes/${slug}`,
-      image: note.coverImage || undefined,
       type: "article",
       publishedTime: note.date,
+      image: generateOgImageUrl(note.title, note.excerpt, "note", note.series),
     });
   } catch {
     return createMetadata({ title: "Note Not Found" });

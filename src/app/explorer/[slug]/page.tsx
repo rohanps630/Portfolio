@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { getArchitectureBySlug } from "@/content/architectures";
 import { Explorer } from "@/components/explorer/Explorer";
-import { createMetadata } from "@/lib/seo";
+import { createMetadata, generateOgImageUrl } from "@/lib/seo";
 
 interface ExplorerPageProps {
   params: { slug: string };
@@ -15,6 +15,7 @@ export async function generateMetadata({ params }: ExplorerPageProps) {
   return createMetadata({
     title: `Architecture Explorer: ${model.system}`,
     description: `Interactive architecture diagram and flow explorer for ${model.system}.`,
+    image: generateOgImageUrl(model.system, "Interactive Architecture Explorer", "explorer"),
   });
 }
 

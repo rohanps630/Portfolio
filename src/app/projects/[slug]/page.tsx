@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Suspense } from "react";
 import { getSystemBySlug, getSystems } from "@/lib/systems";
 import { getArchitectureBySlug } from "@/content/architectures";
-import { createMetadata } from "@/lib/seo";
+import { createMetadata, generateOgImageUrl } from "@/lib/seo";
 import { Explorer } from "@/components/explorer/Explorer";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { MetricFact } from "@/components/ui/MetricFact";
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageProps) {
     title: `${system.title} — Case Study`,
     description: system.executiveSummary,
     path: `/projects/${system.slug}`,
-    image: system.coverImage,
+    image: generateOgImageUrl(system.title, system.executiveSummary, "system"),
   });
 }
 

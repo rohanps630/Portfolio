@@ -39,6 +39,14 @@ export function Footer() {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <Link
+                    href="/colophon"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Colophon
+                  </Link>
+                </li>
               </ul>
             </div>
           </FadeIn>
