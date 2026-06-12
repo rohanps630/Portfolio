@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "bun run validate-content",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "validate-content": "bun run scripts/validate-content.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -32,6 +34,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4.2.2",
     "@tailwindcss/typography": "^0.5.19",
     "@types/mdx": "^2.0.13",
@@ -39,8 +43,9 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.183.1",
-    "eslint": "^10.1.0",
+    "eslint": "^9.39.0",
     "eslint-config-next": "^16.2.1",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "postcss": "^8.5.8",
     "rehype-pretty-code": "^0.14.3",
     "shiki": "^4.0.2",

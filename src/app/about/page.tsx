@@ -10,7 +10,7 @@ import { Certifications } from "@/components/about/Certifications";
 export const metadata = createMetadata({
   title: "About — Full Stack & AI Engineer",
   description:
-    "Rohan P. Suresh — full-stack engineer with 4.75+ years building web, mobile, and AI-integrated systems with React, Node.js, Go, Python & LLMs.",
+    "Rohan P. Suresh — full-stack engineer with 5+ years building web, mobile, and AI-integrated systems with React, Node.js, Go, Python & LLMs.",
   path: "/about",
 });
 

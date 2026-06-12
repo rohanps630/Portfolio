@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable react-hooks/purity -- component is scheduled for deletion in Phase 1 (ADR-005 motion removals); not worth refactoring */
+
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, MeshDistortMaterial } from "@react-three/drei";

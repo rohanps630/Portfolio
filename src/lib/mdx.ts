@@ -39,7 +39,8 @@ function getAllPostsFromFiles(): BlogPostMeta[] {
   return slugs
     .map((slug) => {
       const post = getPostBySlugFromFile(slug);
-      const { content: _, ...meta } = post;
+      const { content, ...meta } = post;
+      void content;
       return meta;
     })
     .filter((post) => post.published)

@@ -27,7 +27,7 @@ function RollingDigit({
   isInView: boolean;
 }) {
   const target = parseInt(digit, 10);
-  const [settled, setSettled] = useState(false);
+  const [, setSettled] = useState(false);
 
   useEffect(() => {
     if (!isInView) return;
@@ -92,7 +92,7 @@ export function AnimatedCounter({
   }
 
   // Split the numeric portion into individual characters (digits and dots),
-  // preserving the precision the caller provided (e.g. "4.75" stays as "4.75").
+  // preserving the precision the caller provided (e.g. "5.0" stays as "5.0").
   const chars = numberStr.split("");
 
   return (

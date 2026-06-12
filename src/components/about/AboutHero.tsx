@@ -29,7 +29,7 @@ export function AboutHero() {
             About Me
           </h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Full-stack engineer with 4.75 years building web, mobile, and
+            Full-stack engineer with 5 years building web, mobile, and
             AI-integrated systems — real-time chat, AI voice agents, healthcare
             platforms, and developer tooling. I&apos;ve shipped products to
             production across React, React Native, Node.js, Go, Python, and

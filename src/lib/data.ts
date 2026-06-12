@@ -1,21 +1,20 @@
-import content from "@/content/content.json";
+import { siteConfig } from "@/content/site";
 
 // --- Site Config ---
 
 export async function getSiteConfig(): Promise<Record<string, string>> {
-  const { site } = content;
   return {
-    name: site.name,
-    title: site.title,
-    description: site.description,
-    tagline: site.tagline,
-    url: site.url,
-    email: site.contact.email,
-    phone: site.contact.phone,
-    location: site.contact.location,
-    whatsapp: site.contact.whatsapp,
-    github: site.social.github,
-    linkedin: site.social.linkedin,
+    name: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    tagline: siteConfig.tagline,
+    url: siteConfig.url,
+    email: siteConfig.contact.email,
+    phone: siteConfig.contact.phone,
+    location: siteConfig.contact.location,
+    whatsapp: siteConfig.contact.whatsapp,
+    github: siteConfig.social.github,
+    linkedin: siteConfig.social.linkedin,
   };
 }
 
@@ -28,7 +27,7 @@ export interface NavItem {
 }
 
 export async function getNavItems(): Promise<NavItem[]> {
-  return content.nav.map((item, i) => ({
+  return siteConfig.nav.map((item, i) => ({
     label: item.label,
     href: item.href,
     sort_order: i,
@@ -43,13 +42,13 @@ export interface Stat {
 }
 
 export async function getStats(): Promise<Stat[]> {
-  return content.stats.map((s) => ({ label: s.label, value: s.value }));
+  return siteConfig.stats.map((s) => ({ label: s.label, value: s.value }));
 }
 
 // --- Tech Stack ---
 
 export async function getTechStack(): Promise<string[]> {
-  return [...content.techStack];
+  return [...siteConfig.techStack];
 }
 
 // --- Page Sections ---
@@ -59,11 +58,19 @@ export interface PageSection {
   visible: boolean;
 }
 
+const DEFAULT_PAGE_SECTIONS: PageSection[] = [
+  { key: "home", visible: true },
+  { key: "about", visible: true },
+  { key: "projects", visible: true },
+  { key: "blog", visible: true },
+  { key: "contact", visible: true }
+];
+
 export async function getPageSections(): Promise<PageSection[]> {
-  return [...content.pageSections];
+  return DEFAULT_PAGE_SECTIONS;
 }
 
 export async function isPageVisible(key: string): Promise<boolean> {
-  const section = content.pageSections.find((s) => s.key === key);
+  const section = DEFAULT_PAGE_SECTIONS.find((s) => s.key === key);
   return section?.visible ?? true;
 }

@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable react-hooks/set-state-in-effect -- component is scheduled for deletion in Phase 1 (ADR-005 motion removals); not worth refactoring */
+
 import { useEffect, useRef, useState } from "react";
 
 export function CursorSpotlight() {

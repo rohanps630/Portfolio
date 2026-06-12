@@ -1,23 +1,8 @@
-export type BlogCategory =
-  | "architecture"
-  | "react"
-  | "mobile"
-  | "ai"
-  | "devops"
-  | "career"
-  | "accessibility";
+import { z } from "zod";
+import { noteSchema, blogCategorySchema } from "@/lib/schemas/note";
 
-export interface BlogPostMeta {
-  slug: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  category: BlogCategory;
-  tags: string[];
-  coverImage: string;
-  published: boolean;
-  readingTime: string;
-}
+export type BlogCategory = z.infer<typeof blogCategorySchema>;
+export type BlogPostMeta = z.infer<typeof noteSchema>;
 
 export interface BlogPost extends BlogPostMeta {
   content: string;
