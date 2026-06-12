@@ -141,8 +141,8 @@ async function main() {
     }
   }
 
-  console.log("Validating blog posts...");
-  const blogDir = join(process.cwd(), "src", "content", "blog");
+  console.log("Validating notes notes...");
+  const blogDir = join(process.cwd(), "src", "content", "notes");
   if (existsSync(blogDir)) {
     const files = readdirSync(blogDir).filter(f => f.endsWith(".mdx"));
     
@@ -154,11 +154,11 @@ async function main() {
 
       const noteResult = noteSchema.safeParse({ ...data, slug });
       if (!noteResult.success) {
-        error(`Blog post validation failed for ${file}: ${noteResult.error.message}`);
+        error(`Note note validation failed for ${file}: ${noteResult.error.message}`);
       } else {
         const coverImage = noteResult.data.coverImage;
         if (coverImage) {
-          checkImage(coverImage, `Post: ${file}`);
+          checkImage(coverImage, `Note: ${file}`);
         }
       }
     }

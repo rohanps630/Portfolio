@@ -1,16 +1,16 @@
 import { Suspense } from "react";
-import { getAllPosts, getPostsByCategory, getAllCategories } from "@/lib/mdx";
+import { getAllNotes, getPostsByCategory, getAllCategories } from "@/lib/mdx";
 import { createMetadata } from "@/lib/seo";
 import { SectionHeading } from "@/components/shared/SectionHeading";
-import { BlogCategoryFilter } from "@/components/blog/BlogCategoryFilter";
-import { BlogGrid } from "@/components/blog/BlogGrid";
-import type { BlogCategory } from "@/types/blog";
+import { NoteCategoryFilter } from "@/components/notes/NoteCategoryFilter";
+import { NoteGrid } from "@/components/notes/NoteGrid";
+import type { NoteCategory } from "@/types/note";
 
 export const metadata = createMetadata({
-  title: "Blog — Architecture, React, AI & DevOps",
+  title: "Note — Architecture, React, AI & DevOps",
   description:
     "Writing by Rohan P. Suresh on software architecture, React, React Native, AI integration, and lessons from shipping production apps.",
-  path: "/blog",
+  path: "/notes",
 });
 
 interface BlogPageProps {
@@ -21,11 +21,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const { category } = await searchParams;
 
   const [allPosts, categories, filteredPosts] = await Promise.all([
-    getAllPosts(),
+    getAllNotes(),
     getAllCategories(),
     category
-      ? getPostsByCategory(category as BlogCategory)
-      : getAllPosts(),
+      ? getPostsByCategory(category as NoteCategory)
+      : getAllNotes(),
   ]);
 
   return (
@@ -33,19 +33,19 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           as="h1"
-          label="Blog"
+          label="Note"
           title="Writing by Rohan P. Suresh"
           subtitle="Thoughts on software architecture, development practices, and lessons learned from building production applications."
         />
 
         <Suspense fallback={null}>
-          <BlogCategoryFilter
+          <NoteCategoryFilter
             categories={categories}
             totalCount={allPosts.length}
           />
         </Suspense>
 
-        <BlogGrid posts={filteredPosts} />
+        <NoteGrid notes={filteredPosts} />
       </div>
     </main>
   );

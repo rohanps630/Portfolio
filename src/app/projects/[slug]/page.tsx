@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { MetricFact } from "@/components/ui/MetricFact";
 import { DecisionRecordBlock } from "@/components/ui/DecisionRecord";
 import { EvidenceLink } from "@/components/ui/EvidenceLink";
+import { RelatedNotes } from "@/components/notes/RelatedNotes";
 
 export async function generateStaticParams() {
   const systems = await getSystems();
@@ -122,7 +123,7 @@ export default async function ProjectPage({ params }: PageProps) {
           </aside>
 
           {/* Content Sections */}
-          <article className="flex-1 max-w-3xl space-y-24">
+          <article className="flex-1 max-w-3xl space-y-24" data-pagefind-body>
             
             {/* Context & Problem */}
             <section id="context" className="scroll-mt-24">
@@ -250,6 +251,9 @@ export default async function ProjectPage({ params }: PageProps) {
                 </div>
               )}
             </section>
+
+            {/* Related Engineering Notes */}
+            <RelatedNotes systemSlug={system.slug} />
           </article>
         </div>
       </div>

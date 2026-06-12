@@ -23,7 +23,7 @@ export const siteConfig = {
     { label: "Home", href: "/" },
     { label: "About", href: "/about" },
     { label: "Projects", href: "/projects" },
-    { label: "Blog", href: "/blog" },
+    { label: "Note", href: "/notes" },
     { label: "Contact", href: "/contact" }
   ],
   techStack: [

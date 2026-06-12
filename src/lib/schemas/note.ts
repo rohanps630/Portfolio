@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const blogCategorySchema = z.enum([
+export const noteCategorySchema = z.enum([
   "architecture",
   "react",
   "mobile",
@@ -15,9 +15,13 @@ export const noteSchema = z.object({
   title: z.string(),
   excerpt: z.string(),
   date: z.string(),
-  category: blogCategorySchema,
+  category: noteCategorySchema,
   tags: z.array(z.string()),
   coverImage: z.string(),
   published: z.boolean(),
   readingTime: z.string().optional(),
+  series: z.string().optional(),
+  seriesOrder: z.number().optional(),
+  relatedSystem: z.string().optional(),
+  canonicalFrom: z.string().optional(),
 });

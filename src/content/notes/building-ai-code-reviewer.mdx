@@ -6,6 +6,9 @@ category: "ai"
 tags: ["ai", "agents", "retrieval", "evals", "anthropic"]
 coverImage: "/images/blog/ai-code-reviewer.jpg"
 published: true
+series: "ai-code-reviewer"
+seriesOrder: 1
+relatedSystem: "ai-code-reviewer"
 ---
 
 Most AI code review tools fall into one of two failure modes. The first looks only at the diff. It catches obvious typos and missing semicolons, but misses the things that matter — the caller in another file that this change just broke, the type the new function is supposed to match, the test that should have been updated. The second mode is the opposite: paste the whole repository into a giant context window and let the model figure it out. This is slow, expensive, noisy, and the model still misses the same things, just for different reasons.

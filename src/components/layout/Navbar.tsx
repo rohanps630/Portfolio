@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { siteConfig } from "@/content/site";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { CommandPalette } from "@/components/ui/CommandPalette";
 import { Button } from "@/components/ui/Button";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { cn } from "@/lib/utils";
@@ -62,6 +63,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
+          <CommandPalette />
           <ThemeToggle />
           <Link href="/contact" className="hidden md:block">
             <motion.div whileTap={{ scale: 0.97 }}>

@@ -7,6 +7,7 @@
     "dev": "next dev --turbopack",
     "prebuild": "bun run validate-content",
     "build": "next build",
+    "postbuild": "pagefind --site .next/server/app --output-path public/pagefind",
     "start": "next start",
     "lint": "eslint .",
     "validate-content": "bun run scripts/validate-content.ts"
@@ -42,6 +43,7 @@
     "eslint": "^9.39.0",
     "eslint-config-next": "^16.2.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",
+    "pagefind": "^1.5.2",
     "postcss": "^8.5.8",
     "rehype-pretty-code": "^0.14.3",
     "shiki": "^4.0.2",

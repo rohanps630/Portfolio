@@ -40,6 +40,9 @@ function CustomLink(props: ComponentPropsWithoutRef<"a">) {
   return <a {...props}>{props.children}</a>;
 }
 
+import { DecisionLink } from "@/components/mdx/DecisionLink";
+import { ExplorerLink } from "@/components/mdx/ExplorerLink";
+
 const mdxComponents = {
   h1: createHeading(1),
   h2: createHeading(2),
@@ -48,13 +51,15 @@ const mdxComponents = {
   h5: createHeading(5),
   h6: createHeading(6),
   a: CustomLink,
+  DecisionLink,
+  ExplorerLink,
 };
 
-interface BlogContentProps {
+interface NoteContentProps {
   source: string;
 }
 
-export async function BlogContent({ source }: BlogContentProps) {
+export async function NoteContent({ source }: NoteContentProps) {
   const { content } = await compileMDX({
     source,
     components: mdxComponents,

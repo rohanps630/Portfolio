@@ -49,7 +49,7 @@ export const aiCodeReviewerModel: ArchitectureModel = {
         { id: "ce1", from: "developer", to: "github", kind: "async", label: "Open PR" },
         { id: "ce2", from: "github", to: "acr-system", kind: "async", label: "Webhook (pr.opened)" },
         { id: "ce3", from: "acr-system", to: "llm-provider", kind: "sync", label: "Prompt / Tool Use" },
-        { id: "ce4", from: "acr-system", to: "github", kind: "async", label: "Post review comments" },
+        { id: "ce4", from: "acr-system", to: "github", kind: "async", label: "Note review comments" },
       ],
     },
     {

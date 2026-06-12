@@ -2,23 +2,23 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import type { BlogCategory } from "@/types/blog";
+import type { NoteCategory } from "@/types/note";
 
 interface CategoryOption {
-  value: BlogCategory;
+  value: NoteCategory;
   label: string;
   count: number;
 }
 
-interface BlogCategoryFilterProps {
+interface NoteCategoryFilterProps {
   categories: CategoryOption[];
   totalCount: number;
 }
 
-export function BlogCategoryFilter({
+export function NoteCategoryFilter({
   categories,
   totalCount,
-}: BlogCategoryFilterProps) {
+}: NoteCategoryFilterProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const activeCategory = searchParams.get("category");
@@ -30,7 +30,7 @@ export function BlogCategoryFilter({
     } else {
       params.delete("category");
     }
-    router.push(`/blog?${params.toString()}`, { scroll: false });
+    router.push(`/notes?${params.toString()}`, { scroll: false });
   }
 
   return (
@@ -38,7 +38,7 @@ export function BlogCategoryFilter({
       <div
         className="flex items-center gap-2 pb-2"
         role="tablist"
-        aria-label="Filter blog posts by category"
+        aria-label="Filter notes notes by category"
       >
         <button
           role="tab"

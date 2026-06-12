@@ -62,7 +62,7 @@ const DEFAULT_PAGE_SECTIONS: PageSection[] = [
   { key: "home", visible: true },
   { key: "about", visible: true },
   { key: "projects", visible: true },
-  { key: "blog", visible: true },
+  { key: "notes", visible: true },
   { key: "contact", visible: true }
 ];
 
