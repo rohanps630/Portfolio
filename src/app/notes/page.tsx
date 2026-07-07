@@ -7,7 +7,7 @@ import { NoteGrid } from "@/components/notes/NoteGrid";
 import type { NoteCategory } from "@/types/note";
 
 export const metadata = createMetadata({
-  title: "Note — Architecture, React, AI & DevOps",
+  title: "Notes — Architecture, React, AI & DevOps",
   description:
     "Writing by Rohan P. Suresh on software architecture, React, React Native, AI integration, and lessons from shipping production apps.",
   path: "/notes",
@@ -29,11 +29,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   ]);
 
   return (
-    <main className="pt-24 pb-16">
+    <div className="pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           as="h1"
-          label="Note"
+          label="Notes"
           title="Writing by Rohan P. Suresh"
           subtitle="Thoughts on software architecture, development practices, and lessons learned from building production applications."
         />
@@ -47,6 +47,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
         <NoteGrid notes={filteredPosts} />
       </div>
-    </main>
+    </div>
   );
 }

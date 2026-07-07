@@ -17,7 +17,7 @@ export const aiAutomationHub: System = {
   },
   "year": "2024",
   "executiveSummary": "An AI-driven platform that transforms customer support and lead generation through intelligent voice agents, automated workflows, and real-time conversation analytics. By combining NLP-powered voice agents with machine learning lead scoring, it helps businesses respond to inquiries in under two minutes and increase lead conversion rates by up to 45%.",
-  "businessContext": "Migrated from previous format.",
+  "businessContext": "The client was losing high-value leads because their support infrastructure averaged four-hour response times and had no intelligent routing — every inquiry went into the same queue regardless of urgency or value. They needed AI-driven automation that could handle routine inquiries end-to-end while identifying and escalating the conversations worth a human's attention, all without replacing their existing CRM and telephony setup.",
   "problemStatement": "Businesses were losing potential customers due to slow response times and inconsistent support quality across multiple communication channels. Their existing support infrastructure averaged four-hour response times and lacked any intelligent routing or prioritization, causing high-value leads to go cold. They needed an AI-powered solution that could handle customer interactions autonomously while maintaining a human touch and knowing when to escalate. The system also had to integrate with existing CRM and telephony infrastructure without requiring a costly migration.",
   "constraints": [
     {
@@ -152,10 +152,10 @@ export const aiAutomationHub: System = {
     }
   ],
   "lessons": [
-    "One key lesson was the value of end-to-end testing.",
-    "A mistake we made early on was underestimating state management complexity, which cost us a sprint to refactor."
+    "The hardest design problem wasn't the AI — it was defining when the agent should escalate to a human. A binary confidence threshold produced too many false escalations. The model that worked was a combination of topic classification and conversation length: long conversations on high-value topics got a human, short routine ones were fully automated.",
+    "Redis Streams as the message queue backbone worked well for throughput, but required careful consumer group management. When a consumer died mid-processing, the pending entry list grew silently until we added explicit dead-letter handling and monitoring."
   ],
-  "featured": true,
+  "featured": false,
   "sortOrder": 3,
   "coverImage": "/images/projects/ai-automation-hub/cover.webp"
 };

@@ -43,3 +43,7 @@ data/
 # Pagefind build output
 public/pagefind/
 
+
+# playwright
+test-results/
+playwright-report/

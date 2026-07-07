@@ -8,6 +8,9 @@ import { noteSchema } from "../src/lib/schemas/note";
 import { getSystems } from "../src/lib/systems";
 import { architectures } from "../src/content/architectures";
 import { architectureModelSchema } from "../src/lib/schemas/architecture";
+import { systemSchema } from "../src/lib/schemas/system";
+import { resumeData } from "../src/content/resume";
+import { resumeSchema } from "../src/lib/schemas/resume";
 
 async function main() {
   let hasError = false;
@@ -35,18 +38,38 @@ async function main() {
     error(`Site config validation failed: ${siteResult.error.message}`);
   }
 
+  console.log("Validating resume...");
+  const resumeResult = resumeSchema.safeParse(resumeData);
+  if (!resumeResult.success) {
+    error(`Resume validation failed: ${resumeResult.error.message}`);
+  }
+
   console.log("Validating systems...");
   const systems = await getSystems();
   const systemSlugs = new Set<string>();
-  
+  const decisionIdsBySystem = new Map<string, Set<string>>();
+
   for (const system of systems) {
     if (systemSlugs.has(system.slug)) {
       error(`Duplicate system slug found: ${system.slug}`);
     }
     systemSlugs.add(system.slug);
 
+    // TypeScript typing alone can't enforce runtime constraints like
+    // executiveSummary length or URL formats — run the schema for real.
+    const systemResult = systemSchema.safeParse(system);
+    if (!systemResult.success) {
+      error(`System schema validation failed for '${system.slug}': ${systemResult.error.message}`);
+    }
+
     if (system.coverImage) {
       checkImage(system.coverImage, `System: ${system.slug}`);
+    }
+    for (const shot of system.screenshots) {
+      checkImage(shot.src, `System screenshot: ${system.slug}`);
+    }
+    for (const diagram of system.staticDiagrams ?? []) {
+      checkImage(diagram.src, `System diagram: ${system.slug}`);
     }
 
     // Referential checks
@@ -57,6 +80,7 @@ async function main() {
       }
       decisionIds.add(d.id);
     }
+    decisionIdsBySystem.set(system.slug, decisionIds);
 
     // Evidence rule
     if (system.tier <= 2) {
@@ -65,6 +89,16 @@ async function main() {
       }
     }
   }
+
+  // Note slugs are needed below to validate architecture noteRefs.
+  const notesDir = join(process.cwd(), "src", "content", "notes");
+  const noteSlugs = new Set<string>(
+    existsSync(notesDir)
+      ? readdirSync(notesDir)
+          .filter((f) => f.endsWith(".mdx"))
+          .map((f) => f.replace(/\.mdx$/, ""))
+      : []
+  );
 
   console.log("Validating architectures...");
   for (const arch of architectures) {
@@ -79,14 +113,18 @@ async function main() {
         error(`Architecture model references unknown system: ${model.system}`);
       }
 
-      // Collect all node IDs across layers
+      // Collect all node and edge IDs across layers
       const nodeIds = new Set<string>();
+      const edgeIds = new Set<string>();
       for (const layer of model.layers) {
         for (const node of layer.nodes) {
           if (nodeIds.has(node.id)) {
             error(`Duplicate node ID '${node.id}' in architecture for system '${model.system}'`);
           }
           nodeIds.add(node.id);
+        }
+        for (const edge of layer.edges) {
+          edgeIds.add(edge.id);
         }
       }
 
@@ -102,13 +140,33 @@ async function main() {
         }
       }
 
+      // Validate node cross-references into decisions and notes — these
+      // dangled silently until the audit caught four dead decisionRefs.
+      const systemDecisionIds = decisionIdsBySystem.get(model.system) ?? new Set<string>();
+      for (const layer of model.layers) {
+        for (const node of layer.nodes) {
+          for (const ref of node.decisionRefs ?? []) {
+            if (!systemDecisionIds.has(ref)) {
+              error(`Node '${node.id}' references unknown decision '${ref}' in system '${model.system}'`);
+            }
+          }
+          for (const ref of node.noteRefs ?? []) {
+            if (!noteSlugs.has(ref)) {
+              error(`Node '${node.id}' references unknown note '${ref}' in system '${model.system}'`);
+            }
+          }
+        }
+      }
+
       // Validate flow step references
       for (const flow of model.flows) {
         for (const step of flow.steps) {
           if (step.nodeId && !nodeIds.has(step.nodeId)) {
             error(`Step in flow '${flow.id}' references unknown node '${step.nodeId}' in system '${model.system}'`);
           }
-          // Edge refs validation could also go here
+          if (step.edgeId && !edgeIds.has(step.edgeId)) {
+            error(`Step in flow '${flow.id}' references unknown edge '${step.edgeId}' in system '${model.system}'`);
+          }
         }
       }
 
@@ -126,12 +184,10 @@ async function main() {
         }
       } else if (model.disclosure === "full") {
         // Full mode rules
-        let hasRationaleAndTradeoff = true;
         for (const layer of model.layers) {
           for (const node of layer.nodes) {
             if (node.kind !== "external" && node.kind !== "client") {
               if (!node.rationale || !node.tradeoffs || node.tradeoffs.length === 0) {
-                hasRationaleAndTradeoff = false;
                 error(`Full mode node '${node.id}' in system '${model.system}' must have rationale and >= 1 tradeoff.`);
               }
             }
@@ -141,8 +197,8 @@ async function main() {
     }
   }
 
-  console.log("Validating notes notes...");
-  const blogDir = join(process.cwd(), "src", "content", "notes");
+  console.log("Validating notes...");
+  const blogDir = notesDir;
   if (existsSync(blogDir)) {
     const files = readdirSync(blogDir).filter(f => f.endsWith(".mdx"));
     
@@ -154,11 +210,15 @@ async function main() {
 
       const noteResult = noteSchema.safeParse({ ...data, slug });
       if (!noteResult.success) {
-        error(`Note note validation failed for ${file}: ${noteResult.error.message}`);
+        error(`Note validation failed for ${file}: ${noteResult.error.message}`);
       } else {
         const coverImage = noteResult.data.coverImage;
         if (coverImage) {
           checkImage(coverImage, `Note: ${file}`);
+        }
+        const relatedSystem = noteResult.data.relatedSystem;
+        if (relatedSystem && !systemSlugs.has(relatedSystem)) {
+          error(`Note ${file} references unknown relatedSystem '${relatedSystem}'`);
         }
       }
     }

@@ -36,15 +36,18 @@ export function TechStackBar({ techs }: TechStackBarProps) {
               {tech}
             </span>
           ))}
-          {/* Second copy for seamless loop */}
-          {techs.map((tech) => (
-            <span
-              key={`b-${tech}`}
-              className="inline-flex items-center text-lg font-medium text-muted-foreground/60 hover:text-foreground transition-colors select-none"
-            >
-              {tech}
-            </span>
-          ))}
+          {/* Second copy for seamless loop — visual only, hidden from AT so
+              the list isn't announced twice */}
+          <span aria-hidden="true" className="contents">
+            {techs.map((tech) => (
+              <span
+                key={`b-${tech}`}
+                className="inline-flex items-center text-lg font-medium text-muted-foreground/60 hover:text-foreground transition-colors select-none"
+              >
+                {tech}
+              </span>
+            ))}
+          </span>
         </div>
       </div>
     </SectionContainer>

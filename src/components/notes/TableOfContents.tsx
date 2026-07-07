@@ -52,7 +52,12 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
                 e.preventDefault();
                 const el = document.getElementById(heading.id);
                 if (el) {
+                  // Keep the URL shareable and the back button meaningful,
+                  // and move focus so keyboard users continue from the section.
+                  history.pushState(null, "", `#${heading.id}`);
                   el.scrollIntoView({ behavior: "smooth" });
+                  el.setAttribute("tabindex", "-1");
+                  el.focus({ preventScroll: true });
                   el.classList.add("heading-highlight");
                   setTimeout(() => el.classList.remove("heading-highlight"), 1500);
                 }

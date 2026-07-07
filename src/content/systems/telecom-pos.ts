@@ -18,7 +18,7 @@ export const telecomPos: System = {
   },
   year: "2024",
   executiveSummary: "Architected and delivered the frontend for a massive multi-tenant Point of Sale (POS) system for a major telecom provider. We utilized React Native Web to maintain a single codebase across iPad kiosks and desktop terminals, implementing complex transactional flows and hardware integrations.",
-  businessContext: "The telecom provider was running on severely outdated legacy POS terminals that frequently crashed during complex multi-line activations, causing massive customer churn in-store. They needed a modern, resilient, and blazing-fast application that could run on both modern tablets and older desktop machines.",
+  businessContext: "The telecom provider was running on severely outdated legacy POS terminals that frequently crashed during complex multi-line activations, causing massive customer churn in-store. They needed a modern, resilient application that stayed responsive on both current tablets and older desktop machines.",
   problemStatement: "Building a POS system is fundamentally an exercise in robust state management. A single transaction might involve credit checks, inventory reservation, trade-in valuations, and payment processing. If the network drops or the hardware glitches mid-flow, the application must recover perfectly without double-charging the customer or losing the cart.",
   constraints: [
     {

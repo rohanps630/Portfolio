@@ -33,7 +33,7 @@ export const multiAgentOpsModel: ArchitectureModel = {
           id: "orchestrator",
           label: "Agent Orchestrator",
           kind: "agent",
-          tech: ["Node.js", "LangGraph"],
+          tech: ["Node.js", "State Machine"],
           summary: "State machine routing tasks to specialized sub-agents.",
           rationale: "Centralizes prompt chaining and tool access control.",
           tradeoffs: ["Single point of failure for reasoning", "High latency overhead"],

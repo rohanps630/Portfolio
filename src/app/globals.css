@@ -192,9 +192,11 @@ body {
 .prose {
   --tw-prose-body: var(--color-foreground);
   --tw-prose-headings: var(--color-foreground);
-  --tw-prose-links: var(--color-accent);
+  /* accent-hover (lighter indigo) clears WCAG AA 4.5:1 as body-text links in
+     dark mode, where the base accent (#6366f1) lands at ~4.2:1. */
+  --tw-prose-links: var(--color-accent-hover);
   --tw-prose-bold: var(--color-foreground);
-  --tw-prose-code: var(--color-accent);
+  --tw-prose-code: var(--color-accent-hover);
   --tw-prose-pre-bg: var(--color-muted);
   --tw-prose-pre-code: var(--color-foreground);
   --tw-prose-quotes: var(--color-muted-foreground);

@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { ArchitectureModel, ArchitectureNode, ArchitectureStep } from "@/lib/schemas/architecture";
+import { ArchitectureModel } from "@/lib/schemas/architecture";
 import { ExplorerCanvas } from "./ExplorerCanvas";
 import { NodeInspector } from "./NodeInspector";
 import { FlowStepper } from "./FlowStepper";
+import { ExplorerTextEquivalent } from "./ExplorerTextEquivalent";
 import { trackEvent } from "@/lib/analytics";
 
 interface ExplorerProps {
@@ -18,10 +19,11 @@ export function Explorer({ model, embedded = false }: ExplorerProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // State from URL
-  const layerId = searchParams.get("layer") || model.layers[0].id;
+  // State from URL — these params arrive from shareable/hand-editable links,
+  // so every one of them must resolve to a valid state, never a crash.
+  const rawLayerId = searchParams.get("layer");
   const flowId = searchParams.get("flow") || null;
-  const stepIdx = parseInt(searchParams.get("step") || "0", 10);
+  const rawStep = parseInt(searchParams.get("step") || "0", 10);
   const selectedNodeId = searchParams.get("node") || null;
 
   // Track open
@@ -48,13 +50,19 @@ export function Explorer({ model, embedded = false }: ExplorerProps) {
     updateState({ layer: id, flow: null, step: null, node: null });
   };
 
-  const currentLayer = model.layers.find((l) => l.id === layerId) || model.layers[0];
+  const currentLayer = model.layers.find((l) => l.id === rawLayerId) || model.layers[0];
+  const layerId = currentLayer.id;
   const selectedNode = selectedNodeId ? currentLayer.nodes.find((n) => n.id === selectedNodeId) || null : null;
   const currentFlow = flowId ? model.flows.find((f) => f.id === flowId) || null : null;
+  const stepIdx = currentFlow
+    ? Math.min(Math.max(Number.isNaN(rawStep) ? 0 : rawStep, 0), currentFlow.steps.length - 1)
+    : 0;
 
   return (
     <div className={`flex flex-col md:flex-row bg-background border border-border overflow-hidden ${embedded ? "h-[600px] rounded-xl" : "h-[calc(100vh-4rem)] w-full"}`}>
-      
+      {/* Accessible text equivalent — visible only to screen readers */}
+      <ExplorerTextEquivalent model={model} layerId={layerId} />
+
       {/* Main Canvas Area */}
       <div className="flex-1 relative flex flex-col overflow-hidden">
         
@@ -74,7 +82,8 @@ export function Explorer({ model, embedded = false }: ExplorerProps) {
             ))}
           </div>
           {model.disclosure === "conceptual" && (
-            <div className="bg-yellow-500/10 text-yellow-600 border border-yellow-500/20 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide pointer-events-auto backdrop-blur-sm">
+            <div className="inline-flex items-center gap-1.5 bg-warning/10 text-foreground border border-warning/40 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide pointer-events-auto backdrop-blur-sm">
+              <span className="h-1.5 w-1.5 rounded-full bg-warning" aria-hidden="true" />
               Conceptual Reconstruction
             </div>
           )}

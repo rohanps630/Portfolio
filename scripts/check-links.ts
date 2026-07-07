@@ -15,9 +15,22 @@ async function findHtmlFiles(dir: string): Promise<string[]> {
 
 async function checkLinks() {
   const buildDir = join(process.cwd(), ".next", "server", "app");
-  
+
   console.log(`Scanning build directory: ${buildDir}`);
   const htmlFiles = await findHtmlFiles(buildDir);
+
+  // Routes that render on demand (searchParams etc.) emit no HTML — take the
+  // authoritative list from Next's manifest instead of a hand-kept whitelist.
+  // Dynamic patterns ([slug]) are intentionally excluded: their valid
+  // instances are enumerated by the prerendered HTML files, so a link to
+  // e.g. /explorer/undefined still fails.
+  const manifestPath = join(process.cwd(), ".next", "app-path-routes-manifest.json");
+  const manifest: Record<string, string> = JSON.parse(
+    await readFile(manifestPath, "utf8")
+  );
+  const manifestRoutes = new Set(
+    Object.values(manifest).filter((route) => !route.includes("["))
+  );
   
   if (htmlFiles.length === 0) {
     console.error("No HTML files found. Did you run `next build` first?");
@@ -95,12 +108,11 @@ async function checkLinks() {
       // Clean up path
       const cleanPath = path === "" ? route : (path.endsWith("/") && path !== "/" ? path.slice(0, -1) : path);
 
-      const dynamicRoutes = ["/projects", "/notes", "/search", "/feed.xml", "/resume"];
-
-      if (!allRoutes.has(cleanPath) && !dynamicRoutes.includes(cleanPath) && !cleanPath.startsWith("/explorer/")) {
+      if (!allRoutes.has(cleanPath) && !manifestRoutes.has(cleanPath)) {
         console.error(`❌ Broken link in ${route}: ${href} (Path ${cleanPath} not found)`);
         brokenLinks++;
-      } else if (hash && cleanPath !== "/resume") { // ignore resume hashes
+      } else if (hash && allRoutes.has(cleanPath)) {
+        // Anchor targets are only verifiable on prerendered pages.
         const targetId = `${cleanPath}#${hash}`;
         if (!allIds.has(targetId)) {
           console.error(`❌ Broken anchor in ${route}: ${href} (Anchor #${hash} not found on ${cleanPath})`);
@@ -112,10 +124,13 @@ async function checkLinks() {
 
   if (brokenLinks > 0) {
     console.error(`\nFound ${brokenLinks} broken links.`);
-    // Don't exit 1 yet so we can see output without failing build, but ideally we would.
+    process.exit(1);
   } else {
     console.log("\n✅ All internal links and anchors are valid.");
   }
 }
 
-checkLinks().catch(console.error);
+checkLinks().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

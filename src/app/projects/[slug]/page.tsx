@@ -1,11 +1,18 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ArrowLeft } from "lucide-react";
+import { GithubIcon } from "@/components/shared/SocialLinks";
 import { Suspense } from "react";
 import { getSystemBySlug, getSystems } from "@/lib/systems";
 import { getArchitectureBySlug } from "@/content/architectures";
 import { createMetadata, generateOgImageUrl } from "@/lib/seo";
-import { Explorer } from "@/components/explorer/Explorer";
+
+// Code-split the interactive Explorer (its client tree + Framer Motion) out of
+// the case-study route's initial bundle; it sits below the fold.
+const Explorer = dynamic(() =>
+  import("@/components/explorer/Explorer").then((m) => m.Explorer)
+);
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { MetricFact } from "@/components/ui/MetricFact";
 import { DecisionRecordBlock } from "@/components/ui/DecisionRecord";
@@ -39,6 +46,11 @@ export async function generateMetadata({ params }: PageProps) {
   });
 }
 
+function hasRealDecisions(decisions: import("@/lib/schemas/system").DecisionRecord[]): boolean {
+  if (decisions.length === 0) return false;
+  return decisions.some((d) => d.alternatives[0]?.option !== "Standard approach");
+}
+
 export default async function ProjectPage({ params }: PageProps) {
   const { slug } = await params;
   const system = await getSystemBySlug(slug);
@@ -49,7 +61,7 @@ export default async function ProjectPage({ params }: PageProps) {
   }
 
   return (
-    <main className="pb-24 pt-24">
+    <div className="pb-24 pt-24">
       {/* Header */}
       <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
         <Link 
@@ -73,10 +85,24 @@ export default async function ProjectPage({ params }: PageProps) {
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-heading mb-6 max-w-4xl">
           {system.title}
         </h1>
-        
+
         <p className="text-xl sm:text-2xl text-muted-foreground max-w-3xl leading-relaxed">
           {system.thesis}
         </p>
+
+        {/* Surface repo link prominently if available */}
+        {system.evidence.filter((e) => e.kind === "repo").map((e) => (
+          <a
+            key={e.url}
+            href={e.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-6 px-4 py-2 bg-muted/50 hover:bg-muted border border-border rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <GithubIcon size={16} />
+            View on GitHub — building in public
+          </a>
+        ))}
       </header>
 
       {/* TL;DR Strip */}
@@ -113,9 +139,11 @@ export default async function ProjectPage({ params }: PageProps) {
               <a href="#architecture" className="block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Architecture
               </a>
-              <a href="#decisions" className="block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Key Decisions
-              </a>
+              {hasRealDecisions(system.decisions) && (
+                <a href="#decisions" className="block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Key Decisions
+                </a>
+              )}
               <a href="#outcomes" className="block py-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Outcomes & Lessons
               </a>
@@ -187,9 +215,12 @@ export default async function ProjectPage({ params }: PageProps) {
                   {system.staticDiagrams.map((diag, i) => (
                     <figure key={i} className="rounded-xl overflow-hidden border border-border bg-card">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
-                        src={diag.src} 
+                      <img
+                        src={diag.src}
                         alt={diag.alt}
+                        width={1600}
+                        height={900}
+                        loading="lazy"
                         className="w-full h-auto object-cover"
                       />
                       {(diag.caption || diag.summary) && (
@@ -204,17 +235,21 @@ export default async function ProjectPage({ params }: PageProps) {
               )}
             </section>
 
-            {/* Decisions */}
-            <section id="decisions" className="scroll-mt-24">
-              <h2 className="text-3xl font-heading font-bold mb-6 text-foreground">
-                Key Engineering Decisions
-              </h2>
-              <div className="space-y-6">
-                {system.decisions.map((decision) => (
-                  <DecisionRecordBlock key={decision.id} decision={decision} />
-                ))}
-              </div>
-            </section>
+            {/* Decisions — only rendered when there are real decisions, not template boilerplate */}
+            {hasRealDecisions(system.decisions) && (
+              <section id="decisions" className="scroll-mt-24">
+                <h2 className="text-3xl font-heading font-bold mb-6 text-foreground">
+                  Key Engineering Decisions
+                </h2>
+                <div className="space-y-6">
+                  {system.decisions
+                    .filter((d) => d.alternatives[0]?.option !== "Standard approach")
+                    .map((decision) => (
+                      <DecisionRecordBlock key={decision.id} decision={decision} />
+                    ))}
+                </div>
+              </section>
+            )}
 
             {/* Outcomes & Lessons */}
             <section id="outcomes" className="scroll-mt-24">
@@ -257,6 +292,6 @@ export default async function ProjectPage({ params }: PageProps) {
           </article>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

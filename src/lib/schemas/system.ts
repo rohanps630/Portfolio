@@ -81,7 +81,6 @@ export const systemSchema = z.object({
 
   // Engineering
   solutionOverview: z.string(),
-  architectureRef: z.string().optional(),
   staticDiagrams: z.array(diagramSchema).optional(),
   decisions: z.array(decisionRecordSchema),
   techStack: z.array(techEntrySchema),

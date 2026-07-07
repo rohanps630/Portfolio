@@ -17,7 +17,7 @@ export const dentalClinicHms: System = {
   },
   "year": "2024",
   "executiveSummary": "A native Android application paired with a robust NestJS backend, purpose-built for small and medium dental clinics that need affordable, mobile-first practice management. Covering scheduling with conflict detection, electronic health records, treatment planning, and automated billing, it has been adopted by over 15 clinics and reduced scheduling conflicts by 90%.",
-  "businessContext": "Migrated from previous format.",
+  "businessContext": "Small dental clinics were caught between two bad options: paper-based tracking that caused double bookings and lost patient histories, or enterprise HMS software built for hospital-scale operations and priced accordingly. The client needed an affordable, mobile-first system that covered the full clinical workflow — scheduling, EHR, treatment planning, and billing — without requiring a full IT team to run it.",
   "problemStatement": "Small dental clinics struggled with managing patient records, scheduling, and billing using outdated paper systems or prohibitively expensive enterprise software designed for hospital-scale operations. Double bookings were common, patient histories were difficult to retrieve during appointments, and billing was a manual, error-prone process. The solution needed to be affordable for independent practices while still meeting healthcare data security standards. It also had to integrate seamlessly into existing clinical workflows without requiring extensive staff training.",
   "constraints": [
     {
@@ -95,19 +95,19 @@ export const dentalClinicHms: System = {
   ],
   "techStack": [
     {
-      "name": "React"
+      "name": "Kotlin"
     },
     {
-      "name": "Go"
+      "name": "NestJS"
     },
     {
       "name": "PostgreSQL"
     },
     {
-      "name": "Kotlin"
+      "name": "Android SDK"
     },
     {
-      "name": "Android SDK"
+      "name": "Firebase"
     }
   ],
   "outcomes": [
@@ -146,8 +146,8 @@ export const dentalClinicHms: System = {
     }
   ],
   "lessons": [
-    "One key lesson was the value of end-to-end testing.",
-    "A mistake we made early on was underestimating state management complexity, which cost us a sprint to refactor."
+    "Healthcare data security is a first-class architectural concern, not a feature to add later. Row-level security in PostgreSQL and AES-256 at rest were designed in from the start; retrofitting them after the data model exists is significantly more expensive.",
+    "The scheduling conflict detection algorithm was the most complex piece of the system — accounting for procedure duration, room turnover time, provider breaks, and emergency slots simultaneously. We ended up modelling it as a constraint-satisfaction problem rather than a calendar query."
   ],
   "featured": false,
   "sortOrder": 6,

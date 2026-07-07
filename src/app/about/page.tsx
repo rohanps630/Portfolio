@@ -16,7 +16,7 @@ export const metadata = createMetadata({
 
 export default function AboutPage() {
   return (
-    <main className="pt-24 pb-16">
+    <div className="pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <section className="py-12 md:py-20">
@@ -61,6 +61,6 @@ export default function AboutPage() {
           <Certifications />
         </section>
       </div>
-    </main>
+    </div>
   );
 }

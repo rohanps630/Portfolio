@@ -17,7 +17,7 @@ export const transitClaims: System = {
   },
   "year": "2022",
   "executiveSummary": "A workflow-centric mobile application that digitizes the entire transit damage claim lifecycle, from initial damage reporting through resolution. By replacing fragmented phone calls, emails, and paper forms with a single source of truth, it cuts claim processing time by 40% and eliminates 70% of communication errors between restoration companies and adjusters.",
-  "businessContext": "Migrated from previous format.",
+  "businessContext": "Furniture restoration companies and transit claims adjusters were coordinating damage claims entirely through phone calls, emails, and paper forms — with no shared source of truth for claim status, photos, or liability. Disputes were common, documentation went missing, and the time between damage report and resolution stretched for weeks. Both parties needed a single workflow they could trust.",
   "problemStatement": "Furniture restoration companies and claims adjusters had no efficient way to communicate about transit damage claims. The existing process was fragmented across phone calls, emails, and paper forms, leading to frequent delays, lost documentation, and disputed liability. There was no single source of truth for claim status, so stakeholders wasted hours tracking down updates manually. The solution needed to support annotated photo evidence, digital signatures, and automated workflow progression while remaining simple enough for non-technical field staff to adopt immediately.",
   "constraints": [
     {
@@ -146,8 +146,8 @@ export const transitClaims: System = {
     }
   ],
   "lessons": [
-    "One key lesson was the value of end-to-end testing.",
-    "A mistake we made early on was underestimating state management complexity, which cost us a sprint to refactor."
+    "Digitizing a paper workflow doesn't mean automating it — it means making the implicit rules explicit. The biggest discovery was that adjusters had informal escalation criteria that existed only in their heads. Surfacing those as configurable workflow rules was the feature that drove the most adoption.",
+    "PDF generation for legally-binding claim forms was harder than anticipated because the output had to match the exact format the insurers' systems expected. We ended up generating PDFs server-side with precise pixel positioning rather than using a template engine."
   ],
   "featured": false,
   "sortOrder": 5,

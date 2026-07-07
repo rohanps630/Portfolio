@@ -8,7 +8,7 @@ import { SectionHeading } from "@/components/shared/SectionHeading";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { StaggerChildren, staggerItemVariants } from "@/components/animations/StaggerChildren";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { formatDate } from "@/lib/utils";
 import { SectionContainer } from "@/components/layout/SectionContainer";
 
@@ -35,7 +35,7 @@ export function NotesPreview({ notes }: NotesPreviewProps) {
     <SectionContainer>
       <FadeIn>
         <SectionHeading
-          label="From the Note"
+          label="From the Notes"
           title="Thoughts & Insights"
         />
       </FadeIn>
@@ -70,12 +70,10 @@ export function NotesPreview({ notes }: NotesPreviewProps) {
 
       <FadeIn delay={0.3}>
         <div className="mt-12 text-center">
-          <Link href="/notes">
-            <Button variant="secondary" size="md">
-              View All Notes
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+          <ButtonLink href="/notes" variant="secondary" size="md">
+            View All Notes
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </ButtonLink>
         </div>
       </FadeIn>
     </SectionContainer>

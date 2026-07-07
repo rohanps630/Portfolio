@@ -1,16 +1,30 @@
 import { compileMDX } from "next-mdx-remote/rsc";
+import Link from "next/link";
+import { isValidElement } from "react";
 import { slugify } from "@/lib/utils";
-import type { ComponentPropsWithoutRef } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
+
+// Flatten heading children to their text content. String() on a React element
+// yields "[object Object]", which used to desync heading ids from the TOC for
+// any heading containing inline code/bold/links.
+function textFromChildren(children: ReactNode): string {
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children);
+  }
+  if (Array.isArray(children)) {
+    return children.map(textFromChildren).join("");
+  }
+  if (isValidElement(children)) {
+    return textFromChildren((children.props as { children?: ReactNode }).children);
+  }
+  return "";
+}
 
 function createHeading(level: 1 | 2 | 3 | 4 | 5 | 6) {
   const Tag = `h${level}` as const;
 
   function HeadingComponent(props: ComponentPropsWithoutRef<"h1">) {
-    const text =
-      typeof props.children === "string"
-        ? props.children
-        : String(props.children ?? "");
-    const id = slugify(text);
+    const id = slugify(textFromChildren(props.children));
 
     return (
       <Tag id={id} {...props}>
@@ -37,7 +51,17 @@ function CustomLink(props: ComponentPropsWithoutRef<"a">) {
     );
   }
 
-  return <a {...props}>{props.children}</a>;
+  // In-page anchors keep native behavior; other internal links go through the
+  // router instead of triggering full page reloads.
+  if (href.startsWith("#")) {
+    return <a {...props}>{props.children}</a>;
+  }
+
+  return (
+    <Link {...props} href={href}>
+      {props.children}
+    </Link>
+  );
 }
 
 import { DecisionLink } from "@/components/mdx/DecisionLink";

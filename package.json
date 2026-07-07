@@ -7,13 +7,15 @@
     "dev": "next dev --turbopack",
     "prebuild": "bun run validate-content",
     "build": "next build",
-    "postbuild": "pagefind --site .next/server/app --output-path public/pagefind",
+    "postbuild": "rm -rf public/pagefind && pagefind --site .next/server/app --output-path public/pagefind",
     "start": "next start",
     "lint": "eslint .",
-    "validate-content": "bun run scripts/validate-content.ts"
+    "validate-content": "bun run scripts/validate-content.ts",
+    "check-links": "bun run scripts/check-links.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@vercel/analytics": "^2.0.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "gray-matter": "^4.0.3",
@@ -39,7 +41,6 @@
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/three": "^0.183.1",
     "eslint": "^9.39.0",
     "eslint-config-next": "^16.2.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
+import { Analytics } from "@vercel/analytics/react";
 import { siteConfig } from "@/content/site";
 import { buildPersonJsonLd, buildWebSiteJsonLd } from "@/lib/seo";
 import { PublicShell } from "@/components/layout/PublicShell";
@@ -55,7 +56,7 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: [
       {
-        url: `${siteConfig.url}/images/og-default.jpg`,
+        url: `${siteConfig.url}/images/og-default.png`,
         width: 1200,
         height: 630,
         alt: siteConfig.title,
@@ -66,7 +67,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteConfig.title,
     description: siteConfig.description,
-    images: [`${siteConfig.url}/images/og-default.jpg`],
+    images: [`${siteConfig.url}/images/og-default.png`],
   },
   robots: {
     index: true,
@@ -124,6 +125,7 @@ export default function RootLayout({
           storageKey="portfolio-theme"
         >
           <PublicShell>{children}</PublicShell>
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>

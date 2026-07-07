@@ -34,10 +34,12 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
   const tier1 = filteredSystems.filter((s) => s.tier === 1);
   const tier2 = filteredSystems.filter((s) => s.tier === 2);
-  const tier3 = filteredSystems.filter((s) => s.tier === 3);
+  const tier3 = filteredSystems
+    .filter((s) => s.tier === 3)
+    .sort((a, b) => Number(b.year) - Number(a.year) || a.sortOrder - b.sortOrder);
 
   return (
-    <main className="pt-24 pb-16">
+    <div className="pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           as="h1"
@@ -138,6 +140,6 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
           </div>
         )}
       </div>
-    </main>
+    </div>
   );
 }

@@ -9,6 +9,7 @@ export function BackToTop() {
 
   useEffect(() => {
     const handleScroll = () => setVisible(window.scrollY > 400);
+    handleScroll(); // initialize — the browser may restore a scroll position with no scroll event
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);

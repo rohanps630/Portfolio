@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getNoteBySlug, getPostSlugs, getAllNotes } from "@/lib/mdx";
+import { getNoteBySlug, getAllNotes } from "@/lib/mdx";
 import { createMetadata, buildArticleJsonLd, buildBreadcrumbJsonLd, generateOgImageUrl } from "@/lib/seo";
 import { siteConfig } from "@/content/site";
 import { NoteHeader } from "@/components/notes/NoteHeader";
@@ -17,8 +17,10 @@ interface NotePageProps {
 }
 
 export async function generateStaticParams() {
-  const slugs = await getPostSlugs();
-  return slugs.map((slug) => ({ slug }));
+  // Published notes only — drafts must not be prebuilt, and their titles must
+  // not leak into prerendered 404 heads via generateMetadata below.
+  const notes = await getAllNotes();
+  return notes.map((note) => ({ slug: note.slug }));
 }
 
 export async function generateMetadata({
@@ -28,6 +30,9 @@ export async function generateMetadata({
 
   try {
     const note = await getNoteBySlug(slug);
+    if (!note.published) {
+      return createMetadata({ title: "Note Not Found" });
+    }
     return createMetadata({
       title: note.title,
       description: note.excerpt,
@@ -42,11 +47,14 @@ export async function generateMetadata({
 }
 
 function extractHeadings(content: string) {
+  // Strip fenced code blocks first — a "## heading" inside a fence is code,
+  // not a section, and must not produce a TOC entry with no anchor target.
+  const withoutFences = content.replace(/^```.*$[\s\S]*?^```\s*$/gm, "");
   const headingRegex = /^(#{2,3})\s+(.+)$/gm;
   const headings: { id: string; text: string; level: number }[] = [];
   let match;
 
-  while ((match = headingRegex.exec(content)) !== null) {
+  while ((match = headingRegex.exec(withoutFences)) !== null) {
     headings.push({
       id: slugify(match[2]),
       text: match[2],
@@ -88,7 +96,7 @@ export default async function NotePage({ params }: NotePageProps) {
 
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: "Home", href: "/" },
-    { name: "Note", href: "/notes" },
+    { name: "Notes", href: "/notes" },
     { name: note.title, href: `/notes/${slug}` },
   ]);
 
@@ -102,7 +110,7 @@ export default async function NotePage({ params }: NotePageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <main className="pt-24 pb-16">
+      <div className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto" data-pagefind-body>
             <NoteHeader note={note} />
@@ -145,7 +153,7 @@ export default async function NotePage({ params }: NotePageProps) {
             )}
           </div>
         </div>
-      </main>
+      </div>
     </>
   );
 }

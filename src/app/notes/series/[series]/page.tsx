@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getNotesInSeries, getSeriesSlugs } from "@/lib/mdx";
 import { createMetadata } from "@/lib/seo";
+import { formatSeriesTitle } from "@/lib/utils";
 import { NoteCard } from "@/components/notes/NoteCard";
 
 export async function generateStaticParams() {
@@ -16,13 +17,13 @@ interface SeriesPageProps {
 
 export async function generateMetadata({ params }: SeriesPageProps) {
   const { series } = await params;
-  
-  // Pretty up the series name (e.g. "ai-code-reviewer" -> "Ai Code Reviewer")
-  const title = series.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+
+  const title = formatSeriesTitle(series);
 
   return createMetadata({
     title: `${title} Series — Notes`,
     description: `A collection of notes in the ${title} series.`,
+    path: `/notes/series/${series}`,
   });
 }
 
@@ -34,10 +35,10 @@ export default async function SeriesPage({ params }: SeriesPageProps) {
     notFound();
   }
 
-  const title = series.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  const title = formatSeriesTitle(series);
 
   return (
-    <main className="pb-24 pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="pb-24 pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <Link 
         href="/notes" 
         className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8 transition-colors"
@@ -63,6 +64,6 @@ export default async function SeriesPage({ params }: SeriesPageProps) {
           <NoteCard key={note.slug} note={note} index={idx} />
         ))}
       </div>
-    </main>
+    </div>
   );
 }

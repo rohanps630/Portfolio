@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { Box, Code2, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Code2, ArrowRight } from "lucide-react";
+import { ButtonLink } from "@/components/ui/Button";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
 import { SectionContainer } from "@/components/layout/SectionContainer";
@@ -50,41 +49,57 @@ export function HeroSection({ stats }: HeroSectionProps) {
 
             <FadeIn direction="up" delay={0.25}>
               <div className="flex flex-wrap gap-4">
-                <Link href="/projects/ai-code-reviewer">
-                  <Button variant="primary" size="lg">
-                    <Code2 className="mr-2 w-4 h-4" />
-                    Explore the AI Code Reviewer
-                  </Button>
-                </Link>
-                <a
+                <ButtonLink href="/projects/ai-code-reviewer" variant="primary" size="lg">
+                  <Code2 className="mr-2 w-4 h-4" />
+                  Explore the AI Code Reviewer
+                </ButtonLink>
+                <ButtonLink
                   href="/resume/rohan-suresh-resume.pdf"
+                  variant="secondary"
+                  size="lg"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Button variant="secondary" size="lg">
-                    View Resume
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </a>
+                  View Resume
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </ButtonLink>
               </div>
             </FadeIn>
           </div>
         </FadeIn>
 
-        {/* Right column - static brand motif */}
+        {/* Right column - engineering focus card */}
         <FadeIn direction="up" delay={0.3} className="lg:col-span-5">
           <div className="hidden lg:flex items-center justify-center relative w-full h-full">
-            <div className="w-full max-w-md aspect-square border border-border bg-card/50 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
+            <div className="w-full max-w-md border border-border bg-card/50 backdrop-blur-sm rounded-2xl p-8 relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(var(--color-accent)_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.03]" />
-              <Box className="w-16 h-16 text-muted-foreground/50 mb-4" />
-              <span className="mono-label text-muted-foreground">
-                System Motif v1
-              </span>
-
-              {/* Abstract lines representing connections */}
-              <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-background to-transparent" />
-              <div className="absolute top-1/4 -left-4 w-12 h-[1px] bg-accent/50" />
-              <div className="absolute bottom-1/4 -right-4 w-12 h-[1px] bg-accent/50" />
+              <div className="relative z-10 space-y-6">
+                <div>
+                  <span className="mono-label text-muted-foreground block mb-3">Current Focus</span>
+                  <div className="flex flex-wrap gap-2">
+                    {["Full Stack Web", "React Native", "AI Integration", "Systems Design"].map((tag) => (
+                      <span key={tag} className="px-3 py-1 bg-accent/10 text-accent border border-accent/20 rounded-full text-sm font-medium">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-t border-border pt-6">
+                  <span className="mono-label text-muted-foreground block mb-3">Core Stack</span>
+                  <div className="flex flex-wrap gap-2">
+                    {["React", "Next.js", "React Native", "Node.js", "TypeScript", "LLM APIs"].map((tech) => (
+                      <span key={tech} className="mono-label text-xs bg-muted px-2 py-1 rounded-md text-muted-foreground">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-t border-border pt-6">
+                  <span className="mono-label text-muted-foreground block mb-2">Based in</span>
+                  <p className="text-foreground font-medium">Kottayam, Kerala, India</p>
+                  <p className="text-sm text-muted-foreground mt-1">Open to remote opportunities</p>
+                </div>
+              </div>
             </div>
           </div>
         </FadeIn>

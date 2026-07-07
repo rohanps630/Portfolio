@@ -30,7 +30,8 @@ export function NodeInspector({ node, system, mode }: NodeInspectorProps) {
           {node.label}
         </h2>
         {node.illustrative && (
-          <span className="inline-flex mt-2 items-center rounded-full bg-yellow-500/10 px-2 py-1 text-xs font-medium text-yellow-600 ring-1 ring-inset ring-yellow-500/20">
+          <span className="inline-flex mt-2 items-center gap-1.5 rounded-full bg-warning/10 px-2 py-1 text-xs font-medium text-foreground ring-1 ring-inset ring-warning/40">
+            <span className="h-1.5 w-1.5 rounded-full bg-warning" aria-hidden="true" />
             Illustrative
           </span>
         )}

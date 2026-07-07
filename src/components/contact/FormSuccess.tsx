@@ -6,14 +6,17 @@ import { Check } from "lucide-react";
 
 export function FormSuccess() {
   return (
-    <div className="flex flex-col items-center text-center py-12 space-y-6">
+    <div
+      role="status"
+      className="flex flex-col items-center text-center py-12 space-y-6"
+    >
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 15 }}
-        className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10"
+        className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10"
       >
-        <Check className="h-8 w-8 text-green-500" />
+        <Check className="h-8 w-8 text-success" />
       </motion.div>
 
       <div className="space-y-2">

@@ -40,12 +40,12 @@ A list of "no big deal" items that nonetheless took a full pass to get right.
 
 The first commit before any code was a stack decision and an ADR documenting it. The constraint was simple: everything had to be production-credible — no experiments, no bets on libraries that might churn in six months. The shape:
 
-- **App layer**: Next.js 15 App Router, React 19, TypeScript 5 strict, Tailwind 4, shadcn/ui, Vercel AI SDK.
+- **App layer**: Next.js 16 App Router, React 19, TypeScript 5 strict, Tailwind 4, shadcn/ui, Vercel AI SDK.
 - **Data**: Postgres via Supabase with pgvector, Drizzle ORM.
-- **AI**: Anthropic Claude primary, OpenAI fallback, Voyage `voyage-code-3` embeddings, Cohere `rerank-3`.
+- **AI**: Anthropic Claude primary, OpenAI fallback, Voyage `voyage-code-3` embeddings, Cohere `rerank-v3.5`.
 - **Python** (Phase 2+): 3.12, uv, Ruff, Pydantic v2, tree-sitter.
 - **Tooling**: Biome over ESLint+Prettier, Vitest, Lefthook, Turborepo, pnpm.
-- **Ops**: Vercel + Modal, Langfuse, Sentry.
+- **Ops**: Vercel, Langfuse, Sentry.
 
 Every choice is in [ADR-001](https://github.com/rohanps630/ai-code-reviewer/blob/main/docs/adr/001-stack-choices.md) with a one-line rejection of the obvious alternative. The point of writing that down: the next time I'm tempted to swap something out mid-build, I have to write a new ADR explaining why. Friction is the feature.
 
@@ -56,7 +56,7 @@ The repo is four workspaces:
 ```
 ai-code-reviewer/
 ├── apps/
-│   ├── web/              # Next.js 15
+│   ├── web/              # Next.js 16
 │   └── indexer/          # Python — Phase 2+
 └── packages/
     ├── agent/            # Hand-written loop, tools, prompts, retrieval
@@ -223,7 +223,7 @@ Phase 2 — *RAG done right*. The roadmap is in [docs/roadmap.md](https://github
 3. Voyage `voyage-code-3` embeddings adapter, batched, with retry/backoff.
 4. Contextual prefix generation per chunk (Anthropic's pattern).
 5. Hybrid retrieval in `packages/agent/src/retrieval/` — BM25 + vector + reciprocal rank fusion.
-6. Cohere `rerank-3` over the top 30.
+6. Cohere `rerank-v3.5` over the top 30.
 7. Replace the placeholder review with a real retrieval-augmented Claude call. Still no agent loop yet — that's Phase 3.
 
 If Phase 1 was about making sure the wires would carry signal, Phase 2 is about generating signal worth carrying.

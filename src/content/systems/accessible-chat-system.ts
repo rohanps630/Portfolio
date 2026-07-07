@@ -17,7 +17,7 @@ export const accessibleChatSystem: System = {
   },
   "year": "2023",
   "executiveSummary": "A real-time communication platform purpose-built for accessibility, combining WebSocket-powered messaging with text-to-speech and speech-to-text capabilities. Designed to break down communication barriers for individuals with speech and hearing impairments, it delivers sub-100ms message latency with full WCAG 2.1 AA compliance across every interaction.",
-  "businessContext": "Migrated from previous format.",
+  "businessContext": "Mainstream chat applications were built for able-bodied users and left individuals with speech and hearing impairments with no usable real-time communication option. The goal was a platform designed from first principles for accessibility — where text-to-speech, speech-to-text, and ARIA-first semantics were core requirements rather than afterthoughts.",
   "problemStatement": "Built for individuals with speech and hearing impairments who face significant barriers in real-time digital communication. Existing chat applications lacked critical accessibility features like text-to-speech and screen reader support, making them effectively unusable for this community. The platform also needed to handle unreliable network conditions gracefully, since many users depend on mobile devices in environments with spotty connectivity. Balancing real-time performance with robust accessibility was a core technical tension that shaped every design decision.",
   "constraints": [
     {
@@ -146,11 +146,11 @@ export const accessibleChatSystem: System = {
     }
   ],
   "lessons": [
-    "One key lesson was the value of end-to-end testing.",
-    "A mistake we made early on was underestimating state management complexity, which cost us a sprint to refactor."
+    "Testing with actual users who have speech and hearing impairments revealed assumptions we hadn't noticed — default browser speech synthesis sounded nothing like natural speech on lower-end Android devices, which forced a server-side fallback engine we hadn't planned for.",
+    "ARIA live regions need to be tuned carefully in a chat context: announcing every message immediately interrupts the screen reader mid-sentence. The right pattern was a politeness level that batched rapid messages rather than interrupting on each one."
   ],
-  "featured": true,
-  "sortOrder": 1,
+  "featured": false,
+  "sortOrder": 4,
   "coverImage": "/images/projects/accessible-chat-system/cover.webp"
 };
 

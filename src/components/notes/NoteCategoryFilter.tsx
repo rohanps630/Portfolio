@@ -35,14 +35,15 @@ export function NoteCategoryFilter({
 
   return (
     <div className="mb-10 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      {/* These are filter toggles, not tabs — there is no tabpanel and no
+          arrow-key roving, so tab semantics would misdescribe them to AT. */}
       <div
         className="flex items-center gap-2 pb-2"
-        role="tablist"
-        aria-label="Filter notes notes by category"
+        role="group"
+        aria-label="Filter notes by category"
       >
         <button
-          role="tab"
-          aria-selected={!activeCategory}
+          aria-pressed={!activeCategory}
           onClick={() => handleFilter(null)}
           className={cn(
             "inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer",
@@ -67,8 +68,7 @@ export function NoteCategoryFilter({
         {categories.map((cat) => (
           <button
             key={cat.value}
-            role="tab"
-            aria-selected={activeCategory === cat.value}
+            aria-pressed={activeCategory === cat.value}
             onClick={() => handleFilter(cat.value)}
             className={cn(
               "inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer",

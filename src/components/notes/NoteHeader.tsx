@@ -24,7 +24,7 @@ export function NoteHeader({ note }: NoteHeaderProps) {
       <Breadcrumbs
         items={[
           { name: "Home", href: "/" },
-          { name: "Note", href: "/notes" },
+          { name: "Notes", href: "/notes" },
           { name: note.title, href: `/notes/${note.slug}` },
         ]}
         className="mb-8"

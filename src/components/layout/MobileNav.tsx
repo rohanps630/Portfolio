@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { siteConfig } from "@/content/site";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { SocialLinks } from "@/components/shared/SocialLinks";
 import { cn } from "@/lib/utils";
 
@@ -26,10 +26,16 @@ export function MobileNav() {
 
       if (e.key !== "Tab") return;
 
-      const focusableElements = menuRef.current?.querySelectorAll<HTMLElement>(
+      const panelElements = menuRef.current?.querySelectorAll<HTMLElement>(
         'a[href], button, [tabindex]:not([tabindex="-1"])'
       );
-      if (!focusableElements || focusableElements.length === 0) return;
+      // The toggle (X) button lives outside the panel — include it in the
+      // cycle so keyboard users can reach the close control.
+      const focusableElements = [
+        toggleButtonRef.current,
+        ...(panelElements ? Array.from(panelElements) : []),
+      ].filter((el): el is HTMLElement => el !== null);
+      if (focusableElements.length === 0) return;
 
       const first = focusableElements[0];
       const last = focusableElements[focusableElements.length - 1];
@@ -54,8 +60,20 @@ export function MobileNav() {
     }
   }, [open]);
 
+  // Close on any navigation (including browser back/forward) so the panel
+  // never overlays a freshly rendered page. State-adjustment-during-render
+  // pattern — an effect would flash the stale menu for a frame.
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    if (open) setOpen(false);
+  }
+
   return (
-    <div className="md:hidden">
+    // Keydown attached to the wrapper so the trap covers the toggle button
+    // (outside the panel) as well as the panel contents that bubble up.
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    <div className="md:hidden" onKeyDown={open ? handleKeyDown : undefined}>
       <button
         ref={toggleButtonRef}
         onClick={() => setOpen(!open)}
@@ -86,7 +104,6 @@ export function MobileNav() {
               exit={{ opacity: 0, x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               className="fixed top-16 right-0 bottom-0 w-72 bg-background border-l border-border z-50 flex flex-col p-6"
-              onKeyDown={handleKeyDown}
             >
               <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
                 {siteConfig.nav.map((item) => (
@@ -107,9 +124,13 @@ export function MobileNav() {
               </nav>
 
               <div className="mt-6">
-                <Link href="/contact" onClick={() => setOpen(false)}>
-                  <Button className="w-full">Contact</Button>
-                </Link>
+                <ButtonLink
+                  href="/contact"
+                  className="w-full"
+                  onClick={() => setOpen(false)}
+                >
+                  Contact
+                </ButtonLink>
               </div>
 
               <div className="mt-auto pt-6 border-t border-border">

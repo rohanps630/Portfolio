@@ -10,6 +10,7 @@ import {
   contactFormSchema,
   type ContactFormData,
   projectTypeLabels,
+  budgetLabels,
   timelineLabels,
 } from "@/types/contact";
 import { Input } from "@/components/ui/Input";
@@ -81,6 +82,9 @@ export function ContactForm() {
   const timelineOptions = Object.entries(timelineLabels).map(
     ([value, label]) => ({ value, label })
   );
+  const budgetOptions = Object.entries(budgetLabels).map(
+    ([value, label]) => ({ value, label })
+  );
 
   return (
     <FadeIn direction="left">
@@ -120,9 +124,9 @@ export function ContactForm() {
 
         <FadeIn delay={0.1}>
           <div className="space-y-4">
-            <label className="block text-sm font-medium text-foreground">
-              What's this about?
-            </label>
+            <p id="projectTypeGroup" className="block text-sm font-medium text-foreground">
+              What&apos;s this about?
+            </p>
             <div 
               role="radiogroup" 
               aria-labelledby="projectTypeGroup"
@@ -136,14 +140,15 @@ export function ContactForm() {
                     {Object.entries(projectTypeLabels).map(([value, label]) => (
                       <label
                         key={value}
-                        className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none transition-colors ${
+                        className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background ${
                           field.value === value
-                            ? "border-primary bg-primary/10 ring-1 ring-primary"
+                            ? "border-accent bg-accent/10 ring-1 ring-accent"
                             : "border-border bg-card hover:bg-muted/50"
                         }`}
                       >
                         <input
                           type="radio"
+                          name={field.name}
                           value={value}
                           checked={field.value === value}
                           onChange={(e) => field.onChange(e.target.value)}
@@ -158,7 +163,7 @@ export function ContactForm() {
                         </span>
                         {field.value === value && (
                           <svg
-                            className="h-5 w-5 text-primary"
+                            className="h-5 w-5 text-accent"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                           >
@@ -182,14 +187,25 @@ export function ContactForm() {
         </FadeIn>
 
         <FadeIn delay={0.2}>
-          <div className={errors.timeline ? 'animate-shake' : ''}>
-            <Select
-              label="Timeline"
-              options={timelineOptions}
-              required
-              error={errors.timeline?.message}
-              {...register("timeline")}
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className={errors.timeline ? 'animate-shake' : ''}>
+              <Select
+                label="Timeline"
+                options={timelineOptions}
+                required
+                error={errors.timeline?.message}
+                {...register("timeline")}
+              />
+            </div>
+            <div className={errors.budget ? 'animate-shake' : ''}>
+              <Select
+                label="Budget"
+                options={budgetOptions}
+                required
+                error={errors.budget?.message}
+                {...register("budget")}
+              />
+            </div>
           </div>
         </FadeIn>
 

@@ -13,7 +13,7 @@ export const metadata = createMetadata({
 
 export default function ColophonPage() {
   return (
-    <main className="pt-24 pb-16">
+    <div className="pt-24 pb-16">
       <SectionContainer>
         <SectionHeading
           as="h1"
@@ -26,7 +26,7 @@ export default function ColophonPage() {
           {/* The Stack */}
           <section>
             <h2 className="text-2xl font-heading font-semibold mb-6">The Stack</h2>
-            <div className="prose prose-invert max-w-none">
+            <div className="prose dark:prose-invert max-w-none">
               <p>
                 This site is built as a static, verifiable system. It uses no database, no complex CMS, and relies entirely on local markdown and TypeScript files for content.
               </p>
@@ -34,7 +34,7 @@ export default function ColophonPage() {
                 <li><strong>Framework:</strong> Next.js 16 (App Router) + React 19</li>
                 <li><strong>Language:</strong> TypeScript 6</li>
                 <li><strong>Styling:</strong> Tailwind CSS 4 (CSS-first <code>@theme</code>)</li>
-                <li><strong>Animations:</strong> Framer Motion 12 + Lenis for smooth scrolling</li>
+                <li><strong>Animations:</strong> Framer Motion 12 with <code>prefers-reduced-motion</code> gating</li>
                 <li><strong>Content:</strong> MDX compiled with <code>next-mdx-remote/rsc</code></li>
                 <li><strong>Search:</strong> Pagefind (Static search index)</li>
                 <li><strong>Deployment:</strong> Vercel (Edge-cached SSG)</li>
@@ -45,9 +45,9 @@ export default function ColophonPage() {
           {/* Performance */}
           <section>
             <h2 className="text-2xl font-heading font-semibold mb-6">Performance</h2>
-            <div className="prose prose-invert max-w-none">
+            <div className="prose dark:prose-invert max-w-none">
               <p>
-                Every route on this site is pre-rendered at build time (SSG). There are no client-side waterfalls for content fetching. The 3D hero scene on the home page is dynamically imported and explicitly disabled on mobile devices to preserve battery and maintain a fast Largest Contentful Paint (LCP).
+                Every route on this site is pre-rendered at build time (SSG). There are no client-side waterfalls for content fetching. Animation components are lazily mounted and respect the OS reduced-motion preference to preserve a fast Largest Contentful Paint (LCP).
               </p>
               <p>
                 Current field data targets (Speed Insights):
@@ -63,9 +63,9 @@ export default function ColophonPage() {
           {/* Accessibility */}
           <section>
             <h2 className="text-2xl font-heading font-semibold mb-6">Accessibility (A11y)</h2>
-            <div className="prose prose-invert max-w-none">
+            <div className="prose dark:prose-invert max-w-none">
               <p>
-                A beautiful design is a failure if it isn't usable. This site was built with a baseline accessibility floor:
+                A beautiful design is a failure if it isn&apos;t usable. This site was built with a baseline accessibility floor:
               </p>
               <ul className="mt-4 space-y-2">
                 <li><strong>Contrast:</strong> All text meets the WCAG AA 4.5:1 ratio minimum.</li>
@@ -79,7 +79,7 @@ export default function ColophonPage() {
           {/* Analytics Disclosure */}
           <section>
             <h2 className="text-2xl font-heading font-semibold mb-6">Analytics & Privacy</h2>
-            <div className="prose prose-invert max-w-none">
+            <div className="prose dark:prose-invert max-w-none">
               <p>
                 This site respects your privacy. I use a lightweight, privacy-focused analytics wrapper (Vercel Analytics) that does not use cookies or collect PII. 
                 Below is the exhaustive list of custom events tracked:
@@ -95,15 +95,15 @@ export default function ColophonPage() {
           {/* Infrastructure */}
           <section>
             <h2 className="text-2xl font-heading font-semibold mb-6">Infrastructure</h2>
-            <div className="prose prose-invert max-w-none">
+            <div className="prose dark:prose-invert max-w-none">
               <p>
                 The CI/CD pipeline enforces strict quality gates before any deployment reaches production.
-                You can review the approach in the <Link href="/notes/portfolio-engineering-lab" className="text-primary hover:underline">Portfolio Engineering Lab</Link> note.
+                You can review the approach in the <Link href="/notes/portfolio-engineering-lab" className="text-accent hover:underline">Portfolio Engineering Lab</Link> note.
               </p>
             </div>
           </section>
         </div>
       </SectionContainer>
-    </main>
+    </div>
   );
 }

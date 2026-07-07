@@ -1,5 +1,5 @@
 import React from "react";
-import { ArchitectureModel, ArchitectureLayer, ArchitectureNode, ArchitectureEdge, ArchitectureGroup } from "@/lib/schemas/architecture";
+import { ArchitectureModel, ArchitectureNode, ArchitectureEdge, ArchitectureGroup } from "@/lib/schemas/architecture";
 
 interface DiagramSvgProps {
   model: ArchitectureModel;
@@ -46,6 +46,12 @@ export function DiagramSvg({ model, layerId, className = "", interactive = false
           <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" className="text-accent" />
         </marker>
       </defs>
+      {interactive && (
+        <style>{`
+          .explorer-node:focus { outline: none; }
+          .explorer-node:focus-visible rect { stroke: var(--color-accent); stroke-width: 3px; }
+        `}</style>
+      )}
 
       <g className="explorer-viewport">
         {/* Groups */}
@@ -156,46 +162,67 @@ function NodeGroup({ node, scale, interactive }: { node: ArchitectureNode; scale
     w = 180; h = 80;
   }
 
-  // Kind-based colors
-  const kindColors: Record<string, string> = {
-    service: "bg-blue-500/10 stroke-blue-500/50 text-blue-500",
-    agent: "bg-purple-500/10 stroke-purple-500/50 text-purple-500",
-    store: "bg-emerald-500/10 stroke-emerald-500/50 text-emerald-500",
-    queue: "bg-orange-500/10 stroke-orange-500/50 text-orange-500",
-    external: "bg-muted stroke-muted-foreground/30 text-muted-foreground",
-    client: "bg-cyan-500/10 stroke-cyan-500/50 text-cyan-500",
-    "pipeline-step": "bg-pink-500/10 stroke-pink-500/50 text-pink-500",
+  // Kind-based indicator dot colors (CSS variable strings for inline SVG use)
+  const kindDotColor: Record<string, string> = {
+    service:       "#3b82f6", // blue-500
+    agent:         "#a855f7", // purple-500
+    store:         "#22c55e", // emerald-500
+    queue:         "#f97316", // orange-500
+    external:      "#71717a", // zinc-500
+    client:        "#06b6d4", // cyan-500
+    "pipeline-step": "#ec4899", // pink-500
+  };
+  const kindFill: Record<string, string> = {
+    service:       "rgba(59,130,246,0.08)",
+    agent:         "rgba(168,85,247,0.08)",
+    store:         "rgba(34,197,94,0.08)",
+    queue:         "rgba(249,115,22,0.08)",
+    external:      "rgba(113,113,122,0.08)",
+    client:        "rgba(6,182,212,0.08)",
+    "pipeline-step": "rgba(236,72,153,0.08)",
   };
 
-  const styleClass = kindColors[node.kind] || kindColors.service;
+  const dotColor = kindDotColor[node.kind] ?? kindDotColor.service;
+  const rectFill = kindFill[node.kind] ?? kindFill.service;
 
-  // Map utility classes to SVG presentational attributes
-  // In a real app we'd map these cleanly, but using CSS classes is standard.
-  // We'll rely on the global CSS vars via currentColor or actual class names if configured.
-  // For SVG we can use fill/stroke classes if we configure Tailwind, otherwise inline styles.
-  // Let's use `fill-card stroke-border` base.
-  
+  // Selection is handled by the canvas's click delegation; for keyboard users
+  // we synthesize a bubbling click so Enter/Space reach the same code path.
+  const activateWithKeyboard = (e: React.KeyboardEvent<SVGGElement>) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    e.currentTarget.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  };
+
   return (
     <g
       className={`explorer-node cursor-pointer transition-all duration-300 ${interactive ? "interactive" : ""}`}
       id={`node-${node.id}`}
       data-node-id={node.id}
       transform={`translate(${x - w / 2}, ${y - h / 2})`}
+      {...(interactive
+        ? {
+            tabIndex: 0,
+            role: "button",
+            "aria-label": `Inspect node: ${node.label}`,
+            onKeyDown: activateWithKeyboard,
+          }
+        : {})}
     >
       <rect
         width={w}
         height={h}
         rx={8}
-        className="fill-card stroke-border hover:stroke-accent"
+        className="stroke-border hover:stroke-accent"
+        fill={rectFill}
         strokeWidth="2"
       />
-      {/* Indicator for kind */}
-      <circle cx={16} cy={h / 2} r={6} className="fill-accent opacity-80" />
+      {/* Kind indicator dot */}
+      <circle cx={16} cy={h / 2} r={5} fill={dotColor} opacity={0.9} />
       <text
-        x={32}
+        x={30}
         y={h / 2 + 5}
-        className="fill-foreground font-medium text-sm"
-        style={{ fontSize: "14px" }}
+        className="fill-foreground font-medium"
+        style={{ fontSize: "13px" }}
       >
         {node.label}
       </text>

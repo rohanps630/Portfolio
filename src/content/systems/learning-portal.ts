@@ -17,7 +17,7 @@ export const learningPortal: System = {
   },
   "year": "2022",
   "executiveSummary": "A unified educational platform that brings together a feature-rich web dashboard for educators and a student-focused mobile experience. Powered by a shared API architecture with real-time collaboration features, it keeps learning seamless across every device while giving institutions actionable analytics on student engagement and outcomes.",
-  "businessContext": "Migrated from previous format.",
+  "businessContext": "Educational institutions were running their web and mobile experiences as separate products — a full-featured desktop tool for educators and a stripped-down companion app for students. The split created fragmented data, inconsistent feature availability, and poor adoption on mobile. The client needed a unified platform with a shared API, real-time collaboration, and an offline-first mobile experience that didn't treat mobile as second class.",
   "problemStatement": "Educational institutions needed a unified platform that works seamlessly across web and mobile, where the web app provides full administrative and content features while the mobile app focuses on student engagement. Existing solutions forced a choice between a powerful desktop tool and a limited mobile companion, resulting in fragmented data and poor adoption among students. The system had to support real-time video sessions and collaborative tools without sacrificing offline functionality for students in low-connectivity areas. Additionally, educators needed granular analytics to identify at-risk learners early without adding to their administrative burden.",
   "constraints": [
     {
@@ -149,10 +149,10 @@ export const learningPortal: System = {
     }
   ],
   "lessons": [
-    "One key lesson was the value of end-to-end testing.",
-    "A mistake we made early on was underestimating state management complexity, which cost us a sprint to refactor."
+    "WatermelonDB for offline-first sync was the right architectural choice, but its lazy loading model requires careful query design — accessing related records outside of a transaction silently returns stale data. The learning curve cost us a week of debugging before we internalized the pattern.",
+    "The analytics pipeline for identifying at-risk learners worked better than expected, but educators didn't trust automated flags without seeing the underlying data. The adoption breakthrough came from showing the raw engagement metrics alongside the flag rather than just surfacing the conclusion."
   ],
-  "featured": true,
+  "featured": false,
   "sortOrder": 2,
   "coverImage": "/images/projects/learning-portal/cover.webp"
 };

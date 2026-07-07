@@ -27,12 +27,13 @@ function getNoteBySlugFromFile(slug: string): Note {
     category: data.category as NoteCategory,
     tags: data.tags || [],
     coverImage: data.coverImage || "",
-    published: data.published ?? true,
+    // Fail closed: a note missing `published` stays hidden. The schema
+    // requires the field, so this only matters if validation is bypassed.
+    published: data.published ?? false,
     readingTime: stats.text,
     series: data.series,
     seriesOrder: data.seriesOrder,
     relatedSystem: data.relatedSystem,
-    canonicalFrom: data.canonicalFrom,
   };
 
   return { ...meta, content };

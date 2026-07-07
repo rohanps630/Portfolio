@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
 import { getNotesInSeries } from "@/lib/mdx";
+import { formatSeriesTitle } from "@/lib/utils";
 
 interface SeriesNavProps {
   series: string;
@@ -17,7 +18,7 @@ export async function SeriesNav({ series, currentSlug }: SeriesNavProps) {
   const prev = currentIndex > 0 ? notes[currentIndex - 1] : null;
   const next = currentIndex < notes.length - 1 ? notes[currentIndex + 1] : null;
 
-  const title = series.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  const title = formatSeriesTitle(series);
 
   return (
     <div className="mt-16 p-6 sm:p-8 bg-card border border-border rounded-xl">

@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <main className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">
+    <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">
       <p className="font-heading text-8xl md:text-9xl font-bold text-accent/20">
         404
       </p>
@@ -30,6 +30,6 @@ export default function NotFound() {
           Search Site
         </button>
       </div>
-    </main>
+    </div>
   );
 }

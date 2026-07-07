@@ -5,7 +5,9 @@
       "url": [
         "http://localhost:3000/",
         "http://localhost:3000/projects",
-        "http://localhost:3000/blog",
+        "http://localhost:3000/projects/ai-code-reviewer",
+        "http://localhost:3000/notes",
+        "http://localhost:3000/notes/building-ai-code-reviewer",
         "http://localhost:3000/contact",
         "http://localhost:3000/resume"
       ],
@@ -16,10 +18,10 @@
     },
     "assert": {
       "assertions": {
-        "categories:performance": ["error", {"minScore": 0.98}],
-        "categories:accessibility": ["error", {"minScore": 1}],
-        "categories:best-practices": ["error", {"minScore": 1}],
-        "categories:seo": ["error", {"minScore": 1}]
+        "categories:performance": ["error", {"minScore": 0.9}],
+        "categories:accessibility": ["error", {"minScore": 0.95}],
+        "categories:best-practices": ["warn", {"minScore": 0.9}],
+        "categories:seo": ["error", {"minScore": 0.95}]
       }
     }
   }

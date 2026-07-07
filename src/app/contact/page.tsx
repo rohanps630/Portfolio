@@ -13,7 +13,7 @@ export const metadata = createMetadata({
 
 export default function ContactPage() {
   return (
-    <main className="pt-24 pb-16">
+    <div className="pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           as="h1"
@@ -36,6 +36,6 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

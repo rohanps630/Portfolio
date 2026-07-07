@@ -4,13 +4,13 @@ import { PrintButton } from "@/components/ui/PrintButton";
 
 export const metadata = createMetadata({
   title: "Resume — Rohan P. Suresh",
-  description: "Senior Full-Stack Engineer Resume",
+  description: "Rohan P. Suresh — Full Stack & AI Integration Engineer. Experience, skills, and résumé.",
   path: "/resume",
 });
 
 export default function ResumePage() {
   return (
-    <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 print:py-0 print:px-0">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 print:py-0 print:px-0">
       <div className="bg-card border border-border p-8 sm:p-12 rounded-xl print:border-none print:shadow-none print:bg-transparent print:p-0">
         
         <header className="mb-8 border-b border-border pb-8 print:pb-4">
@@ -56,26 +56,28 @@ export default function ResumePage() {
           </div>
         </section>
 
-        <section className="mb-8">
-          <h2 className="text-2xl font-heading font-bold mb-6 text-foreground print:mb-4">
-            Education
-          </h2>
-          <div className="flex flex-col gap-4">
-            {resumeData.education.map((edu) => (
-              <div key={edu.institution}>
-                <div className="flex justify-between items-baseline">
-                  <h3 className="text-lg font-bold text-foreground">
-                    {edu.institution}
-                  </h3>
-                  <span className="text-sm mono-label text-muted-foreground">
-                    {edu.date}
-                  </span>
+        {resumeData.education.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-2xl font-heading font-bold mb-6 text-foreground print:mb-4">
+              Education
+            </h2>
+            <div className="flex flex-col gap-4">
+              {resumeData.education.map((edu) => (
+                <div key={edu.institution}>
+                  <div className="flex justify-between items-baseline">
+                    <h3 className="text-lg font-bold text-foreground">
+                      {edu.institution}
+                    </h3>
+                    <span className="text-sm mono-label text-muted-foreground">
+                      {edu.date}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground">{edu.degree}</p>
                 </div>
-                <p className="text-muted-foreground">{edu.degree}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section>
           <h2 className="text-2xl font-heading font-bold mb-4 text-foreground">
@@ -98,6 +100,6 @@ export default function ResumePage() {
           <PrintButton />
         </div>
       </div>
-    </main>
+    </div>
   );
 }

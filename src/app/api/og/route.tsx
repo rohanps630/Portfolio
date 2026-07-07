@@ -1,14 +1,18 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
+import { siteConfig } from "@/content/site";
 
 export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const title = searchParams.get("title") || "Rohan P. Suresh";
-  const subtitle = searchParams.get("subtitle") || "Full Stack Developer";
+  // Bound all reflected input so a long/garbage query can't drive unbounded
+  // rendering work per request. (This does NOT bound the cache key space —
+  // every distinct query string is still a distinct cached image.)
+  const title = (searchParams.get("title") || "Rohan P. Suresh").slice(0, 120);
+  const subtitle = (searchParams.get("subtitle") || "Full Stack & AI Integration Engineer").slice(0, 160);
   const type = searchParams.get("type") || "default";
-  const extra = searchParams.get("extra") || ""; // e.g. series name
+  const extra = (searchParams.get("extra") || "").slice(0, 60); // e.g. series name
 
   let Content;
 
@@ -144,9 +148,9 @@ export async function GET(request: NextRequest) {
               fontWeight: 500,
             }}
           >
-            <span style={{ color: "#f0f0f5" }}>rohansuresh.dev</span>
+            <span style={{ color: "#f0f0f5" }}>{new URL(siteConfig.url).hostname}</span>
             <span style={{ color: "#1e1e3a" }}>|</span>
-            <span>Full Stack Developer</span>
+            <span>Full Stack &amp; AI Integration Engineer</span>
           </div>
         )}
       </div>
@@ -154,6 +158,9 @@ export async function GET(request: NextRequest) {
     {
       width: 1200,
       height: 630,
+      headers: {
+        "Cache-Control": "public, immutable, no-transform, max-age=31536000",
+      },
     }
   );
 }

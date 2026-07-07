@@ -1,9 +1,8 @@
-import Link from "next/link";
 import { ArrowRight, Box } from "lucide-react";
 import type { System } from "@/lib/schemas/system";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { MetricFact } from "@/components/ui/MetricFact";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 
 interface SystemRowProps {
   system: System;
@@ -41,14 +40,16 @@ export function SystemRow({ system }: SystemRowProps) {
         </div>
 
         <div className="flex gap-4 mt-6">
-          <Link href={`/projects/${system.slug}`}>
-            <Button>
-              Case study <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
-          </Link>
-          <Button variant="secondary" className="hidden lg:flex">
+          <ButtonLink href={`/projects/${system.slug}`}>
+            Case study <ArrowRight className="ml-2 w-4 h-4" />
+          </ButtonLink>
+          <ButtonLink
+            href={`/explorer/${system.slug}`}
+            variant="secondary"
+            className="hidden lg:inline-flex"
+          >
             <Box className="mr-2 w-4 h-4" /> Explorer
-          </Button>
+          </ButtonLink>
         </div>
       </div>
 

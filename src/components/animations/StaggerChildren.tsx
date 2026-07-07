@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface StaggerChildrenProps {
@@ -37,12 +37,8 @@ export function StaggerChildren({
   staggerDelay = 0.1,
   className,
 }: StaggerChildrenProps) {
-  const prefersReducedMotion = useReducedMotion();
-
-  if (prefersReducedMotion) {
-    return <div className={className}>{children}</div>;
-  }
-
+  // Reduced motion is handled by MotionConfig reducedMotion="user" in
+  // PublicShell; no manual branch (it would cause a hydration mismatch).
   return (
     <motion.div
       variants={containerVariants(delay, staggerDelay)}

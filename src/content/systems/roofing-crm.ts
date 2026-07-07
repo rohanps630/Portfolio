@@ -17,7 +17,7 @@ export const roofingCrm: System = {
   },
   "year": "2023",
   "executiveSummary": "A mobile-first CRM built specifically for roofing contractors, covering the entire job lifecycle from lead capture and estimation through scheduling, progress tracking, and invoicing. Designed to work reliably on job sites with limited connectivity, it reduces invoicing time by 60% and brings GPS-tagged photo documentation, weather-aware scheduling, and offline-first sync to every project.",
-  "businessContext": "Migrated from previous format.",
+  "businessContext": "Roofing contractors were running their entire business — leads, estimates, scheduling, and invoicing — across paper, spreadsheets, and text messages. Generic CRMs didn't fit their field-heavy workflow, and enterprise field-service software was priced out of reach for independent contractors. The client needed a purpose-built mobile tool that worked on job sites, including areas with no cellular signal.",
   "problemStatement": "Roofing contractors relied on paper-based tracking and generic CRMs that didn't fit their field-heavy workflow. Job data was scattered across clipboards, spreadsheets, and text messages, leading to lost estimates and delayed invoicing. They needed a mobile-first solution designed specifically for the roofing trade that could handle the entire job lifecycle from lead capture to final payment. Critically, the app had to function fully offline on remote job sites where cellular coverage is often unreliable.",
   "constraints": [
     {
@@ -69,7 +69,7 @@ export const roofingCrm: System = {
   ],
   "techStack": [
     {
-      "name": "React"
+      "name": "React Native"
     },
     {
       "name": "Node.js"
@@ -78,7 +78,7 @@ export const roofingCrm: System = {
       "name": "PostgreSQL"
     },
     {
-      "name": "Three.js"
+      "name": "Stripe"
     }
   ],
   "outcomes": [
@@ -111,8 +111,8 @@ export const roofingCrm: System = {
     }
   ],
   "lessons": [
-    "One key lesson was the value of end-to-end testing.",
-    "A mistake we made early on was underestimating state management complexity, which cost us a sprint to refactor."
+    "Ride-alongs with contractors before writing code revealed that photo documentation was more critical than any workflow feature — contractors used photos as liability protection, not just progress tracking. This completely reordered our feature priorities.",
+    "The offline-first sync conflict resolution strategy required more edge case handling than expected. The most common failure mode was a contractor editing a job estimate on both their phone and tablet simultaneously, which required a merge strategy rather than last-write-wins."
   ],
   "featured": false,
   "sortOrder": 4,
