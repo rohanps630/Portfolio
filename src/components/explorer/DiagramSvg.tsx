@@ -17,6 +17,11 @@ export function DiagramSvg({ model, layerId, className = "", interactive = false
   const w = 100 * SCALE;
   const h = 100 * SCALE;
 
+  // SVG defs ids are document-global — scope the marker per system so two
+  // diagrams on one page can't collide. (The unused "arrowhead-active"
+  // marker was removed; step highlighting styles the path stroke instead.)
+  const markerId = `arrowhead-${model.system}`;
+
   return (
     <svg
       viewBox={`0 0 ${w} ${h}`}
@@ -26,7 +31,7 @@ export function DiagramSvg({ model, layerId, className = "", interactive = false
     >
       <defs>
         <marker
-          id="arrowhead"
+          id={markerId}
           markerWidth="10"
           markerHeight="7"
           refX="9"
@@ -34,16 +39,6 @@ export function DiagramSvg({ model, layerId, className = "", interactive = false
           orient="auto"
         >
           <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" className="text-muted-foreground" />
-        </marker>
-        <marker
-          id="arrowhead-active"
-          markerWidth="10"
-          markerHeight="7"
-          refX="9"
-          refY="3.5"
-          orient="auto"
-        >
-          <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" className="text-accent" />
         </marker>
       </defs>
       {interactive && (
@@ -61,7 +56,7 @@ export function DiagramSvg({ model, layerId, className = "", interactive = false
 
         {/* Edges */}
         {layer.edges.map((edge) => (
-          <EdgePath key={edge.id} edge={edge} nodes={layer.nodes} scale={SCALE} />
+          <EdgePath key={edge.id} edge={edge} nodes={layer.nodes} scale={SCALE} markerId={markerId} />
         ))}
 
         {/* Nodes */}
@@ -103,7 +98,7 @@ function GroupRect({ group, scale }: { group: ArchitectureGroup; scale: number }
   );
 }
 
-function EdgePath({ edge, nodes, scale }: { edge: ArchitectureEdge; nodes: ArchitectureNode[]; scale: number }) {
+function EdgePath({ edge, nodes, scale, markerId }: { edge: ArchitectureEdge; nodes: ArchitectureNode[]; scale: number; markerId: string }) {
   const fromNode = nodes.find((n) => n.id === edge.from);
   const toNode = nodes.find((n) => n.id === edge.to);
 
@@ -131,7 +126,7 @@ function EdgePath({ edge, nodes, scale }: { edge: ArchitectureEdge; nodes: Archi
         d={d}
         className="stroke-muted-foreground/50 fill-none transition-colors duration-300"
         strokeWidth="2"
-        markerEnd="url(#arrowhead)"
+        markerEnd={`url(#${markerId})`}
         data-edge-id={edge.id}
       />
       {edge.label && (

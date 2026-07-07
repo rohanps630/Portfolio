@@ -14,6 +14,12 @@ function getPostSlugsFromFiles(): string[] {
 }
 
 function getNoteBySlugFromFile(slug: string): Note {
+  // The slug arrives from the URL (dynamicParams). Constrain it to slug
+  // characters so it can never traverse out of the notes directory; callers
+  // catch the throw and 404.
+  if (!/^[a-zA-Z0-9-]+$/.test(slug)) {
+    throw new Error(`Invalid note slug: ${slug}`);
+  }
   const filePath = path.join(NOTES_DIR, `${slug}.mdx`);
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(fileContent);

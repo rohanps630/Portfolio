@@ -76,7 +76,8 @@ export async function sendContactEmail(data: ContactFormData) {
   await resend.emails.send({
     from: "Portfolio Contact <noreply@rohansuresh.dev>",
     to: contactEmail || "rohanpsuresh@gmail.com",
-    subject: `New Project Inquiry from ${data.name}`,
+    // Collapse any line breaks in the name — header values must be single-line.
+    subject: `New Project Inquiry from ${data.name.replace(/[\r\n]+/g, " ").trim()}`,
     html,
   });
 

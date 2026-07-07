@@ -9,9 +9,15 @@ interface DecisionLinkProps {
 }
 
 export function DecisionLink({ id, system, title }: DecisionLinkProps) {
+  // Content decision ids are already "decision-N"; accept either that or the
+  // bare number so the anchor never becomes "#decision-decision-1".
+  const normalized = id.toLowerCase();
+  const anchor = normalized.startsWith("decision-")
+    ? normalized
+    : `decision-${normalized}`;
   return (
     <Link
-      href={`/projects/${system}#decision-${id.toLowerCase()}`}
+      href={`/projects/${system}#${anchor}`}
       className="not-prose my-6 flex items-center gap-4 p-4 rounded-lg border border-border bg-muted/30 hover:bg-muted/50 transition-colors group"
     >
       <div className="p-2 bg-card rounded shadow-sm border border-border shrink-0">

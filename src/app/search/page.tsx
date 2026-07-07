@@ -1,5 +1,5 @@
 import { createMetadata } from "@/lib/seo";
-import { CommandPalette } from "@/components/ui/CommandPalette";
+import { OpenSearchButton } from "@/components/ui/OpenSearchButton";
 
 // Search is a thin, JS-only UI with no indexable content of its own — keep it
 // out of the index but let crawlers follow its links.
@@ -19,7 +19,9 @@ export default function SearchPage() {
       <p className="text-muted-foreground mb-8">
         Press <kbd className="px-2 py-1 bg-muted border border-border rounded text-sm mx-1">⌘K</kbd> to open search from anywhere on the site.
       </p>
-      <CommandPalette />
+      {/* The palette itself lives in the Navbar — a second instance here
+          would register a duplicate ⌘K listener and stack two dialogs. */}
+      <OpenSearchButton />
     </div>
   );
 }

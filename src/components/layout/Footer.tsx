@@ -86,7 +86,9 @@ export function Footer() {
 
         <FadeIn delay={0.3}>
           <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-muted-foreground">
+            {/* suppressHydrationWarning: the year is baked in at build time
+                and can lag the client's clock every January until a rebuild. */}
+            <p className="text-xs text-muted-foreground" suppressHydrationWarning>
               &copy; {new Date().getFullYear()} {siteConfig.name}. All rights
               reserved.
             </p>

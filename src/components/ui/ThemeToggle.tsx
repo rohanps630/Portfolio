@@ -6,7 +6,9 @@ import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function ThemeToggle({ className }: { className?: string }) {
-  const { theme, setTheme } = useTheme();
+  // resolvedTheme, not theme: with enableSystem a stored "system" value would
+  // make the first toggle a visual no-op and mislabel the button.
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // next-themes hydration gate: theme is unknowable on the server, so the
@@ -17,6 +19,7 @@ export function ThemeToggle({ className }: { className?: string }) {
   if (!mounted) {
     return (
       <button
+        disabled
         className={cn(
           "p-2 rounded-lg text-muted-foreground",
           className
@@ -28,20 +31,18 @@ export function ThemeToggle({ className }: { className?: string }) {
     );
   }
 
+  const isDark = resolvedTheme === "dark";
+
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
       className={cn(
         "p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer",
         className
       )}
-      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
     >
-      {theme === "dark" ? (
-        <Sun className="h-5 w-5" />
-      ) : (
-        <Moon className="h-5 w-5" />
-      )}
+      {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
     </button>
   );
 }
