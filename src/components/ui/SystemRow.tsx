@@ -1,4 +1,5 @@
 import { ArrowRight, Box } from "lucide-react";
+import Image from "next/image";
 import type { System } from "@/lib/schemas/system";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { MetricFact } from "@/components/ui/MetricFact";
@@ -6,9 +7,11 @@ import { ButtonLink } from "@/components/ui/Button";
 
 interface SystemRowProps {
   system: System;
+  // Resolved server-side (file-existence checked); absent → designed fallback.
+  coverSrc?: string;
 }
 
-export function SystemRow({ system }: SystemRowProps) {
+export function SystemRow({ system, coverSrc }: SystemRowProps) {
   return (
     <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 py-12 border-b border-border last:border-0 group">
       {/* Left Column: Context */}
@@ -66,13 +69,24 @@ export function SystemRow({ system }: SystemRowProps) {
           ))}
         </div>
 
-        {/* Placeholder for DiagramThumb (added in Phase 2/3) */}
-        <div className="w-full h-48 sm:h-64 bg-card border border-border rounded-xl flex items-center justify-center relative overflow-hidden group-hover:border-accent/30 transition-colors">
-          <div className="absolute inset-0 bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] [background-size:16px_16px] opacity-20" />
-          <span className="mono-label text-muted-foreground z-10 flex items-center gap-2">
-            <Box className="w-4 h-4" /> System Diagram Motif
-          </span>
-        </div>
+        {coverSrc ? (
+          <div className="relative w-full aspect-video bg-card border border-border rounded-xl overflow-hidden group-hover:border-accent/30 transition-colors">
+            <Image
+              src={coverSrc}
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 55vw, 100vw"
+              className="object-cover"
+            />
+          </div>
+        ) : (
+          <div className="w-full h-48 sm:h-64 bg-card border border-border rounded-xl flex items-center justify-center relative overflow-hidden group-hover:border-accent/30 transition-colors">
+            <div className="absolute inset-0 bg-[radial-gradient(var(--color-border)_1px,transparent_1px)] [background-size:16px_16px] opacity-20" />
+            <span className="mono-label text-muted-foreground z-10 flex items-center gap-2">
+              <Box className="w-4 h-4" /> System Diagram Motif
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

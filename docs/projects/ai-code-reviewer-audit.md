@@ -76,3 +76,19 @@ CI (`ci.yml`): lint+typecheck / TS tests / web build / Python (ruff+mypy+pytest 
 ## 11. What is **absent** (verified negatives)
 
 No Modal · no `get_pr_discussion` tool (tools = search_code, read_file, find_references, run_tests: `tools/index.ts`) · no OSS-PR golden dataset · no cloud-model eval results · no hosted demo · no injection-attempt logging · languages limited to Python/TS/JS · GitHub integration not on main · no load/perf testing · single semantic-cache TTL strategy (no invalidation beyond expiry).
+
+---
+
+## Addendum — 2026-07-11 status verification (development complete; production on own PRs)
+
+Verified against the local checkout at `~/Work/Personal/ai-code-reviewer` (history through 2026-07-04, `pushed_at` 2026-07-08) and the public GitHub Actions API (queried 2026-07-11). Supersedes the sections noted below.
+
+1. **GitHub-native delivery is on `main`** (supersedes §9 "branch only" and the capability matrix's PARTIAL rows): `packages/github`, `apps/cli`, `apps/worker`, and `.github/workflows/acr-self-review.yml` are all present on `origin/main` (tip 2026-06-13).
+2. **Self-review workflow is operational**: 19 Actions runs of `acr-self-review.yml` per the public API on 2026-07-11 — successes on 2026-07-01 (×2) and 2026-07-08 (one success, one failure in that batch). The agent reviews this repository's own pull requests in CI. This is the system's production surface; there is still **no hosted public demo** and no external-repo deployment.
+3. **Cloud-model eval runs now exist** (supersedes §5 "no committed eval run uses a cloud frontier model"): `evals/results/v1-claude-judge` (judge 0.48, FP rate 1.0, verdict below-bar) and `v1-claude-judge-fixed` (judge 0.993, FP ≈1.57/example, verdict below-bar), both 2026-06-13. The published starting line remains the committed below-bar baseline; the ≥0.8-with-<20%-FP target is still unmet. Dataset v2 does not exist yet.
+4. **Phase 7 Milestone 2** (suggestion blocks): prompt v0.4 shipped 2026-06-12; `docs/prompts.md` records its eval impact as *Pending run* — code shipped, ship-criterion (logged eval delta) not yet met.
+5. **Streaming review results endpoint** with authentication and rate limiting landed 2026-06-13.
+6. **Correctness-audit remediation** of the reasoning core, worker, and replay (2026-07-04) lives on branch `fix/agent-core-audit`, **not yet merged to main**.
+7. Unchanged absences: Phase 7 M3 (daemon/webhooks) and M4 (PR chat) have no code; no injection-attempt telemetry; no measured per-review cost from the self-review runs is committed.
+
+**Status ruling for site copy:** development of the 6-phase plan plus Phase-7 Milestone 1 is complete; the system runs in production scoped to its own repository's PRs. Site `status.kind` may read `production` provided the self-review scoping stays explicit and the below-bar eval baseline remains published.

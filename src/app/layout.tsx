@@ -90,6 +90,24 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/*
+          Dev-only filter for a Next.js-internal false positive: every route
+          logs `Each child in a list should have a unique "key" prop` owned by
+          `OuterLayoutRouter` (framework code) once per hydration. Bisected
+          2026-07-12: fires with template.tsx deleted, with all <head> children
+          keyed, and on next 16.2.10; component stack is empty — no userland
+          frame. Upstream: https://github.com/vercel/next.js/issues/67333.
+          The filter matches ONLY that owner, so genuine key warnings (owned by
+          our components) still surface. Remove once a Next upgrade ships the
+          fix. Not rendered in production builds.
+        */}
+        {process.env.NODE_ENV === "development" && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(()=>{var e=console.error;console.error=function(){var a=Array.prototype.slice.call(arguments);if(typeof a[0]==="string"&&a[0].indexOf('unique "key"')!==-1&&a.some(function(x){return typeof x==="string"&&x.indexOf("OuterLayoutRouter")!==-1}))return;return e.apply(console,a)}})();`,
+            }}
+          />
+        )}
         <link
           rel="preload"
           href="/fonts/Satoshi-Variable.woff2"

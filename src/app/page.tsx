@@ -5,7 +5,7 @@ import { FeaturedSystems } from "@/components/home/FeaturedSystems";
 import { NotesPreview } from "@/components/home/NotesPreview";
 import { ValuePillars } from "@/components/home/ValuePillars";
 import { CTASection } from "@/components/home/CTASection";
-import { getFeaturedSystems } from "@/lib/systems";
+import { getFeaturedSystems, getSystemCoverMap } from "@/lib/systems";
 import { getStats } from "@/lib/data";
 import { getAllNotes } from "@/lib/mdx";
 
@@ -22,6 +22,8 @@ export default async function Home() {
     getStats(),
     getAllNotes(),
   ]);
+  const featured = featuredSystems.slice(0, 3);
+  const covers = await getSystemCoverMap(featured);
 
   return (
     <>
@@ -30,7 +32,7 @@ export default async function Home() {
       </section>
 
       <section className="py-20 md:py-28">
-        <FeaturedSystems systems={featuredSystems.slice(0, 3)} />
+        <FeaturedSystems systems={featured} covers={covers} />
       </section>
 
       {recentNotes.length > 0 && (

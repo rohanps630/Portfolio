@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import { ArrowLeft } from "lucide-react";
 import { GithubIcon } from "@/components/shared/SocialLinks";
 import { Suspense } from "react";
-import { getSystemBySlug, getSystems } from "@/lib/systems";
+import Image from "next/image";
+import { getSystemBySlug, getSystems, getSystemCoverMap } from "@/lib/systems";
 import { getArchitectureBySlug } from "@/content/architectures";
 import { createMetadata, generateOgImageUrl } from "@/lib/seo";
 
@@ -60,6 +61,8 @@ export default async function ProjectPage({ params }: PageProps) {
     notFound();
   }
 
+  const coverSrc = (await getSystemCoverMap([system]))[system.slug];
+
   return (
     <div className="pb-24 pt-24">
       {/* Header */}
@@ -100,10 +103,26 @@ export default async function ProjectPage({ params }: PageProps) {
             className="inline-flex items-center gap-2 mt-6 px-4 py-2 bg-muted/50 hover:bg-muted border border-border rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             <GithubIcon size={16} />
-            View on GitHub — building in public
+            View on GitHub{system.status.kind === "building" ? " — building in public" : ""}
           </a>
         ))}
       </header>
+
+      {/* Cover art — editorial system-diagram motif, decorative (alt="") */}
+      {coverSrc && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+          <div className="relative aspect-video rounded-2xl overflow-hidden border border-border">
+            <Image
+              src={coverSrc}
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1280px) 1216px, 100vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
+      )}
 
       {/* TL;DR Strip */}
       <div className="border-y border-border bg-card/50 backdrop-blur-sm mb-16">

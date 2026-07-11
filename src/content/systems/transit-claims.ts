@@ -13,10 +13,10 @@ export const transitClaims: System = {
   "confidentiality": "Built under confidentiality limits. Numbers are approximate.",
   "role": "Mobile Developer",
   "timeline": {
-    "start": "2022"
+    "start": "2021"
   },
-  "year": "2022",
-  "executiveSummary": "A workflow-centric mobile application that digitizes the entire transit damage claim lifecycle, from initial damage reporting through resolution. By replacing fragmented phone calls, emails, and paper forms with a single source of truth, it cuts claim processing time by 40% and eliminates 70% of communication errors between restoration companies and adjusters.",
+  "year": "2021",
+  "executiveSummary": "A workflow-centric mobile application that digitizes the entire transit damage claim lifecycle, from initial damage reporting through resolution. By replacing fragmented phone calls, emails, and paper forms with a single source of truth, it cuts claim processing time by 40% and eliminates 70% of communication errors between restoration companies and adjusters. The system was delivered to the client.",
   "businessContext": "Furniture restoration companies and transit claims adjusters were coordinating damage claims entirely through phone calls, emails, and paper forms — with no shared source of truth for claim status, photos, or liability. Disputes were common, documentation went missing, and the time between damage report and resolution stretched for weeks. Both parties needed a single workflow they could trust.",
   "problemStatement": "Furniture restoration companies and claims adjusters had no efficient way to communicate about transit damage claims. The existing process was fragmented across phone calls, emails, and paper forms, leading to frequent delays, lost documentation, and disputed liability. There was no single source of truth for claim status, so stakeholders wasted hours tracking down updates manually. The solution needed to support annotated photo evidence, digital signatures, and automated workflow progression while remaining simple enough for non-technical field staff to adopt immediately.",
   "constraints": [

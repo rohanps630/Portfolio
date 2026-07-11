@@ -1,17 +1,34 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import type { System } from "@/lib/schemas/system";
 import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { MetricFact } from "@/components/ui/MetricFact";
+import { ImagePlaceholder } from "@/components/shared/ImagePlaceholder";
 
 interface SystemCardProps {
   system: System;
+  // Resolved server-side (file-existence checked); absent → designed fallback.
+  coverSrc?: string;
 }
 
-export function SystemCard({ system }: SystemCardProps) {
+export function SystemCard({ system, coverSrc }: SystemCardProps) {
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-all duration-300 hover:border-accent/50 hover:shadow-md group relative">
+      {coverSrc ? (
+        <div className="relative aspect-video rounded-xl overflow-hidden border border-border">
+          <Image
+            src={coverSrc}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+            className="object-cover"
+          />
+        </div>
+      ) : (
+        <ImagePlaceholder title={system.title} aspectRatio="video" />
+      )}
       <div className="p-6 flex flex-col flex-grow gap-4">
         <div className="flex justify-between items-start gap-4">
           <h3 className="font-heading text-lg font-bold text-foreground">

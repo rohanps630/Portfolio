@@ -8,16 +8,14 @@ export const aiCodeReviewer: System = {
   "domain": "ai-systems",
   "context": "independent",
   "status": {
-    "kind": "building",
-    "phase": 6,
-    "phaseTotal": 6
+    "kind": "production"
   },
   "role": "Sole Engineer — Architecture, Implementation, Evals",
   "timeline": {
     "start": "2026"
   },
   "year": "2026",
-  "executiveSummary": "An AI agent that reviews pull requests by reasoning over the repository, not just the diff. Built from scratch as a working study of production LLM engineering: a hand-written, model-agnostic agent runtime, hybrid BM25 + vector retrieval with cross-encoder reranking, a versioned eval harness with a committed baseline, two-layer caching, prompt-injection defense, and end-to-end observability. Core build complete — foundations, retrieval, agent runtime, evals, and production concerns — with GitHub-native PR delivery in progress.",
+  "executiveSummary": "An AI agent that reviews pull requests by reasoning over the repository, not just the diff. Built from scratch as a working study of production LLM engineering: a hand-written, model-agnostic agent runtime, hybrid BM25 + vector retrieval with cross-encoder reranking, a versioned eval harness with a committed baseline, two-layer caching, prompt-injection defense, and end-to-end observability. Development complete: the agent runs in production on its own repository, reviewing every pull request through a GitHub Actions self-review workflow.",
   "businessContext": "Every code review tool that calls itself 'AI' fails in one of two ways. Diff-only tools are fast and cheap, but they miss the issues that matter: the caller this change just broke, the interface this new type is supposed to satisfy, the test that now exercises dead code. Mega-prompt tools go to the other extreme — paste the whole repository into context — which is slow (minutes per review), expensive, and still misses the same issues because the model can't attend to everything in a large context window. The gap between those two failure modes is retrieval: identifying the right 3–5% of a repository that is genuinely load-bearing for understanding a given diff, structuring it so the model can reason rather than scan, and measuring with an eval harness whether the retrieval actually improved review quality. No off-the-shelf tool solves this correctly because it requires real retrieval engineering — AST-aware chunking, hybrid search, cross-encoder reranking — not framework glue. That is why this system exists.",
   "problemStatement": "Off-the-shelf AI code review tools either operate only on the diff (missing critical context like callers, type definitions, and tests) or paste the entire repository into a single mega-prompt (slow, expensive, and noisy). The harder, more interesting problem is building an agent that retrieves the right context for each finding, justifies its reasoning, and stays cheap and fast enough to run on every PR. Doing this well requires real retrieval engineering — not LangChain glue — plus evals that catch regressions before they ship, and production-grade observability so you can debug an agent that thinks for itself.",
   "constraints": [
@@ -159,21 +157,21 @@ export const aiCodeReviewer: System = {
   ],
   "outcomes": [
     {
-      "value": "Core complete",
+      "value": "Shipped",
       "label": "Build Status",
-      "description": "Foundations, retrieval, agent runtime, evals, and production concerns are built and tested (426 tests in CI). GitHub delivery package (packages/github) and acr-review CLI are implemented; self-review workflow is the next milestone.",
+      "description": "All build phases complete and tested (426 tests in CI). GitHub delivery (packages/github), the acr-review CLI, and the self-review GitHub Actions workflow are merged to main — the agent reviews this repository's own PRs in CI (19 workflow runs as of 2026-07-11).",
       "provenance": "measured"
     },
     {
       "value": "80%+",
       "label": "Eval Target",
-      "description": "Target: ≥0.8 judge score with <20% false positives on dataset v2 — the committed v1 baseline (judge 0.635, 67% FP, verdict: below-bar) is the published starting line",
+      "description": "Target: ≥0.8 judge score with <20% false positives on dataset v2 — the committed v1 baseline (judge 0.635, 67% FP, verdict: below-bar) is the published starting line; later Claude-judged v1 runs also remain below-bar",
       "provenance": "target"
     },
     {
       "value": "$0.50",
       "label": "Cost Cap",
-      "description": "Hard per-review spend cap enforced inside the agent loop via a per-model pricing table, alongside prompt caching, semantic caching, and tier-based routing. This is a code-enforced ceiling, not a measured average — real-traffic cost will be confirmed once the agent runs on live PRs.",
+      "description": "Hard per-review spend cap enforced inside the agent loop via a per-model pricing table, alongside prompt caching, semantic caching, and tier-based routing. This is a code-enforced ceiling, not a measured average — the agent now runs on its own PRs in CI, but no measured per-review cost from those runs is published yet.",
       "provenance": "scope-fact"
     }
   ],

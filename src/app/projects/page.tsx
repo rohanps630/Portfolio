@@ -1,6 +1,11 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { getSystems, getSystemDomains, getSystemContexts } from "@/lib/systems";
+import {
+  getSystems,
+  getSystemDomains,
+  getSystemContexts,
+  getSystemCoverMap,
+} from "@/lib/systems";
 import { createMetadata } from "@/lib/seo";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { SystemFilter } from "@/components/systems/SystemFilter";
@@ -31,6 +36,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
     if (context && s.context !== context) return false;
     return true;
   });
+
+  const covers = await getSystemCoverMap(filteredSystems);
 
   const tier1 = filteredSystems.filter((s) => s.tier === 1);
   const tier2 = filteredSystems.filter((s) => s.tier === 2);
@@ -71,7 +78,11 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
               <section>
                 <div className="flex flex-col">
                   {tier1.map((system) => (
-                    <SystemRow key={system.slug} system={system} />
+                    <SystemRow
+                      key={system.slug}
+                      system={system}
+                      coverSrc={covers[system.slug]}
+                    />
                   ))}
                 </div>
               </section>
@@ -85,7 +96,11 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {tier2.map((system) => (
-                    <SystemCard key={system.slug} system={system} />
+                    <SystemCard
+                      key={system.slug}
+                      system={system}
+                      coverSrc={covers[system.slug]}
+                    />
                   ))}
                 </div>
               </section>

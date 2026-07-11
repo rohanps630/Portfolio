@@ -10,9 +10,11 @@ import type { System } from "@/lib/schemas/system";
 
 interface FeaturedSystemsProps {
   systems: System[];
+  // slug → cover src, resolved server-side (client components can't touch fs)
+  covers?: Record<string, string>;
 }
 
-export function FeaturedSystems({ systems }: FeaturedSystemsProps) {
+export function FeaturedSystems({ systems, covers }: FeaturedSystemsProps) {
   return (
     <SectionContainer>
       <FadeIn>
@@ -22,7 +24,7 @@ export function FeaturedSystems({ systems }: FeaturedSystemsProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
         {systems.map((system, index) => (
           <FadeIn key={system.slug} delay={index * 0.15}>
-            <SystemCard system={system} />
+            <SystemCard system={system} coverSrc={covers?.[system.slug]} />
           </FadeIn>
         ))}
       </div>
