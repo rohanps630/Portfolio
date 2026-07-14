@@ -8,6 +8,12 @@ updates:
       # Batch minor/patch bumps into one PR; majors stay individual.
       minor-and-patch:
         update-types: ["minor", "patch"]
+    ignore:
+      # TypeScript 7.x is the native (Go) compiler port and doesn't expose the
+      # Node compiler API that Next.js 16.2's built-in type-check step requires,
+      # so the major bump breaks `next build`. Hold at 6.x until Next supports it.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     open-pull-requests-limit: 5
 
   - package-ecosystem: "github-actions"
