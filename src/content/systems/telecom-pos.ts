@@ -81,12 +81,7 @@ export const telecomPos: System = {
     }
   ],
   evidence: [],
-  screenshots: [
-    {
-      src: "/images/projects/telecom-pos/screenshot-1.webp",
-      alt: "Telecom POS Platform Interface"
-    }
-  ],
+  screenshots: [],
   lessons: [
     "React Native Web is an incredibly powerful paradigm for enterprise applications where feature parity across platforms is more important than bespoke platform aesthetics.",
     "A Backend-for-Frontend (BFF) is absolutely mandatory when modernizing a frontend against a sprawling legacy SOAP backend."

@@ -137,20 +137,7 @@ export const aiAutomationHub: System = {
     }
   ],
   "evidence": [],
-  "screenshots": [
-    {
-      "src": "/images/projects/ai-automation-hub/screenshot-1.webp",
-      "alt": "AI-Powered Automation Hub screenshot"
-    },
-    {
-      "src": "/images/projects/ai-automation-hub/screenshot-2.webp",
-      "alt": "AI-Powered Automation Hub screenshot"
-    },
-    {
-      "src": "/images/projects/ai-automation-hub/screenshot-3.webp",
-      "alt": "AI-Powered Automation Hub screenshot"
-    }
-  ],
+  "screenshots": [],
   "lessons": [
     "The hardest design problem wasn't the AI — it was defining when the agent should escalate to a human. A binary confidence threshold produced too many false escalations. The model that worked was a combination of topic classification and conversation length: long conversations on high-value topics got a human, short routine ones were fully automated.",
     "Redis Streams as the message queue backbone worked well for throughput, but required careful consumer group management. When a consumer died mid-processing, the pending entry list grew silently until we added explicit dead-letter handling and monitoring."

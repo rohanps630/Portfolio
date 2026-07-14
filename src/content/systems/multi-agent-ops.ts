@@ -82,12 +82,7 @@ export const multiAgentOps: System = {
     }
   ],
   evidence: [],
-  screenshots: [
-    {
-      src: "/images/projects/multi-agent-ops/screenshot-1.webp",
-      alt: "Multi-Agent Customer Ops Platform Dashboard"
-    }
-  ],
+  screenshots: [],
   lessons: [
     "Formal state machines (XState) are invaluable when building UIs that interact with non-deterministic LLM agent streams.",
     "Observability must be built into the agent framework from day one; retrofitting traces onto a complex multi-agent system is nearly impossible."
