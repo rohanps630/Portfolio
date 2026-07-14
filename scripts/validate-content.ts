@@ -82,10 +82,18 @@ async function main() {
     }
     decisionIdsBySystem.set(system.slug, decisionIds);
 
-    // Evidence rule
+    // Proof rule: a higher-tier system must be backed by *some* proof. That can
+    // be shareable links (evidence), screenshots, OR quantified outcomes.
+    // Confidential client work (schema: context:"client" + confidentiality)
+    // legitimately has no public evidence or screenshots, so its metrics in
+    // `outcomes` are what substantiate the tier — don't force fake assets.
     if (system.tier <= 2) {
-      if (system.evidence.length === 0 && system.screenshots.length === 0) {
-        warn(`Tier ${system.tier} system ${system.slug} has no evidence or screenshots (required in Phase 2)`);
+      if (
+        system.evidence.length === 0 &&
+        system.screenshots.length === 0 &&
+        system.outcomes.length === 0
+      ) {
+        warn(`Tier ${system.tier} system ${system.slug} has no evidence, screenshots, or outcomes (required in Phase 2)`);
       }
     }
   }

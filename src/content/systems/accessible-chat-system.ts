@@ -131,20 +131,7 @@ export const accessibleChatSystem: System = {
     }
   ],
   "evidence": [],
-  "screenshots": [
-    {
-      "src": "/images/projects/accessible-chat-system/screenshot-1.webp",
-      "alt": "Accessible Real-Time Chat System screenshot"
-    },
-    {
-      "src": "/images/projects/accessible-chat-system/screenshot-2.webp",
-      "alt": "Accessible Real-Time Chat System screenshot"
-    },
-    {
-      "src": "/images/projects/accessible-chat-system/screenshot-3.webp",
-      "alt": "Accessible Real-Time Chat System screenshot"
-    }
-  ],
+  "screenshots": [],
   "lessons": [
     "Testing with actual users who have speech and hearing impairments revealed assumptions we hadn't noticed — default browser speech synthesis sounded nothing like natural speech on lower-end Android devices, which forced a server-side fallback engine we hadn't planned for.",
     "ARIA live regions need to be tuned carefully in a chat context: announcing every message immediately interrupts the screen reader mid-sentence. The right pattern was a politeness level that batched rapid messages rather than interrupting on each one."

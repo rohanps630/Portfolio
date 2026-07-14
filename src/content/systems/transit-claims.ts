@@ -131,20 +131,7 @@ export const transitClaims: System = {
     }
   ],
   "evidence": [],
-  "screenshots": [
-    {
-      "src": "/images/projects/transit-claims/screenshot-1.webp",
-      "alt": "Transit Claim Reporting System screenshot"
-    },
-    {
-      "src": "/images/projects/transit-claims/screenshot-2.webp",
-      "alt": "Transit Claim Reporting System screenshot"
-    },
-    {
-      "src": "/images/projects/transit-claims/screenshot-3.webp",
-      "alt": "Transit Claim Reporting System screenshot"
-    }
-  ],
+  "screenshots": [],
   "lessons": [
     "Digitizing a paper workflow doesn't mean automating it — it means making the implicit rules explicit. The biggest discovery was that adjusters had informal escalation criteria that existed only in their heads. Surfacing those as configurable workflow rules was the feature that drove the most adoption.",
     "PDF generation for legally-binding claim forms was harder than anticipated because the output had to match the exact format the insurers' systems expected. We ended up generating PDFs server-side with precise pixel positioning rather than using a template engine."

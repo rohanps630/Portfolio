@@ -96,20 +96,7 @@ export const roofingCrm: System = {
     }
   ],
   "evidence": [],
-  "screenshots": [
-    {
-      "src": "/images/projects/roofing-crm/screenshot-1.webp",
-      "alt": "Roofing Industry CRM screenshot"
-    },
-    {
-      "src": "/images/projects/roofing-crm/screenshot-2.webp",
-      "alt": "Roofing Industry CRM screenshot"
-    },
-    {
-      "src": "/images/projects/roofing-crm/screenshot-3.webp",
-      "alt": "Roofing Industry CRM screenshot"
-    }
-  ],
+  "screenshots": [],
   "lessons": [
     "Ride-alongs with contractors before writing code revealed that photo documentation was more critical than any workflow feature — contractors used photos as liability protection, not just progress tracking. This completely reordered our feature priorities.",
     "The offline-first sync conflict resolution strategy required more edge case handling than expected. The most common failure mode was a contractor editing a job estimate on both their phone and tablet simultaneously, which required a merge strategy rather than last-write-wins."

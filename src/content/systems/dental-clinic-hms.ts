@@ -131,20 +131,7 @@ export const dentalClinicHms: System = {
     }
   ],
   "evidence": [],
-  "screenshots": [
-    {
-      "src": "/images/projects/dental-clinic-hms/screenshot-1.webp",
-      "alt": "Dental Clinic Management System screenshot"
-    },
-    {
-      "src": "/images/projects/dental-clinic-hms/screenshot-2.webp",
-      "alt": "Dental Clinic Management System screenshot"
-    },
-    {
-      "src": "/images/projects/dental-clinic-hms/screenshot-3.webp",
-      "alt": "Dental Clinic Management System screenshot"
-    }
-  ],
+  "screenshots": [],
   "lessons": [
     "Healthcare data security is a first-class architectural concern, not a feature to add later. Row-level security in PostgreSQL and AES-256 at rest were designed in from the start; retrofitting them after the data model exists is significantly more expensive.",
     "The scheduling conflict detection algorithm was the most complex piece of the system — accounting for procedure duration, room turnover time, provider breaks, and emergency slots simultaneously. We ended up modelling it as a constraint-satisfaction problem rather than a calendar query."

@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "validate-content": "bun run scripts/validate-content.ts",
     "check-links": "bun run scripts/check-links.ts",
-    "generate-covers": "bun run scripts/generate-covers.ts"
+    "generate-covers": "bun run scripts/generate-covers.ts",
+    "generate-note-covers": "bun run scripts/generate-note-covers.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

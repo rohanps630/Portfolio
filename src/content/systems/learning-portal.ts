@@ -134,20 +134,7 @@ export const learningPortal: System = {
     }
   ],
   "evidence": [],
-  "screenshots": [
-    {
-      "src": "/images/projects/learning-portal/screenshot-1.webp",
-      "alt": "Interactive Learning Portal screenshot"
-    },
-    {
-      "src": "/images/projects/learning-portal/screenshot-2.webp",
-      "alt": "Interactive Learning Portal screenshot"
-    },
-    {
-      "src": "/images/projects/learning-portal/screenshot-3.webp",
-      "alt": "Interactive Learning Portal screenshot"
-    }
-  ],
+  "screenshots": [],
   "lessons": [
     "WatermelonDB for offline-first sync was the right architectural choice, but its lazy loading model requires careful query design — accessing related records outside of a transaction silently returns stale data. The learning curve cost us a week of debugging before we internalized the pattern.",
     "The analytics pipeline for identifying at-risk learners worked better than expected, but educators didn't trust automated flags without seeing the underlying data. The adoption breakthrough came from showing the raw engagement metrics alongside the flag rather than just surfacing the conclusion."
