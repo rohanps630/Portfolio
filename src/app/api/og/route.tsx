@@ -1,13 +1,95 @@
 import { ImageResponse } from "next/og";
 import { NextRequest } from "next/server";
+import { siteConfig } from "@/content/site";
 
 export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const title = searchParams.get("title") || "Rohan P. Suresh";
-  const subtitle =
-    searchParams.get("subtitle") || "Full Stack Developer";
+  // Bound all reflected input so a long/garbage query can't drive unbounded
+  // rendering work per request. (This does NOT bound the cache key space —
+  // every distinct query string is still a distinct cached image.)
+  const title = (searchParams.get("title") || "Rohan P. Suresh").slice(0, 120);
+  const subtitle = (searchParams.get("subtitle") || "Full Stack & AI Integration Engineer").slice(0, 160);
+  const type = searchParams.get("type") || "default";
+  const extra = (searchParams.get("extra") || "").slice(0, 60); // e.g. series name
+
+  let Content;
+
+  if (type === "system") {
+    Content = (
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+          <div style={{ width: "40px", height: "4px", backgroundColor: "#6366f1" }} />
+          <span style={{ color: "#6366f1", fontSize: "24px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            Case Study
+          </span>
+        </div>
+        <h1 style={{ color: "#f0f0f5", fontSize: "64px", fontWeight: 800, lineHeight: 1.1, margin: 0, maxWidth: "900px" }}>
+          {title}
+        </h1>
+        {subtitle && (
+          <p style={{ color: "#8888a0", fontSize: "32px", marginTop: "10px", maxWidth: "800px", lineHeight: 1.4 }}>
+            {subtitle}
+          </p>
+        )}
+      </div>
+    );
+  } else if (type === "note") {
+    Content = (
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
+          <span style={{ color: "#8b5cf6", fontSize: "24px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            {extra ? `Series: ${extra}` : "Engineering Note"}
+          </span>
+        </div>
+        <h1 style={{ color: "#f0f0f5", fontSize: "64px", fontWeight: 800, lineHeight: 1.1, margin: 0, maxWidth: "900px" }}>
+          {title}
+        </h1>
+        {subtitle && (
+          <p style={{ color: "#8888a0", fontSize: "32px", marginTop: "10px", maxWidth: "800px", lineHeight: 1.4 }}>
+            {subtitle}
+          </p>
+        )}
+      </div>
+    );
+  } else if (type === "explorer") {
+    Content = (
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px", alignItems: "center", textAlign: "center", width: "100%" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+          <div style={{ padding: "12px 24px", border: "2px solid rgba(99, 102, 241, 0.3)", borderRadius: "100px", color: "#6366f1", fontSize: "24px", fontWeight: 600 }}>
+            Architecture Explorer
+          </div>
+        </div>
+        <h1 style={{ color: "#f0f0f5", fontSize: "72px", fontWeight: 800, lineHeight: 1.1, margin: 0 }}>
+          {title}
+        </h1>
+        <div style={{ display: "flex", justifyContent: "center", gap: "16px", marginTop: "40px" }}>
+          <div style={{ width: "60px", height: "60px", borderRadius: "12px", border: "2px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)" }} />
+          <div style={{ width: "60px", height: "60px", borderRadius: "12px", border: "2px solid rgba(99, 102, 241, 0.5)", background: "rgba(99, 102, 241, 0.1)" }} />
+          <div style={{ width: "60px", height: "60px", borderRadius: "12px", border: "2px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)" }} />
+        </div>
+      </div>
+    );
+  } else {
+    Content = (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: "40px" }}>
+          <span style={{ color: "#6366f1", fontSize: "36px", fontWeight: 700 }}>R</span>
+          <span style={{ color: "#f0f0f5", fontSize: "36px", fontWeight: 700 }}>ohan</span>
+          <span style={{ color: "#6366f1", fontSize: "36px", fontWeight: 700 }}>.</span>
+        </div>
+        <h1 style={{ color: "#f0f0f5", fontSize: "72px", fontWeight: 800, lineHeight: 1.1, margin: 0, maxWidth: "900px" }}>
+          {title}
+        </h1>
+        {subtitle && (
+          <p style={{ color: "#8888a0", fontSize: "32px", marginTop: "20px", maxWidth: "800px" }}>
+            {subtitle}
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return new ImageResponse(
     (
@@ -31,8 +113,8 @@ export async function GET(request: NextRequest) {
             position: "absolute",
             top: "-100px",
             right: "-100px",
-            width: "500px",
-            height: "500px",
+            width: "600px",
+            height: "600px",
             borderRadius: "50%",
             background: "radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)",
           }}
@@ -40,82 +122,45 @@ export async function GET(request: NextRequest) {
         <div
           style={{
             position: "absolute",
-            bottom: "-80px",
-            left: "-80px",
-            width: "400px",
-            height: "400px",
+            bottom: "-100px",
+            left: "-100px",
+            width: "500px",
+            height: "500px",
             borderRadius: "50%",
             background: "radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)",
           }}
         />
 
-        {/* Logo */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            marginBottom: "40px",
-          }}
-        >
-          <span style={{ color: "#6366f1", fontSize: "28px", fontWeight: 700 }}>
-            R
-          </span>
-          <span style={{ color: "#f0f0f5", fontSize: "28px", fontWeight: 700 }}>
-            ohan
-          </span>
-          <span style={{ color: "#6366f1", fontSize: "28px", fontWeight: 700 }}>
-            .
-          </span>
-        </div>
-
-        {/* Title */}
-        <h1
-          style={{
-            color: "#f0f0f5",
-            fontSize: "56px",
-            fontWeight: 800,
-            lineHeight: 1.1,
-            margin: 0,
-            maxWidth: "800px",
-          }}
-        >
-          {title}
-        </h1>
-
-        {/* Subtitle */}
-        <p
-          style={{
-            color: "#8888a0",
-            fontSize: "24px",
-            marginTop: "20px",
-            maxWidth: "600px",
-          }}
-        >
-          {subtitle}
-        </p>
+        {Content}
 
         {/* Bottom bar */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: "60px",
-            left: "80px",
-            display: "flex",
-            alignItems: "center",
-            gap: "24px",
-            color: "#8888a0",
-            fontSize: "18px",
-          }}
-        >
-          <span>rohansuresh.dev</span>
-          <span style={{ color: "#1e1e3a" }}>|</span>
-          <span>Full Stack Developer</span>
-        </div>
+        {type !== "explorer" && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: "60px",
+              left: "80px",
+              display: "flex",
+              alignItems: "center",
+              gap: "24px",
+              color: "#8888a0",
+              fontSize: "24px",
+              fontWeight: 500,
+            }}
+          >
+            <span style={{ color: "#f0f0f5" }}>{new URL(siteConfig.url).hostname}</span>
+            <span style={{ color: "#1e1e3a" }}>|</span>
+            <span>Full Stack &amp; AI Integration Engineer</span>
+          </div>
+        )}
       </div>
     ),
     {
       width: 1200,
       height: 630,
+      headers: {
+        "Cache-Control": "public, immutable, no-transform, max-age=31536000",
+      },
     }
   );
 }

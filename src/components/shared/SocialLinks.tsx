@@ -2,7 +2,7 @@ import { Mail } from "lucide-react";
 import { siteConfig } from "@/content/site";
 import { cn } from "@/lib/utils";
 
-function GithubIcon({ size = 20 }: { size?: number }) {
+export function GithubIcon({ size = 20 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -56,18 +56,22 @@ export function SocialLinks({ className, iconSize = 20 }: SocialLinksProps) {
 
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      {links.map((link) => (
-        <a
-          key={link.label}
-          href={link.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          aria-label={link.label}
-        >
-          {link.icon}
-        </a>
-      ))}
+      {links.map((link) => {
+        // target="_blank" on a mailto: opens a blank orphan tab in some
+        // browsers — only external http(s) profiles get a new tab.
+        const isHttp = link.href.startsWith("http");
+        return (
+          <a
+            key={link.label}
+            href={link.href}
+            {...(isHttp ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label={link.label}
+          >
+            {link.icon}
+          </a>
+        );
+      })}
     </div>
   );
 }

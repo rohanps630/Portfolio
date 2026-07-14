@@ -1,0 +1,218 @@
+---
+title: "Async-First Engineering: Collaboration Patterns From Three Years Remote"
+excerpt: "Practical patterns from working on distributed engineering teams across multiple time zones — written RFCs, async standups, PR-driven discussion, and the meetings worth keeping."
+date: "2025-03-01"
+category: "career"
+tags: ["remote-work", "async", "code-review", "process", "engineering"]
+coverImage: "/images/blog/remote-teams.jpg"
+published: false
+---
+
+## The Async-First Mindset
+
+After three years on remote-first engineering teams, the single biggest lesson is that async communication is not just a concession to time zones. It produces better decisions. When engineers write their thoughts instead of speaking off the cuff in a meeting, proposals are more structured, context is preserved for future reference, and introverted team members contribute equally.
+
+The shift to async-first is not about eliminating meetings. It is about making meetings intentional. Every meeting on our team calendar must answer the question: why can this not be a document? If the answer is that it requires real-time debate or relationship building, the meeting stays. If the answer is information sharing, it becomes a written update.
+
+We measured the impact of this policy over six months. Meeting hours per engineer dropped from 12 hours per week to 4.5 hours per week. Pull request throughput increased by 22%. Most telling, our quarterly engagement survey showed that 85% of engineers rated their ability to do deep work as "good" or "excellent," up from 41% before the change.
+
+## What Actually Replaced Meetings
+
+We reduced recurring meetings to two per week: a Monday planning session and a Friday demo. Everything else became async. Technical discussions happen in GitHub PR comments. Architecture decisions are proposed as written RFCs with a 48-hour comment window. Status updates are automated through CI/CD notifications and a daily bot that collects blockers.
+
+### The Async Standup Pattern
+
+Traditional standups are synchronous ceremonies that interrupt deep work. We replaced them with a Slack bot that runs at 9 AM in each engineer's local timezone and posts their responses to a shared channel.
+
+```typescript
+// Async standup bot configuration
+interface StandupConfig {
+  questions: string[];
+  channels: {
+    individual: string; // DM channel for prompts
+    team: string; // Shared channel for responses
+  };
+  schedule: {
+    promptTime: string; // Time in engineer's local timezone
+    reminderAfter: number; // Minutes before sending a reminder
+    deadlineAfter: number; // Minutes before marking as missed
+  };
+}
+
+const standupConfig: StandupConfig = {
+  questions: [
+    "What did you ship or make progress on yesterday?",
+    "What are you working on today?",
+    "Any blockers or decisions needed from the team?",
+  ],
+  channels: {
+    individual: "dm",
+    team: "#eng-standups",
+  },
+  schedule: {
+    promptTime: "09:00",
+    reminderAfter: 60,
+    deadlineAfter: 120,
+  },
+};
+
+// Standup response aggregator
+async function aggregateStandups(
+  responses: StandupResponse[]
+): Promise<string> {
+  const blockers = responses.filter((r) =>
+    r.answers[2] && r.answers[2].toLowerCase() !== "none" && r.answers[2].toLowerCase() !== "no"
+  );
+
+  let summary = `*Daily Standup Summary* - ${new Date().toLocaleDateString()}\n`;
+  summary += `${responses.length} engineers checked in\n\n`;
+
+  if (blockers.length > 0) {
+    summary += `*Blockers requiring attention:*\n`;
+    blockers.forEach((b) => {
+      summary += `- <@${b.userId}>: ${b.answers[2]}\n`;
+    });
+    summary += "\n";
+  }
+
+  responses.forEach((r) => {
+    summary += `*<@${r.userId}>*\n`;
+    summary += `> Yesterday: ${r.answers[0]}\n`;
+    summary += `> Today: ${r.answers[1]}\n\n`;
+  });
+
+  return summary;
+}
+```
+
+The bot surfaces blockers at the top of the summary, which means the team can act on them immediately rather than waiting for everyone to finish speaking in a synchronous standup. Over three months, average blocker resolution time dropped from 1.5 days to 4 hours.
+
+### RFC Process for Architecture Decisions
+
+Every significant technical decision goes through a written RFC. This creates a searchable archive of why decisions were made, which is invaluable when a new team member asks "why do we do it this way?" six months later.
+
+```markdown
+# RFC-042: Migrate from REST to GraphQL for Client Dashboard
+
+## Status: Approved
+## Author: @engineer-name
+## Date: 2025-02-15
+## Reviewers: @tech-lead, @senior-dev, @frontend-lead
+
+## Context
+The client dashboard currently makes 12 REST API calls to load the main view.
+Average load time is 3.2 seconds. Mobile users on slower connections experience
+timeouts. The frontend team spends significant time aggregating data from
+multiple endpoints.
+
+## Proposal
+Adopt GraphQL with Apollo Server for the dashboard API layer. REST endpoints
+remain for third-party integrations and webhook consumers.
+
+## Tradeoffs
+**Pros:**
+- Single request for dashboard data (projected: 800ms load time)
+- Frontend team controls data shape without backend changes
+- Built-in query complexity analysis prevents abuse
+
+**Cons:**
+- Learning curve for 3 engineers unfamiliar with GraphQL
+- Additional caching complexity (Apollo cache vs. our existing Redis layer)
+- Monitoring and observability tooling needs updating
+
+## Decision Criteria
+- Must not regress p95 API latency
+- Must not require more than 2 sprints to implement
+- Must maintain backward compatibility for mobile app v2.x
+
+## Comment Period: 48 hours (closes 2025-02-17)
+```
+
+The 48-hour comment window is deliberate. It gives engineers across all time zones at least one full work day to review and respond. Decisions made in a one-hour meeting inevitably miss input from whoever could not attend.
+
+## Code Review as Culture
+
+In a remote team, pull request reviews are the primary touchpoint between engineers. We established three principles: reviews must happen within four business hours, every review must include at least one positive comment, and nitpicks are labeled as such so authors know what is blocking versus what is optional.
+
+```markdown
+## PR Review Guidelines
+
+- **Blocking**: Security issues, bugs, missing tests
+- **Suggestion**: Better approach exists but current works
+- **Nitpick**: Style preference, not worth blocking (prefix with "nit:")
+
+## Review SLA
+- Small PRs (< 200 lines): 4 business hours
+- Medium PRs (200-500 lines): 8 business hours
+- Large PRs (500+ lines): should be broken up, otherwise 24 hours
+
+## Required Review Checklist
+- [ ] Code compiles and tests pass locally
+- [ ] No security vulnerabilities introduced
+- [ ] Error handling covers edge cases
+- [ ] At least one positive comment included
+```
+
+The "at least one positive comment" rule seemed trivial when we introduced it, but it transformed our review culture. Before the rule, reviews read like a list of complaints. After, reviewers actively looked for things done well, which made authors more receptive to constructive feedback. Our internal survey showed a 30-point improvement in how engineers rated the review experience.
+
+The four-hour SLA matters because review latency is the biggest predictor of cycle time in remote teams. We tracked it: when reviews averaged 2 hours, features shipped in 3 days. When reviews averaged 12 hours, the same features took 8 days. Context switching between PRs while waiting for review was the primary driver.
+
+## Sprint Planning for Distributed Teams
+
+Our planning sessions follow a structured format designed for remote efficiency. The entire planning happens in a shared document before the Monday sync, with the live meeting used only for resolving disagreements and committing to the plan.
+
+```typescript
+// Sprint planning automation
+interface SprintPlan {
+  sprintNumber: number;
+  startDate: string;
+  endDate: string;
+  teamCapacity: {
+    engineer: string;
+    availableDays: number;
+    carryOver: string[]; // Unfinished items from last sprint
+  }[];
+  commitments: {
+    title: string;
+    owner: string;
+    estimate: number; // Story points
+    priority: "P0" | "P1" | "P2";
+    dependencies: string[];
+  }[];
+  metrics: {
+    plannedPoints: number;
+    teamVelocity: number; // Rolling 4-sprint average
+    capacityUtilization: number; // Planned / available, target: 70-80%
+  };
+}
+
+function calculateCapacityUtilization(plan: SprintPlan): number {
+  const totalAvailableDays = plan.teamCapacity.reduce(
+    (sum, member) => sum + member.availableDays,
+    0
+  );
+  const pointsPerDay = plan.metrics.teamVelocity / (totalAvailableDays || 1);
+  const plannedDays = plan.metrics.plannedPoints / pointsPerDay;
+  return Math.round((plannedDays / totalAvailableDays) * 100);
+}
+```
+
+We target 70-80% capacity utilization in planning. Teams that plan to 100% utilization consistently miss their commitments because they have no buffer for production incidents, unexpected complexity, or the inevitable "quick fix" that takes two days. Our completion rate improved from 62% to 88% after we adopted the 75% utilization target.
+
+## Maintaining Human Connection
+
+The hardest part of remote work is preventing isolation. We allocate budget for quarterly in-person offsites focused on relationship building rather than work output. Between offsites, optional virtual coffee chats are randomly paired each week. These small rituals have a measurable impact on retention and collaboration quality.
+
+We also run monthly "show and tell" sessions where engineers demo side projects, interesting tools they found, or technical deep-dives that are not directly related to work. These sessions are recorded for anyone who cannot attend live. Attendance is optional but consistently high, averaging 80% of the team.
+
+## Lessons Learned
+
+**Documentation debt is worse than technical debt in remote teams.** When you cannot tap someone on the shoulder and ask a question, missing documentation blocks progress for hours instead of minutes. We allocate 10% of every sprint to documentation tasks and treat them with the same priority as feature work.
+
+**Timezone overlap matters more than total overlap.** We found that having at least 3 hours of overlap between any two collaborating engineers was the minimum for healthy collaboration. Below that, async processes break down because the feedback loop becomes too slow. We use this as a hiring constraint: new engineers must overlap at least 3 hours with their immediate team.
+
+**Onboarding takes twice as long remotely.** Our onboarding program is 6 weeks for remote engineers compared to 3 weeks when we had an office. The extra time accounts for the relationship building, context absorption, and tool setup that happens naturally in person but must be explicitly structured remotely. Every new hire is paired with a buddy for their first 90 days.
+
+**Tools are not the solution.** We tried every collaboration tool imaginable in the first year. Miro, Notion, Linear, Slack, Discord, Loom, Tuple. The tools matter far less than the processes. A team with strong async habits and clear communication norms will succeed with basic tools. A team with weak processes will fail regardless of how sophisticated their tooling is.
+
+Remote engineering, at the end, is about building trust through transparency. When people can see the work, understand the decisions, and feel connected to their teammates, the geographic distribution becomes irrelevant. The patterns described here are not prescriptive templates — they are starting points that every team should adapt to their own culture, size, and domain.

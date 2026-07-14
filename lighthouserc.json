@@ -1,0 +1,28 @@
+{
+  "ci": {
+    "collect": {
+      "startServerCommand": "bun run start",
+      "url": [
+        "http://localhost:3000/",
+        "http://localhost:3000/projects",
+        "http://localhost:3000/projects/ai-code-reviewer",
+        "http://localhost:3000/notes",
+        "http://localhost:3000/notes/building-ai-code-reviewer",
+        "http://localhost:3000/contact",
+        "http://localhost:3000/resume"
+      ],
+      "numberOfRuns": 3
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", {"minScore": 0.9}],
+        "categories:accessibility": ["error", {"minScore": 0.95}],
+        "categories:best-practices": ["warn", {"minScore": 0.9}],
+        "categories:seo": ["error", {"minScore": 0.95}]
+      }
+    }
+  }
+}

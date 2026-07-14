@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { FadeIn } from "@/components/animations/FadeIn";
-import { MagneticButton } from "@/components/ui/MagneticButton";
 import { SectionContainer } from "@/components/layout/SectionContainer";
 
 export function CTASection() {
@@ -26,13 +24,9 @@ export function CTASection() {
             </p>
 
             <div className="mt-8">
-              <MagneticButton>
-                <Link href="/contact">
-                  <Button variant="primary" size="lg">
-                    Get in Touch
-                  </Button>
-                </Link>
-              </MagneticButton>
+              <ButtonLink href="/contact" variant="primary" size="lg">
+                Get in Touch
+              </ButtonLink>
             </div>
           </div>
         </div>

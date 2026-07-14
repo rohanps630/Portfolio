@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useInView, useReducedMotion } from "framer-motion";
+import { useInView } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface AnimatedCounterProps {
@@ -27,7 +27,7 @@ function RollingDigit({
   isInView: boolean;
 }) {
   const target = parseInt(digit, 10);
-  const [settled, setSettled] = useState(false);
+  const [, setSettled] = useState(false);
 
   useEffect(() => {
     if (!isInView) return;
@@ -43,8 +43,12 @@ function RollingDigit({
       className="inline-block overflow-hidden relative"
       style={{ height: "1em", width: "0.65em" }}
     >
+      {/* The whole rolling column is visual-only; the sr-only span below is
+          the single source screen readers announce (previously the target
+          digit was exposed twice). */}
       <span
         className="inline-flex flex-col"
+        aria-hidden="true"
         style={{
           transform: isInView
             ? `translateY(-${target * 10}%)`
@@ -55,11 +59,7 @@ function RollingDigit({
         }}
       >
         {digits.map((d) => (
-          <span
-            key={d}
-            className="block text-center leading-[1em]"
-            aria-hidden={d !== target}
-          >
+          <span key={d} className="block text-center leading-[1em]">
             {d}
           </span>
         ))}
@@ -78,21 +78,12 @@ export function AnimatedCounter({
   const { numberStr, suffix } = parseValue(value);
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
-  const prefersReducedMotion = useReducedMotion();
-
-  if (prefersReducedMotion) {
-    return (
-      <div className={cn("text-center", className)}>
-        <p className="font-heading text-4xl md:text-5xl font-bold tracking-tight">
-          {value}
-        </p>
-        <p className="mt-2 text-sm text-muted-foreground">{label}</p>
-      </div>
-    );
-  }
+  // No manual reduced-motion branch (it caused a server/client tree mismatch):
+  // the globals.css prefers-reduced-motion rule forces transition-duration to
+  // 0.01ms !important, which collapses the roll to an instant settle.
 
   // Split the numeric portion into individual characters (digits and dots),
-  // preserving the precision the caller provided (e.g. "4.75" stays as "4.75").
+  // preserving the precision the caller provided (e.g. "5.0" stays as "5.0").
   const chars = numberStr.split("");
 
   return (

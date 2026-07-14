@@ -2,47 +2,59 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import readingTime from "reading-time";
-import type { BlogPostMeta, BlogPost, BlogCategory } from "@/types/blog";
+import type { NoteMeta, Note, NoteCategory } from "@/types/note";
 
-const BLOG_DIR = path.join(process.cwd(), "src/content/blog");
+const NOTES_DIR = path.join(process.cwd(), "src/content/notes");
 
 function getPostSlugsFromFiles(): string[] {
   return fs
-    .readdirSync(BLOG_DIR)
+    .readdirSync(NOTES_DIR)
     .filter((file) => file.endsWith(".mdx"))
     .map((file) => file.replace(/\.mdx$/, ""));
 }
 
-function getPostBySlugFromFile(slug: string): BlogPost {
-  const filePath = path.join(BLOG_DIR, `${slug}.mdx`);
+function getNoteBySlugFromFile(slug: string): Note {
+  // The slug arrives from the URL (dynamicParams). Constrain it to slug
+  // characters so it can never traverse out of the notes directory; callers
+  // catch the throw and 404.
+  if (!/^[a-zA-Z0-9-]+$/.test(slug)) {
+    throw new Error(`Invalid note slug: ${slug}`);
+  }
+  const filePath = path.join(NOTES_DIR, `${slug}.mdx`);
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(fileContent);
   const stats = readingTime(content);
 
-  const meta: BlogPostMeta = {
+  const meta: NoteMeta = {
     slug,
     title: data.title,
     excerpt: data.excerpt,
     date: data.date,
-    category: data.category as BlogCategory,
+    category: data.category as NoteCategory,
     tags: data.tags || [],
     coverImage: data.coverImage || "",
-    published: data.published ?? true,
+    // Fail closed: a note missing `published` stays hidden. The schema
+    // requires the field, so this only matters if validation is bypassed.
+    published: data.published ?? false,
     readingTime: stats.text,
+    series: data.series,
+    seriesOrder: data.seriesOrder,
+    relatedSystem: data.relatedSystem,
   };
 
   return { ...meta, content };
 }
 
-function getAllPostsFromFiles(): BlogPostMeta[] {
+function getAllNotesFromFiles(): NoteMeta[] {
   const slugs = getPostSlugsFromFiles();
   return slugs
     .map((slug) => {
-      const post = getPostBySlugFromFile(slug);
-      const { content: _, ...meta } = post;
+      const note = getNoteBySlugFromFile(slug);
+      const { content, ...meta } = note;
+      void content;
       return meta;
     })
-    .filter((post) => post.published)
+    .filter((note) => note.published)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
@@ -50,20 +62,20 @@ export async function getPostSlugs(): Promise<string[]> {
   return getPostSlugsFromFiles();
 }
 
-export async function getPostBySlug(slug: string): Promise<BlogPost> {
-  return getPostBySlugFromFile(slug);
+export async function getNoteBySlug(slug: string): Promise<Note> {
+  return getNoteBySlugFromFile(slug);
 }
 
-export async function getAllPosts(): Promise<BlogPostMeta[]> {
-  return getAllPostsFromFiles();
+export async function getAllNotes(): Promise<NoteMeta[]> {
+  return getAllNotesFromFiles();
 }
 
-export async function getPostsByCategory(category: BlogCategory): Promise<BlogPostMeta[]> {
-  return getAllPostsFromFiles().filter((post) => post.category === category);
+export async function getPostsByCategory(category: NoteCategory): Promise<NoteMeta[]> {
+  return getAllNotesFromFiles().filter((note) => note.category === category);
 }
 
-export async function getAllCategories(): Promise<{ value: BlogCategory; label: string; count: number }[]> {
-  const labels: Record<BlogCategory, string> = {
+export async function getAllCategories(): Promise<{ value: NoteCategory; label: string; count: number }[]> {
+  const labels: Record<NoteCategory, string> = {
     architecture: "Architecture",
     react: "React",
     mobile: "Mobile",
@@ -73,11 +85,11 @@ export async function getAllCategories(): Promise<{ value: BlogCategory; label: 
     accessibility: "Accessibility",
   };
 
-  const posts = getAllPostsFromFiles();
-  const categoryMap = new Map<BlogCategory, number>();
+  const notes = getAllNotesFromFiles();
+  const categoryMap = new Map<NoteCategory, number>();
 
-  for (const post of posts) {
-    categoryMap.set(post.category, (categoryMap.get(post.category) || 0) + 1);
+  for (const note of notes) {
+    categoryMap.set(note.category, (categoryMap.get(note.category) || 0) + 1);
   }
 
   return Array.from(categoryMap.entries())
@@ -87,4 +99,21 @@ export async function getAllCategories(): Promise<{ value: BlogCategory; label: 
       count,
     }))
     .sort((a, b) => b.count - a.count);
+}
+
+export async function getSeriesSlugs(): Promise<string[]> {
+  const notes = getAllNotesFromFiles();
+  const seriesSet = new Set<string>();
+  for (const note of notes) {
+    if (note.series) seriesSet.add(note.series);
+  }
+  return Array.from(seriesSet);
+}
+
+export async function getNotesInSeries(series: string): Promise<NoteMeta[]> {
+  const notes = getAllNotesFromFiles().filter(note => note.series === series);
+  return notes.sort((a, b) => (a.seriesOrder || 0) - (b.seriesOrder || 0));
+}
+export async function getNotesRelatedToSystem(systemSlug: string): Promise<NoteMeta[]> {
+  return getAllNotesFromFiles().filter(note => note.relatedSystem === systemSlug);
 }

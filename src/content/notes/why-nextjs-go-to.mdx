@@ -1,0 +1,181 @@
+---
+title: "Why Next.js is My Go-To for Client Projects (and When I Don't Use It)"
+excerpt: "After building over a dozen production apps with Next.js, here's my honest take on when it shines, when it's overkill, and the alternatives I reach for instead."
+date: "2025-08-05"
+category: "react"
+tags: ["nextjs", "react", "frameworks", "architecture"]
+coverImage: "/images/blog/nextjs-goto.jpg"
+published: false
+---
+
+## The Default Choice
+
+When a client comes to me with a new web project, Next.js is my starting point about eighty percent of the time. The combination of server-side rendering, API routes, file-based routing, and the deployment story with Vercel makes it the fastest path from idea to production for most web applications. The App Router in particular has matured into a genuinely powerful model for building data-driven pages.
+
+Over the past three years I have shipped fourteen production applications with Next.js. They range from a three-page marketing site for a fintech startup to a complex healthcare dashboard with role-based access, real-time data, and HIPAA-compliant infrastructure. That breadth of experience has given me a clear sense of where Next.js excels and where it creates unnecessary friction.
+
+## Where Next.js Shines
+
+The sweet spot is content-heavy applications that also need dynamic features. Marketing sites with a blog, SaaS dashboards with public-facing pages, e-commerce storefronts. Server Components let me fetch data at the component level without client-side waterfalls, and the built-in image optimization alone has saved clients thousands of dollars in bandwidth costs.
+
+```tsx
+// Server Component - zero client JS for this data fetch
+async function PricingTable() {
+  const plans = await db.plans.findMany({ where: { active: true } });
+
+  return (
+    <div className="grid grid-cols-3 gap-6">
+      {plans.map((plan) => (
+        <PricingCard key={plan.id} plan={plan} />
+      ))}
+    </div>
+  );
+}
+```
+
+This component fetches pricing data on the server and ships zero JavaScript to the client for the data-fetching logic. In a traditional React SPA, you would need a loading state, an error state, a useEffect hook, and the entire fetch library bundled into your client JavaScript. With Server Components, the HTML arrives fully rendered.
+
+## SSR vs SSG: Choosing the Right Rendering Strategy
+
+One of the most common mistakes I see is defaulting to server-side rendering for everything. Next.js gives you granular control over rendering strategy at the page level, and choosing correctly has a significant impact on both performance and hosting costs.
+
+```tsx
+// Static Generation - built at deploy time, cached at the edge
+// Ideal for: blog posts, documentation, marketing pages
+export async function generateStaticParams() {
+  const posts = await db.posts.findMany({ select: { slug: true } });
+  return posts.map((post) => ({ slug: post.slug }));
+}
+
+export default async function BlogPost({ params }: { params: { slug: string } }) {
+  const post = await db.posts.findUnique({ where: { slug: params.slug } });
+  return <ArticleLayout post={post} />;
+}
+
+// Server-Side Rendering - generated on every request
+// Ideal for: personalized dashboards, real-time data, user-specific content
+export const dynamic = "force-dynamic";
+
+export default async function Dashboard() {
+  const session = await getSession();
+  const metrics = await db.metrics.findMany({
+    where: { userId: session.userId },
+    orderBy: { createdAt: "desc" },
+    take: 30,
+  });
+
+  return <DashboardLayout metrics={metrics} user={session.user} />;
+}
+```
+
+For a client's marketing site, switching the blog from SSR to SSG reduced their Vercel bill by 40 percent because pages were served from the edge cache instead of invoking a serverless function on every request. Their Time to First Byte dropped from 380 milliseconds to 45 milliseconds for cached pages.
+
+Incremental Static Regeneration sits in between. I use it for content that changes periodically but does not need to be real-time. Product catalog pages with a 60-second revalidation window give users fresh data without the cost of SSR on every request.
+
+## API Route Patterns
+
+Next.js API routes have replaced standalone Express servers for many of my projects. For applications where the backend logic is tightly coupled to the frontend, collocating API routes in the same repository eliminates deployment coordination headaches and lets you share TypeScript types between client and server.
+
+```typescript
+// app/api/projects/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { z } from "zod";
+
+const createProjectSchema = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().max(500).optional(),
+  clientId: z.string().uuid(),
+});
+
+export async function GET(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const searchParams = request.nextUrl.searchParams;
+  const page = parseInt(searchParams.get("page") ?? "1");
+  const limit = parseInt(searchParams.get("limit") ?? "20");
+
+  const [projects, total] = await Promise.all([
+    db.projects.findMany({
+      where: { userId: session.userId },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { updatedAt: "desc" },
+      include: { client: { select: { name: true } } },
+    }),
+    db.projects.count({ where: { userId: session.userId } }),
+  ]);
+
+  return NextResponse.json({
+    projects,
+    pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+  });
+}
+
+export async function POST(request: NextRequest) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const parsed = createProjectSchema.safeParse(body);
+
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+
+  const project = await db.projects.create({
+    data: { ...parsed.data, userId: session.userId },
+  });
+
+  return NextResponse.json(project, { status: 201 });
+}
+```
+
+I always add Zod validation to API routes. It catches malformed requests early, provides clear error messages, and the schema definitions double as documentation. This pattern has prevented countless bugs in production.
+
+## Performance Metrics from Real Projects
+
+Here are concrete numbers from three recent Next.js projects that illustrate the framework's performance characteristics:
+
+A SaaS landing page with blog (SSG) achieved a Lighthouse performance score of 98, with a Largest Contentful Paint of 0.8 seconds and a Total Blocking Time of 12 milliseconds. The client-side JavaScript bundle was 47 KB gzipped.
+
+A healthcare dashboard (SSR with streaming) had a Time to First Byte of 210 milliseconds, with the above-the-fold content interactive within 1.2 seconds. The key optimization was streaming the shell layout immediately while the data-heavy components loaded progressively.
+
+An e-commerce storefront (ISR with 60-second revalidation) served 2.3 million page views per month with an average TTFB of 52 milliseconds from the edge cache. The Vercel bill was $340 per month, compared to $1,200 per month on their previous SSR-only setup.
+
+## When I Reach for Something Else
+
+For highly interactive single-page applications where every view is behind authentication, a plain Vite plus React setup is simpler and avoids the SSR complexity. For static documentation sites, Astro gives better performance out of the box. And for projects where the client's team is more comfortable with Vue, I will use Nuxt without hesitation.
+
+**Remix** is my pick when the application is heavily form-driven. Remix's nested routing with loader and action functions maps naturally to CRUD workflows. For an internal admin tool I built last year, Remix's progressive enhancement meant the forms worked even before JavaScript loaded, which the client's QA team appreciated.
+
+**Astro** wins for content-first sites with minimal interactivity. A documentation site I migrated from Next.js to Astro went from a 92 KB JavaScript bundle to 8 KB because Astro ships zero JavaScript by default and only hydrates the components you explicitly mark as interactive. For a site where 95 percent of pages are static Markdown, that tradeoff is obvious.
+
+**Plain Vite plus React** is what I use for internal tools and SPAs behind authentication. When there is no SEO requirement and every page requires a logged-in user, SSR adds complexity with no benefit. A Vite build produces a static bundle that can be served from any CDN or S3 bucket, and the developer experience with HMR is faster than Next.js dev mode.
+
+## The Honest Tradeoffs
+
+Next.js is not without friction. The App Router's caching behavior can be surprising if you do not invest time understanding it. I have seen developers confused when their dynamic data appears stale because they did not realize Next.js was aggressively caching fetch responses. The `cache: "no-store"` and `revalidate` options need to be understood upfront.
+
+The boundary between server and client components requires discipline. A common mistake is adding `"use client"` to a component just because it imports a hook, and then losing the ability to fetch data on the server anywhere in that component tree. I have a rule: start every component as a Server Component and only add `"use client"` when you need browser APIs, event handlers, or state.
+
+Vendor lock-in to Vercel, while not absolute, is a real consideration for clients who want to self-host. Next.js runs on other platforms, but features like ISR, image optimization, and middleware work best on Vercel. For clients with strict on-premise requirements, I am transparent about these limitations during the proposal phase.
+
+## Lessons Learned
+
+**Use the `next/image` component for everything.** On a recent project, replacing standard img tags with next/image across the site reduced image bandwidth by 62 percent through automatic WebP conversion and responsive sizing. The lazy loading behavior also eliminated layout shift for below-the-fold images.
+
+**Invest in understanding the caching model.** I spend the first thirty minutes of every Next.js project setting up a mental model of the four caching layers: request memoization, data cache, full route cache, and router cache. Getting this wrong leads to either stale data or unnecessary re-renders.
+
+**Use Server Actions for mutations.** Instead of creating API route handlers for every form submission, Server Actions let you colocate the mutation logic with the component. This reduced the number of files in a recent project by 30 percent and eliminated an entire class of client-server type synchronization bugs.
+
+Next.js is not the answer to every problem, but it is a remarkably capable default. The key is knowing when to use it and, just as importantly, when to set it aside.

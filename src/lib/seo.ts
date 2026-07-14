@@ -11,6 +11,15 @@ interface CreateMetadataOptions {
   absoluteTitle?: boolean;
 }
 
+export function generateOgImageUrl(title: string, subtitle?: string, type: "default" | "system" | "note" | "explorer" = "default", extra?: string) {
+  const params = new URLSearchParams();
+  params.set("title", title);
+  if (subtitle) params.set("subtitle", subtitle);
+  if (type !== "default") params.set("type", type);
+  if (extra) params.set("extra", extra);
+  return `${siteConfig.url}/api/og?${params.toString()}`;
+}
+
 export function createMetadata({
   title,
   description,
@@ -21,7 +30,7 @@ export function createMetadata({
   absoluteTitle = false,
 }: CreateMetadataOptions = {}): Metadata {
   const url = `${siteConfig.url}${path}`;
-  const ogImage = image || `${siteConfig.url}/images/og-default.jpg`;
+  const ogImage = image || `${siteConfig.url}/images/og-default.png`;
 
   return {
     title: absoluteTitle && title ? { absolute: title } : title,
@@ -138,12 +147,10 @@ export function buildArticleJsonLd({
     datePublished: date,
     dateModified: date,
     url,
-    image: image || `${siteConfig.url}/images/og-default.jpg`,
-    author: {
-      "@type": "Person",
-      name: siteConfig.name,
-      url: siteConfig.url,
-    },
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    image: image || `${siteConfig.url}/images/og-default.png`,
+    author: { "@id": `${siteConfig.url}/#person` },
+    publisher: { "@id": `${siteConfig.url}/#person` },
   };
 }
 
@@ -157,7 +164,10 @@ export function buildBreadcrumbJsonLd(
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: `${siteConfig.url}${item.href}`,
+      // The final crumb is the current page; per Google, omit `item` on it.
+      ...(index < items.length - 1
+        ? { item: `${siteConfig.url}${item.href}` }
+        : {}),
     })),
   };
 }

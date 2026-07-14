@@ -1,4 +1,5 @@
 import { createMetadata } from "@/lib/seo";
+import { Suspense } from "react";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { ContactInfo } from "@/components/contact/ContactInfo";
@@ -12,7 +13,7 @@ export const metadata = createMetadata({
 
 export default function ContactPage() {
   return (
-    <main className="pt-24 pb-16">
+    <div className="pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading
           as="h1"
@@ -29,10 +30,12 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="lg:col-span-3 lg:order-1">
-            <ContactForm />
+            <Suspense fallback={<div className="h-64 flex items-center justify-center text-muted-foreground">Loading form...</div>}>
+              <ContactForm />
+            </Suspense>
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

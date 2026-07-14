@@ -2,14 +2,21 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { siteConfig } from "@/content/site";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { cn } from "@/lib/utils";
+
+// Code-split the search palette (Pagefind + its UI) out of the initial bundle.
+const CommandPalette = dynamic(
+  () => import("@/components/ui/CommandPalette").then((m) => m.CommandPalette),
+  { ssr: false }
+);
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -17,6 +24,7 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
+    handleScroll(); // initialize — the browser may restore a scroll position with no scroll event
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -45,7 +53,7 @@ export function Navbar() {
               className={cn(
                 "relative px-3 py-2 text-sm font-medium rounded-lg transition-colors",
                 pathname === item.href
-                  ? "text-accent"
+                  ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground link-underline"
               )}
             >
@@ -62,12 +70,11 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
+          <CommandPalette />
           <ThemeToggle />
-          <Link href="/contact" className="hidden md:block">
-            <motion.div whileTap={{ scale: 0.97 }}>
-              <Button size="sm">Contact</Button>
-            </motion.div>
-          </Link>
+          <ButtonLink href="/contact" size="sm" className="hidden md:inline-flex">
+            Contact
+          </ButtonLink>
           <MobileNav />
         </div>
       </nav>

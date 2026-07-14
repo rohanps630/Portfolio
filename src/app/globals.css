@@ -52,6 +52,18 @@
   --color-success: #22c55e;
   --color-error: #ef4444;
   --color-warning: #f59e0b;
+
+  /* Lab Kit tokens */
+  --color-status-production: #22c55e;
+  --color-status-building: #f59e0b;
+  --color-status-archive: #a1a1aa;
+  --color-flow: var(--color-accent);
+  --color-node-bg: var(--color-card);
+  --color-node-border: var(--color-border);
+  --color-code-bg: #09090b;
+  --color-provenance-measured: #22c55e;
+  --color-provenance-target: #f59e0b;
+  --color-provenance-scope: var(--color-muted-foreground);
 }
 
 /* Light mode overrides */
@@ -69,6 +81,18 @@
   --color-success: #16a34a;
   --color-error: #dc2626;
   --color-warning: #d97706;
+
+  /* Lab Kit tokens */
+  --color-status-production: #16a34a;
+  --color-status-building: #d97706;
+  --color-status-archive: #71717a;
+  --color-flow: var(--color-accent);
+  --color-node-bg: var(--color-card);
+  --color-node-border: var(--color-border);
+  --color-code-bg: #f8f8fc;
+  --color-provenance-measured: #16a34a;
+  --color-provenance-target: #d97706;
+  --color-provenance-scope: var(--color-muted-foreground);
 }
 
 /* Base styles */
@@ -82,6 +106,21 @@ body {
   color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@utility text-display {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.05;
+  font-weight: 700;
+  font-family: var(--font-heading);
+}
+
+@utility mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 /* Selection */
@@ -153,9 +192,11 @@ body {
 .prose {
   --tw-prose-body: var(--color-foreground);
   --tw-prose-headings: var(--color-foreground);
-  --tw-prose-links: var(--color-accent);
+  /* accent-hover (lighter indigo) clears WCAG AA 4.5:1 as body-text links in
+     dark mode, where the base accent (#6366f1) lands at ~4.2:1. */
+  --tw-prose-links: var(--color-accent-hover);
   --tw-prose-bold: var(--color-foreground);
-  --tw-prose-code: var(--color-accent);
+  --tw-prose-code: var(--color-accent-hover);
   --tw-prose-pre-bg: var(--color-muted);
   --tw-prose-pre-code: var(--color-foreground);
   --tw-prose-quotes: var(--color-muted-foreground);

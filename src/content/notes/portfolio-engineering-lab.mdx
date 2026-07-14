@@ -1,0 +1,58 @@
+---
+title: "Building a Portfolio as an Engineering Lab"
+excerpt: "Why I rebuilt my portfolio from scratch without a CMS, and how I turned it into a verifiable system to showcase architecture, design, and continuous integration."
+date: "2026-06-12"
+category: "architecture"
+tags: ["nextjs", "typescript", "architecture", "system-design", "ssg"]
+coverImage: "/images/blog/portfolio-lab.jpg"
+published: true
+---
+
+Most portfolios are business cards. You arrive, you scroll past a generic hero section, you look at three thumbnails of past work, and you leave. They solve the problem of *presence*, but they don't solve the problem of *proof*.
+
+When I set out to rebuild this site, I wanted to build an engineering lab—a verifiable system that doesn't just tell you what I can do, but explicitly demonstrates it through its architecture, performance, and accessibility.
+
+Here is how and why I built it.
+
+> **Architectural Decision (ADR-005): Local Markdown & TypeScript over a Headless CMS**
+> 
+> *Status: Accepted (2026-06-01)*
+## 1. Zero-Database Architecture
+
+The easiest way to build a portfolio in 2026 is to connect a Next.js frontend to a Headless CMS. It gives you a nice UI to write posts and manage case studies. I explicitly chose not to do that.
+
+Every piece of content on this site—from the case studies to the engineering notes—lives directly in the git repository as Markdown (`.mdx`) or TypeScript files. 
+
+Why? Because a portfolio's data model is small, static, and authored by exactly one person: me. Introducing a database or a network dependency for content fetching introduces latency, points of failure, and maintenance overhead for zero tangible benefit. By using local files, the entire site can be statically generated (SSG) at build time. The database *is* the build step.
+
+## 2. Interactive Architecture Exploration
+
+I spend a lot of time designing distributed systems. The standard way to showcase this is a PNG exported from Draw.io or Excalidraw. 
+
+I wanted to do better. So I built the **Architecture Explorer**.
+
+<ExplorerLink 
+  slug="ai-code-reviewer" 
+  title="AI Code Reviewer System" 
+/>
+
+The Explorer is a custom React engine built to render interactive node-and-edge diagrams. It allows you to toggle between high-level context, container diagrams, and sequential data flows. It runs on the client using raw SVG paths rather than a heavy diagramming library, with Framer Motion driving the transitions — and it's code-split so it doesn't weigh down first paint.
+
+## 3. A11y and Performance as First Principles
+
+A beautiful site that fails a screen reader audit or takes 4 seconds to load is a failure of engineering.
+
+1. **Accessibility**: I implemented a strict baseline. Every interactive element has a visible focus ring. Contrast ratios meet WCAG AA. And crucially, all Framer Motion animations respect the `prefers-reduced-motion` media query. If you disable animations at the OS level, this site respects that choice.
+2. **Performance**: Because of the SSG architecture, there are no client-side data waterfalls. The heaviest interactive pieces — like the Explorer — are code-split and lazily loaded so they don't block first paint or weigh on the Largest Contentful Paint (LCP).
+
+## 4. The Colophon
+
+Transparency is a core value of this lab. If you're curious about the specific technologies used, the analytics events tracked, or the exact performance targets this site is held to, I maintain a living document.
+
+[Read the Colophon](/colophon)
+
+## What's Next
+
+This site is not "done." It is a living laboratory. As I build new systems, experiment with new AI integration patterns, or discover better ways to optimize React, the results will show up here—both in the code and in the notes.
+
+If you're building something interesting and need a senior engineer who cares about both the architecture and the pixels, [let's talk](/contact).

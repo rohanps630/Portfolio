@@ -10,13 +10,13 @@ import { Certifications } from "@/components/about/Certifications";
 export const metadata = createMetadata({
   title: "About — Full Stack & AI Engineer",
   description:
-    "Rohan P. Suresh — full-stack engineer with 4.75+ years building web, mobile, and AI-integrated systems with React, Node.js, Go, Python & LLMs.",
+    "Rohan P. Suresh — full-stack engineer with 5+ years building web, mobile, and AI-integrated systems with React, Node.js, Go, Python & LLMs.",
   path: "/about",
 });
 
 export default function AboutPage() {
   return (
-    <main className="pt-24 pb-16">
+    <div className="pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <section className="py-12 md:py-20">
@@ -61,6 +61,6 @@ export default function AboutPage() {
           <Certifications />
         </section>
       </div>
-    </main>
+    </div>
   );
 }

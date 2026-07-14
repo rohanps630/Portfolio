@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type Direction = "up" | "down" | "left" | "right";
@@ -28,12 +28,9 @@ export function FadeIn({
   direction = "up",
   className,
 }: FadeInProps) {
-  const prefersReducedMotion = useReducedMotion();
-
-  if (prefersReducedMotion) {
-    return <div className={className}>{children}</div>;
-  }
-
+  // Reduced motion is handled once by MotionConfig reducedMotion="user" in
+  // PublicShell — a manual branch here would render a different element tree
+  // on server (null preference) vs. reduce-motion clients.
   const offset = directionOffset[direction];
 
   return (
