@@ -15,8 +15,9 @@ export const siteConfig = {
     linkedin: "https://linkedin.com/in/rohanpsuresh"
   },
   stats: [
+    // "Products Shipped" is intentionally absent: it is derived from the
+    // systems registry in src/lib/data.ts (getStats) so it cannot drift.
     { label: "Years Building", value: "5" },
-    { label: "Products Shipped", value: "7+" },
     { label: "AI Integrations", value: "4+" }
   ],
   nav: [
