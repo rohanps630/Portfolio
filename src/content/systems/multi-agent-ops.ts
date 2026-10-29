@@ -18,7 +18,7 @@ export const multiAgentOps: System = {
   },
   year: "2026",
   executiveSummary:
-    "Within a team, I built the frontend architecture, agent integration, design system and quality baseline for a multi-tenant AI assistant for enterprise support reps. A rep types a request in plain English; the assistant fetches live data from back-office systems and shows it in interactive panels (tables, charts, forms, step-by-step wizards) beside the chat. This case study covers my decisions, at pattern level, under enterprise confidentiality.",
+    "A multi-tenant AI assistant for enterprise support reps. A rep types a request in plain English; the assistant fetches live data from back-office systems and shows it in interactive panels (tables, charts, forms, step-by-step wizards) beside the chat. This case study covers the frontend architecture, agent integration, design-system and quality decisions, at pattern level, under enterprise confidentiality.",
   businessContext:
     "Support reps jump between several back-office tools (accounts, billing, ticketing and more) for every customer interaction. Calls run long, training is expensive, and the same lookups repeat all day. The goal was one conversation from which a rep can see data, act on it, and finish the interaction.",
   problemStatement:
