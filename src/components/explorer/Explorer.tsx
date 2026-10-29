@@ -84,7 +84,7 @@ export function Explorer({ model, embedded = false }: ExplorerProps) {
           {model.disclosure === "conceptual" && (
             <div className="inline-flex items-center gap-1.5 bg-warning/10 text-foreground border border-warning/40 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide pointer-events-auto backdrop-blur-sm">
               <span className="h-1.5 w-1.5 rounded-full bg-warning" aria-hidden="true" />
-              Conceptual Reconstruction
+              Illustrative Pattern
             </div>
           )}
         </div>

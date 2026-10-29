@@ -42,7 +42,7 @@ export const multiAgentOps: System = {
     },
   ],
   solutionOverview:
-    "A supervisor agent routes each request to specialist sub-agents (Python, Strands Agents, FastAPI, on AWS Bedrock); a fast path handles common requests without a full reasoning loop. A tool layer wraps upstream REST APIs, and sub-agents return a typed panel description that the UI renders. The Next.js/React frontend has its own chat layer built directly on the open AG-UI streaming protocol, wrapped in a React-free module, plus a registry-driven panel system (normalizers, per-panel specs, instance IDs, confirmation lifecycles). IDs travel in structured request context, never in model prose. The tenant is resolved per request from the Host header; per-tenant config is loaded at runtime with a TTL cache and single-flight loading, and fails closed. Sign-in uses Cognito with enterprise SSO (Azure AD / SAML) and token passthrough. Datadog APM carries a W3C traceparent from the browser through the UI server and agent to upstream APIs; browser errors go to a privacy-safe, rate-limited endpoint that strips tokens, IDs and query strings. The platform runs on ECS Fargate.",
+    "A supervisor agent routes each request to specialist sub-agents (Python, Strands Agents, FastAPI, on AWS Bedrock); a fast path handles common requests without a full reasoning loop. A tool layer wraps upstream REST APIs, and sub-agents return a typed panel description that the UI renders. The Next.js/React frontend has its own chat layer built directly on the open AG-UI streaming protocol, wrapped in a React-free module, plus a registry-driven panel system (normalizers, per-panel specs, instance IDs, confirmation lifecycles). IDs travel in structured request context, never in model prose. The tenant is resolved per request at runtime, never from build config, and a missing tenant config fails closed. Sign-in uses Cognito with enterprise SSO (Azure AD / SAML) and token passthrough. Datadog APM carries a W3C traceparent from the browser through the UI server and agent to upstream APIs; browser errors go to a privacy-safe, rate-limited endpoint that strips tokens, IDs and query strings. The platform runs on ECS Fargate.",
   decisions: [
     {
       id: "decision-1",
@@ -82,7 +82,7 @@ export const multiAgentOps: System = {
       id: "decision-3",
       title: "Resolve the tenant per request, fail closed",
       decision:
-        "Resolve the tenant from the Host header on every request and load its config at runtime. A missing or broken config is an error, never a fallback.",
+        "Resolve the tenant on every request and load its config at runtime. A missing or broken config is an error, never a fallback.",
       alternatives: [
         {
           option: "Per-tenant builds or build-time config",
@@ -95,7 +95,7 @@ export const multiAgentOps: System = {
       ],
       rationale:
         "One build and one server serve every tenant, and a wrong-tenant response becomes impossible by construction rather than by care.",
-      cost: "A missing or broken config is a hard outage for that tenant instead of degraded service, and the TTL cache and single-flight loading add complexity.",
+      cost: "A missing or broken config is a hard outage for that tenant instead of degraded service, and caching per-tenant config safely adds complexity.",
       nodeRefs: ["panel-routes", "tool-layer"],
     },
     {
@@ -158,7 +158,7 @@ export const multiAgentOps: System = {
       value: "1 build",
       label: "Every tenant",
       description:
-        "One build and one server serve every tenant on its own subdomain, resolved per request.",
+        "One build and one server serve every tenant, resolved per request.",
       provenance: "scope-fact",
     },
     {
