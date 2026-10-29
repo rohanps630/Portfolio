@@ -6,6 +6,7 @@ out
 dist
 .next
 *.tgz
+next-env.d.ts
 
 # code coverage
 coverage
