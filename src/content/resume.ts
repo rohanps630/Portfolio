@@ -16,13 +16,13 @@ export const resumeData = {
   experience: [
     {
       company: "Innovation Incubator Advisory",
-      role: "Lead Full-Stack Engineer",
+      role: "Software Engineer",
       date: "Jun 2024 — Present",
       description: [
-        "Leading the frontend re-architecture for a multi-agent customer operations platform.",
-        "Establishing observability baselines (OpenTelemetry) for non-deterministic LLM flows.",
-        "Architecting state-machine-driven UIs to handle complex agent orchestration streams.",
-        "Collaborating across teams to deliver production-ready, AI-integrated features.",
+        "Building the frontend architecture and agent integration for a multi-tenant, multi-agent customer operations assistant (Next.js, React, Strands Agents, AWS Bedrock).",
+        "Replaced a third-party chat SDK with an in-house streaming layer on the AG-UI protocol, fixing duplicated and truncated replies.",
+        "Designed backend-checked confirmation for risky agent actions and fail-closed, per-request tenant resolution.",
+        "Added end-to-end Datadog tracing (browser to upstream APIs) and a property-based test baseline (fast-check, Hypothesis).",
       ],
     },
     {

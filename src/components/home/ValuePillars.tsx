@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Search, GitMerge, Layers } from "lucide-react";
+import { Search, ShieldCheck, Layers } from "lucide-react";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { FadeIn } from "@/components/animations/FadeIn";
 import { SectionContainer } from "@/components/layout/SectionContainer";
@@ -16,12 +16,12 @@ const pillars = [
     icon: Search,
   },
   {
-    title: "State Machines for Non-Determinism",
+    title: "Confirmation Belongs in Code",
     description:
-      "LLM agent outputs are non-deterministic. Standard state management produces brittle race conditions. The Multi-Agent Ops platform models agent states explicitly with XState — handling tool failures, human interrupts, and unexpected LLM events without a catch-all error boundary.",
+      "Agent output is non-deterministic, so safety can't depend on it. In the Multi-Agent Ops platform, risky mutations run only when the request carries a structured confirmation from a UI button, checked by the backend. Typed text or model output can never trigger them.",
     proof: "Multi-Agent Customer Ops",
     proofSlug: "/projects/multi-agent-ops",
-    icon: GitMerge,
+    icon: ShieldCheck,
   },
   {
     title: "Single Codebase, Production Scale",
